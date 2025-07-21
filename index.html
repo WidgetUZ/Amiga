@@ -102,16 +102,7 @@
         .window-bar {
             height: 19px; padding: 0 4px; display: flex; align-items: center;
             justify-content: space-between; cursor: move; flex-shrink: 0;
-        }
-        
-        .amiga-window.active .window-bar {
             background-color: var(--amiga-white);
-            color: var(--amiga-black);
-        }
-        .amiga-window.inactive .window-bar {
-            background-image: repeating-linear-gradient(0deg, var(--amiga-black), var(--amiga-black) 1px, transparent 1px, transparent 2px),
-                              repeating-linear-gradient(90deg, var(--amiga-black), var(--amiga-black) 1px, var(--amiga-white) 1px, var(--amiga-white) 2px);
-            background-size: 2px 2px;
             color: var(--amiga-black);
         }
         
@@ -141,13 +132,24 @@
             position: absolute;
             left: 0;
             right: 0;
-            height: 1px;
-            background-color: var(--amiga-black);
         }
-        .title-lines::before { top: 7px; }
-        .title-lines::after { bottom: 7px; }
-        
-        .amiga-window.inactive .title-lines { display: none; }
+
+        .amiga-window.active .title-lines::before, 
+        .amiga-window.active .title-lines::after {
+            height: 2px;
+            background-color: var(--amiga-blue);
+        }
+        .amiga-window.active .title-lines::before { top: 6px; }
+        .amiga-window.active .title-lines::after { bottom: 6px; }
+
+        .amiga-window.inactive .title-lines::before,
+        .amiga-window.inactive .title-lines::after {
+            height: 1px;
+            background-color: transparent;
+            background-image: repeating-linear-gradient(to right, var(--amiga-blue) 0, var(--amiga-blue) 2px, transparent 2px, transparent 4px);
+        }
+        .amiga-window.inactive .title-lines::before { top: 7px; }
+        .amiga-window.inactive .title-lines::after { bottom: 7px; }
 
 
         .window-gadgets { display: flex; align-items: center; }
@@ -172,6 +174,13 @@
             overflow-y: auto;
             color: var(--amiga-white);
             font-size: 9px; line-height: 1.8;
+        }
+        
+        .pixel-art-canvas {
+            display: none; /* Hidden by default */
+            margin: 0 auto 8px auto;
+            border: 2px solid var(--amiga-black);
+            background-color: var(--amiga-white);
         }
         
         .window-content p, .window-content a, .search-result-title a {
@@ -307,7 +316,11 @@
         function createWindowHTML(id, title, pos, type) {
             let contentHTML = '';
             if (type === 'rss') {
-                contentHTML = '<div class="window-content" data-type="rss">Ładowanie...</div>';
+                contentHTML = `
+                    <div class="window-content" data-type="rss">
+                        <canvas id="canvas-${id}" class="pixel-art-canvas" width="128" height="128"></canvas>
+                        <div class="news-items-container">Ładowanie...</div>
+                    </div>`;
             } else if (type === 'google') {
                 contentHTML = `
                     <div class="window-content" data-type="google">
@@ -385,6 +398,33 @@
                 }
             }
         });
+        
+        // --- Pixel Art Function ---
+        function loadImageToPixelArt(url, canvas, proxyUrl) {
+            const ctx = canvas.getContext('2d');
+            let img = new window.Image();
+            img.crossOrigin = "Anonymous";
+            
+            img.onload = function() {
+                canvas.style.display = 'block';
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = 16;
+                tempCanvas.height = 16;
+                
+                tempCtx.imageSmoothingEnabled = false;
+                tempCtx.drawImage(img, 0, 0, 16, 16);
+                
+                ctx.imageSmoothingEnabled = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(tempCanvas, 0, 0, 16, 16, 0, 0, canvas.width, canvas.height);
+            };
+            img.onerror = function() {
+                console.error("Could not load image for pixelation:", url);
+                canvas.style.display = 'none';
+            }
+            img.src = proxyUrl + encodeURIComponent(url);
+        }
 
         async function performSearch(query, windowEl) {
             const resultsContainer = windowEl.querySelector('.search-results');
@@ -423,7 +463,11 @@
         async function loadFeedIntoWindow(windowEl, name, url) {
             const contentEl = windowEl.querySelector('.window-content');
             if (!contentEl || contentEl.dataset.type !== 'rss') return;
-            contentEl.innerHTML = 'Ładowanie...';
+            const newsContainer = contentEl.querySelector('.news-items-container');
+            const canvas = contentEl.querySelector('.pixel-art-canvas');
+            newsContainer.innerHTML = 'Ładowanie...';
+            canvas.style.display = 'none';
+
             const proxyUrl = 'https://corsproxy.io/?';
             
             try {
@@ -438,16 +482,37 @@
                 const items = xml.querySelectorAll("item");
                 if (items.length === 0) throw new Error("No news items found.");
 
+                // Find first image for pixelation
+                let imageUrl = null;
+                const firstItem = items[0];
+                if (firstItem) {
+                    const mediaContent = firstItem.querySelector('content[medium="image"]');
+                    const enclosure = firstItem.querySelector('enclosure[type^="image"]');
+                    if (mediaContent) {
+                        imageUrl = mediaContent.getAttribute('url');
+                    } else if (enclosure) {
+                        imageUrl = enclosure.getAttribute('url');
+                    } else {
+                        const description = firstItem.querySelector('description')?.textContent || '';
+                        const match = description.match(/<img[^>]+src="([^">]+)"/);
+                        if (match) imageUrl = match[1];
+                    }
+                }
+
+                if (imageUrl) {
+                    loadImageToPixelArt(imageUrl, canvas, proxyUrl);
+                }
+
                 let html = "";
                 items.forEach(item => {
                     const title = item.querySelector("title")?.textContent || 'Brak tytułu';
                     const link = item.querySelector("link")?.textContent || '#';
                     html += `<div class="news-item"><strong><a href="${link}" target="_blank">${title}</a></strong></div>`;
                 });
-                contentEl.innerHTML = html;
+                newsContainer.innerHTML = html;
             } catch (error) {
                 console.error(`Error loading RSS for ${name}:`, error);
-                contentEl.innerHTML = `<p>Błąd: Nie można wczytać kanału.<br><small>${error.message}</small></p>`;
+                newsContainer.innerHTML = `<p>Błąd: Nie można wczytać kanału.<br><small>${error.message}</small></p>`;
             }
         }
 
