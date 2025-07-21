@@ -1,43 +1,466 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <title>Amiga Workbench Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Framework w stylu Amigi -->
-  <link rel="stylesheet" href="amigaworkbench.css">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workbench 1.3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --amiga-blue: #0050a8;
+            --amiga-orange: #f77b22;
+            --amiga-black: #000000;
+            --amiga-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--amiga-black);
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            user-select: none;
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMjYiIHZpZXdCb3g9IjAgMCAxOCAyNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCAwTDE3LjAxMjcgMTIuMDMwM0w4LjUwNjMzIDE0LjQzNjRMMTIuMDMwMyAyNS4wNTI1TDguNTA2MzMgMTYuODQyNEwwIDIxLjA1NDVWMFoiIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4='), auto;
+            background-color: var(--amiga-blue);
+        }
+
+        .workbench-screen {
+            background-color: var(--amiga-blue);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .top-bar {
+            background-color: var(--amiga-white);
+            color: var(--amiga-black);
+            height: 19px;
+            border-bottom: 2px solid var(--amiga-black);
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 2px 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .top-bar-text {
+            transform: scaleY(1.2);
+            transform-origin: top;
+        }
+
+        .desktop { padding-top: 35px; padding-left: 20px; padding-right: 20px; }
+
+        .desktop-icon {
+            display: flex; flex-direction: column; align-items: center;
+            width: 90px; cursor: inherit; margin-bottom: 20px;
+        }
+
+        .icon-image {
+            width: 54px; height: 48px; background-color: var(--amiga-white);
+            border: 2px solid var(--amiga-black); position: relative;
+            margin-bottom: 4px; display: flex; align-items: center; justify-content: center;
+        }
+        
+        .disk-icon::before {
+            content: ''; position: absolute; width: 100%; height: 10px;
+            background-color: var(--amiga-orange); top: 0; left: 0;
+        }
+        .disk-icon::after {
+            content: ''; position: absolute; width: 16px; height: 8px;
+            background-color: var(--amiga-white); border: 2px solid var(--amiga-black);
+            bottom: 6px; left: 50%; transform: translateX(-50%);
+        }
+        
+        .icon-label {
+            background-color: transparent; color: var(--amiga-white);
+            padding: 2px 4px; font-size: 8px; text-align: center;
+            border: 1px solid transparent; width: 100%; white-space: nowrap;
+            transform: scaleY(1.2); transform-origin: center;
+        }
+        .desktop-icon:hover .icon-label {
+             background-color: var(--amiga-white); color: var(--amiga-black);
+        }
+        
+        .amiga-window {
+            position: absolute; width: 420px; max-width: 90%; height: 320px;
+            background-color: var(--amiga-white);
+            border: 1px solid;
+            border-color: var(--amiga-white) var(--amiga-black) var(--amiga-black) var(--amiga-white);
+            z-index: 50; display: flex; flex-direction: column;
+            padding: 1px;
+        }
+
+        .window-bar {
+            height: 19px; padding: 0 4px; display: flex; align-items: center;
+            justify-content: space-between; cursor: move; flex-shrink: 0;
+        }
+        
+        .amiga-window.active .window-bar {
+            background-color: var(--amiga-white);
+            color: var(--amiga-black);
+        }
+        .amiga-window.inactive .window-bar {
+            background-image: repeating-linear-gradient(0deg, var(--amiga-black), var(--amiga-black) 1px, transparent 1px, transparent 2px),
+                              repeating-linear-gradient(90deg, var(--amiga-black), var(--amiga-black) 1px, var(--amiga-white) 1px, var(--amiga-white) 2px);
+            background-size: 2px 2px;
+            color: var(--amiga-black);
+        }
+        
+        .window-title-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .window-title {
+            transform: scaleY(1.2);
+            transform-origin: top;
+            padding-top: 2px;
+            white-space: nowrap;
+        }
+
+        .title-lines {
+            flex-grow: 1;
+            height: 100%;
+            margin-left: 8px;
+            position: relative;
+        }
+
+        .title-lines::before, .title-lines::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: var(--amiga-black);
+        }
+        .title-lines::before { top: 7px; }
+        .title-lines::after { bottom: 7px; }
+        
+        .amiga-window.inactive .title-lines { display: none; }
+
+
+        .window-gadgets { display: flex; align-items: center; }
+        .gadget {
+            width: 15px; height: 15px;
+            border: 1px solid;
+            border-color: var(--amiga-white) var(--amiga-black) var(--amiga-black) var(--amiga-white);
+            cursor: inherit; margin: 0 2px; background-color: var(--amiga-white);
+        }
+        
+        .window-content-wrapper {
+            flex-grow: 1;
+            margin: 4px;
+            border: 2px solid var(--amiga-black);
+            background-color: var(--amiga-blue);
+            overflow: hidden;
+        }
+        
+        .window-content {
+            height: 100%;
+            padding: 8px; 
+            overflow-y: auto;
+            color: var(--amiga-white);
+            font-size: 9px; line-height: 1.8;
+        }
+        
+        .window-content p, .window-content a, .search-result-title a {
+            transform: scaleY(1.2);
+            transform-origin: top left;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .news-item, .search-result {
+            margin-bottom: 8px; border-bottom: 1px dashed var(--amiga-blue);
+            padding-bottom: 8px;
+        }
+        .news-item a, .search-result-title a { color: var(--amiga-white); text-decoration: none; }
+        .news-item a:hover, .search-result-title a:hover { color: var(--amiga-orange); }
+
+        .window-content::-webkit-scrollbar { width: 16px; }
+        .window-content::-webkit-scrollbar-track {
+            background: var(--amiga-white);
+            border-left: 2px solid var(--amiga-black);
+        }
+        .window-content::-webkit-scrollbar-thumb {
+            background: var(--amiga-orange);
+            border: 2px solid var(--amiga-black);
+        }
+        
+        .google-search-input {
+            width: 100%;
+            background-color: var(--amiga-white);
+            border: 2px solid var(--amiga-black);
+            padding: 5px;
+            font-family: inherit;
+            font-size: 10px;
+            color: var(--amiga-black);
+            margin-bottom: 8px;
+        }
+        .google-search-input:focus { outline: none; }
+    </style>
 </head>
 <body>
-  <div class="wb-bar">
-    <span>Workbench release.&nbsp;</span><span id="ram">804344 free memory</span>
-  </div>
-  <div class="desktop">
-    <!-- Okna RSS -->
-    <div class="window" id="sport">
-      <div class="window-title">Sport</div>
-      <div class="window-content" id="feed-sport"></div>
+
+    <div class="workbench-screen">
+        <div class="top-bar">
+            <div id="top-bar-text" class="top-bar-text">Workbench Release. 804844 free memory</div>
+            <div class="top-bar-text" id="clock">12:00:00</div>
+        </div>
+
+        <div class="desktop">
+            <div id="desktop-icons" class="flex flex-wrap gap-4"></div>
+        </div>
+
+        <div id="windows-container"></div>
     </div>
-    <div class="window" id="politics">
-      <div class="window-title">Polityka</div>
-      <div class="window-content" id="feed-politics"></div>
-    </div>
-    <div class="window" id="religion">
-      <div class="window-title">Religia katolicka</div>
-      <div class="window-content" id="feed-religion"></div>
-    </div>
-    <div class="window" id="comics">
-      <div class="window-title">Komiksy (pixelart)</div>
-      <div class="window-content" id="feed-comics"></div>
-      <canvas id="pixelart" width="128" height="128"></canvas>
-    </div>
-    <div class="window" id="geopolitics">
-      <div class="window-title">Geopolityka</div>
-      <div class="window-content" id="feed-geopolitics"></div>
-    </div>
-    <!-- Dodaj więcej okien wg potrzeb -->
-  </div>
-  <script src="rss.js"></script>
-  <script src="pixelart.js"></script>
+
+    <script>
+        const feeds = [
+            { id: 'news', name: 'Wiadomości', url: 'https://www.polsatnews.pl/rss/wszystkie.xml', pos: { top: '40px', left: '200px' } },
+            { id: 'sport', name: 'Sport (Interia)', url: 'https://sport.interia.pl/feed', pos: { top: '380px', left: '200px' } },
+            { id: 'retro', name: 'Retro (Eurogamer)', url: 'https://www.eurogamer.pl/feed', pos: { top: '40px', left: '640px' } },
+            { id: 'fdb', name: 'Filmy (FDB.pl)', url: 'https://fdb.pl/rss', pos: { top: '380px', left: '640px' } },
+            { id: 'aleteia', name: 'Aleteia.pl', url: 'https://aleteia.org/pl/feed/', pos: { top: '40px', left: '1080px' } },
+            { id: 'stacja7', name: 'Stacja7', url: 'https://stacja7.pl/feed/', pos: { top: '380px', left: '1080px' } },
+        ];
+        
+        const specialWindows = [
+            { id: 'google', name: 'Google', pos: { top: '720px', left: '640px' } }
+        ];
+
+        let highestZIndex = 100;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDesktop();
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+
+        function setupDesktop() {
+            const iconsContainer = document.getElementById('desktop-icons');
+            const windowsContainer = document.getElementById('windows-container');
+
+            iconsContainer.innerHTML += createIconHTML('Ram Disk', false);
+            iconsContainer.innerHTML += createIconHTML('Workbench', false);
+
+            feeds.forEach((feed) => {
+                iconsContainer.innerHTML += createIconHTML(feed.name, true, feed.id);
+                windowsContainer.innerHTML += createWindowHTML(feed.id, feed.name, feed.pos, 'rss');
+            });
+            
+            specialWindows.forEach((win) => {
+                iconsContainer.innerHTML += createIconHTML(win.name, true, win.id);
+                windowsContainer.innerHTML += createWindowHTML(win.id, win.name, win.pos, win.id);
+            });
+            
+            iconsContainer.innerHTML += createTrashcanIconHTML();
+
+            const allWindows = document.querySelectorAll('.amiga-window');
+            
+            feeds.forEach((feed, index) => {
+                const windowEl = document.getElementById(`window-${feed.id}`);
+                makeWindowFunctional(windowEl, allWindows);
+                loadFeedIntoWindow(windowEl, feed.name, feed.url);
+                activateWindow(windowEl, allWindows, index === 0);
+            });
+
+            specialWindows.forEach((win) => {
+                const windowEl = document.getElementById(`window-${win.id}`);
+                makeWindowFunctional(windowEl, allWindows);
+                activateWindow(windowEl, allWindows, false);
+            });
+        }
+        
+        function activateWindow(windowEl, allWindows, isActive) {
+            if (isActive) {
+                windowEl.classList.add('active');
+                windowEl.classList.remove('inactive');
+                windowEl.style.zIndex = ++highestZIndex;
+            } else {
+                windowEl.classList.add('inactive');
+                windowEl.classList.remove('active');
+            }
+        }
+
+        function createIconHTML(name, isInteractive, id = '') {
+            const dataAttr = isInteractive ? `data-window-id="window-${id}"` : '';
+            const className = isInteractive ? 'desktop-icon interactive-icon' : 'desktop-icon';
+            return `<div class="${className}" ${dataAttr}><div class="icon-image disk-icon"></div><div class="icon-label">${name}</div></div>`;
+        }
+        
+        function createTrashcanIconHTML() {
+            return `<div class="desktop-icon"><div class="icon-image" style="background-color: #fff;"><div style="width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22square%22 stroke-linejoin=%22arcs%22><path d=%22M3 6h18%22></path><path d=%22M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2%22></path></svg>'); background-repeat: no-repeat; background-position: center; background-size: 32px 32px;"></div></div><div class="icon-label">Trashcan</div></div>`;
+        }
+
+        function createWindowHTML(id, title, pos, type) {
+            let contentHTML = '';
+            if (type === 'rss') {
+                contentHTML = '<div class="window-content" data-type="rss">Ładowanie...</div>';
+            } else if (type === 'google') {
+                contentHTML = `
+                    <div class="window-content" data-type="google">
+                        <form id="form-${id}">
+                            <input type="text" class="google-search-input" placeholder="Szukaj i wciśnij Enter...">
+                        </form>
+                        <div class="search-results"></div>
+                    </div>`;
+            }
+
+            return `
+                <div id="window-${id}" class="amiga-window" style="top: ${pos.top}; left: ${pos.left};">
+                    <div class="window-bar">
+                        <div class="window-gadgets"><div class="gadget gadget-close"></div></div>
+                        <div class="window-title-container">
+                           <span class="window-title">${title}</span>
+                           <div class="title-lines"></div>
+                        </div>
+                        <div class="window-gadgets"><div class="gadget gadget-resize"></div></div>
+                    </div>
+                    <div class="window-content-wrapper">${contentHTML}</div>
+                </div>`;
+        }
+
+        function makeWindowFunctional(windowEl, allWindows) {
+            const bar = windowEl.querySelector('.window-bar');
+            const closeGadget = windowEl.querySelector('.gadget-close');
+            let isDragging = false, offsetX, offsetY;
+
+            const bringToFront = () => {
+                highestZIndex++;
+                windowEl.style.zIndex = highestZIndex;
+                allWindows.forEach(win => {
+                    win.classList.remove('active');
+                    win.classList.add('inactive');
+                });
+                windowEl.classList.add('active');
+                windowEl.classList.remove('inactive');
+            };
+
+            bar.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('gadget')) return;
+                isDragging = true;
+                offsetX = e.clientX - windowEl.offsetLeft;
+                offsetY = e.clientY - windowEl.offsetTop;
+                bringToFront();
+            });
+
+            document.addEventListener('mousemove', (e) => { if (isDragging) { windowEl.style.left = `${e.clientX - offsetX}px`; windowEl.style.top = `${e.clientY - offsetY}px`; } });
+            document.addEventListener('mouseup', () => { isDragging = false; });
+            closeGadget.addEventListener('click', () => { windowEl.style.display = 'none'; });
+            windowEl.addEventListener('mousedown', bringToFront, true);
+
+            const googleForm = windowEl.querySelector('form');
+            if (googleForm) {
+                googleForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const input = googleForm.querySelector('.google-search-input');
+                    const query = input.value.trim();
+                    if (query) {
+                        performSearch(query, windowEl);
+                    }
+                });
+            }
+        }
+        
+        document.getElementById('desktop-icons').addEventListener('click', (e) => {
+            const icon = e.target.closest('.interactive-icon');
+            if (icon) {
+                const windowId = icon.dataset.windowId;
+                const windowEl = document.getElementById(windowId);
+                if (windowEl) {
+                    windowEl.style.display = 'flex';
+                    windowEl.dispatchEvent(new MouseEvent('mousedown'));
+                }
+            }
+        });
+
+        async function performSearch(query, windowEl) {
+            const resultsContainer = windowEl.querySelector('.search-results');
+            resultsContainer.innerHTML = '<p>Szukam...</p>';
+            const proxyUrl = 'https://corsproxy.io/?';
+            const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(`${proxyUrl}${encodeURIComponent(searchUrl)}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const text = await response.text();
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                
+                const results = doc.querySelectorAll('.result');
+                if (results.length === 0) throw new Error("Brak wyników.");
+
+                let html = '';
+                results.forEach(result => {
+                    const titleEl = result.querySelector('.result__title a');
+                    const snippetEl = result.querySelector('.result__snippet');
+                    const title = titleEl ? titleEl.innerText.trim() : 'Brak tytułu';
+                    const link = titleEl ? titleEl.href : '#';
+                    const snippet = snippetEl ? snippetEl.innerText.trim() : '';
+                    
+                    html += `<div class="search-result"><div class="search-result-title"><a href="${link}" target="_blank">${title}</a></div><p>${snippet}</p></div>`;
+                });
+                resultsContainer.innerHTML = html;
+            } catch (error) {
+                console.error(`Search failed:`, error);
+                resultsContainer.innerHTML = `<p>Błąd wyszukiwania: ${error.message}</p>`;
+            }
+        }
+
+        async function loadFeedIntoWindow(windowEl, name, url) {
+            const contentEl = windowEl.querySelector('.window-content');
+            if (!contentEl || contentEl.dataset.type !== 'rss') return;
+            contentEl.innerHTML = 'Ładowanie...';
+            const proxyUrl = 'https://corsproxy.io/?';
+            
+            try {
+                const response = await fetch(`${proxyUrl}${encodeURIComponent(url)}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const text = await response.text();
+                
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(text, "application/xml");
+                if (xml.querySelector("parsererror")) throw new Error("Invalid RSS feed format.");
+                
+                const items = xml.querySelectorAll("item");
+                if (items.length === 0) throw new Error("No news items found.");
+
+                let html = "";
+                items.forEach(item => {
+                    const title = item.querySelector("title")?.textContent || 'Brak tytułu';
+                    const link = item.querySelector("link")?.textContent || '#';
+                    html += `<div class="news-item"><strong><a href="${link}" target="_blank">${title}</a></strong></div>`;
+                });
+                contentEl.innerHTML = html;
+            } catch (error) {
+                console.error(`Error loading RSS for ${name}:`, error);
+                contentEl.innerHTML = `<p>Błąd: Nie można wczytać kanału.<br><small>${error.message}</small></p>`;
+            }
+        }
+
+        function updateClock() {
+            const clockElement = document.getElementById('clock');
+            if (clockElement) {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                clockElement.textContent = `${h}:${m}:${s}`;
+            }
+        }
+    </script>
 </body>
 </html>
