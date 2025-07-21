@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Amiga Workbench Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Framework w stylu Amigi -->
+  <link rel="stylesheet" href="amigaworkbench.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wb-bar">
+    <span>Workbench release.&nbsp;</span><span id="ram">804344 free memory</span>
+  </div>
+  <div class="desktop">
+    <!-- Okna RSS -->
+    <div class="window" id="sport">
+      <div class="window-title">Sport</div>
+      <div class="window-content" id="feed-sport"></div>
+    </div>
+    <div class="window" id="politics">
+      <div class="window-title">Polityka</div>
+      <div class="window-content" id="feed-politics"></div>
+    </div>
+    <div class="window" id="religion">
+      <div class="window-title">Religia katolicka</div>
+      <div class="window-content" id="feed-religion"></div>
+    </div>
+    <div class="window" id="comics">
+      <div class="window-title">Komiksy (pixelart)</div>
+      <div class="window-content" id="feed-comics"></div>
+      <canvas id="pixelart" width="128" height="128"></canvas>
+    </div>
+    <div class="window" id="geopolitics">
+      <div class="window-title">Geopolityka</div>
+      <div class="window-content" id="feed-geopolitics"></div>
+    </div>
+    <!-- Dodaj więcej okien wg potrzeb -->
+  </div>
+  <script src="rss.js"></script>
+  <script src="pixelart.js"></script>
+</body>
+</html>
