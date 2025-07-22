@@ -67,7 +67,7 @@
             transform: scaleY(1.2);
             transform-origin: top;
         }
-
+        
         #top-bar-right {
             display: flex;
             gap: 16px;
@@ -264,13 +264,13 @@
             const internetIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M5 0 a 5 5 0 0 1 0 10 a 5 5 0 0 1 0 -10" fill="#fff" stroke="#000" stroke-width="1"/><path d="M5 0v10 M0 5h12 M1 2a6 6 0 0110 0 M1 8a6 6 0 0010 0" fill="none" stroke="#0050a8" stroke-width="1"/></svg>`;
             const sayIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M1 0h10v7H7l-2 3v-3H1z" fill="#fff" stroke="#000" stroke-width="1"/><path d="M3 2h6v1H3zm0 2h6v1H3z" fill="#0050a8"/></svg>`;
             const workbenchIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M0 0h12v8H0z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M1 1h10v6H1z" fill="#0050a8"/><path d="M4 8h4v2H4z" fill="#aaa" stroke="#000" stroke-width="1"/></svg>`;
-            const ramDiskIcon = `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M1 0h5l3 3v7H1z" fill="#fff" stroke="#000" stroke-width="1"/><path d="M6 0v3h3" fill="none" stroke="#000" stroke-width="1"/><path d="M3 5h4v1H3zm0 2h4v1H3z" fill="#0050a8"/></svg>`;
+            const folderIcon = `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M1 0h5l3 3v7H1z" fill="#fff" stroke="#000" stroke-width="1"/><path d="M6 0v3h3" fill="none" stroke="#000" stroke-width="1"/><path d="M3 5h4v1H3zm0 2h4v1H3z" fill="#0050a8"/></svg>`;
             const trashcanIcon = `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M1 2h8v8H1z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M0 2h10v1H0z M3 0h4v2H3z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M3 4h1v5H3zm3 0h1v5H4z" fill="#000"/></svg>`;
 
             iconsLeft.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
             
-            iconsRight.innerHTML += createInteractiveIconHTML('Ram Disk', 'ram-disk-window', ramDiskIcon);
+            iconsRight.innerHTML += createInteractiveIconHTML('Ram Disk', 'ram-disk-window', folderIcon);
             iconsRight.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
             iconsRight.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
 
