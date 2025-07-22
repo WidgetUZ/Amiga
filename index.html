@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.cdnfonts.com/css/amiga-forever" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <!-- Add Readability.js for better text extraction -->
     <script src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.min.js"></script>
     <style>
@@ -26,8 +26,8 @@
         }
 
         body {
-            font-family: 'Amiga Forever', 'Press Start 2P', cursive;
-            font-size: 10px;
+            font-family: 'VT323', monospace;
+            font-size: 22px;
             color: var(--amiga-black);
             -webkit-font-smoothing: none;
             -moz-osx-font-smoothing: grayscale;
@@ -54,27 +54,27 @@
         .top-bar {
             background-color: var(--amiga-black);
             color: var(--amiga-white);
-            height: 19px;
+            height: 28px;
             border-bottom: 2px solid var(--amiga-white);
             width: 100%;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
-            padding: 2px 8px 0;
+            padding: 2px 10px 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         
         .top-bar-text {
-            transform: scaleY(1.2);
-            transform-origin: top;
             white-space: nowrap;
+            font-size: 22px;
         }
         
         #top-bar-right {
             display: flex;
+            align-items: center;
             gap: 16px;
         }
 
@@ -112,46 +112,44 @@
             display: flex;
             flex-direction: column;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 24px;
             align-content: flex-start;
         }
 
         .desktop-icon {
             display: flex; flex-direction: column; align-items: center;
-            width: 90px; cursor: inherit;
+            width: 110px; cursor: inherit;
             text-decoration: none;
         }
 
         .icon-image {
-            width: 54px; height: 48px; 
+            width: 64px; height: 58px; 
             background-color: transparent;
             border: none;
             position: relative;
-            margin-bottom: 4px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 5px; display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
         
         .icon-label { 
             background-color: transparent; 
             color: var(--amiga-white); 
-            padding: 2px 4px; 
-            font-size: 8px; 
+            padding: 3px 5px; 
+            font-size: 18px; 
             text-align: center; 
             border: 1px solid transparent; 
             width: 100%; 
             white-space: normal; /* Allow wrapping */
             word-break: break-word;
-            transform: scaleY(1.2); 
-            transform-origin: center; 
-            min-height: 24px; /* Space for two lines */
+            min-height: 40px; /* Space for two lines */
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .desktop-icon:hover .icon-label { background-color: var(--amiga-white); color: var(--amiga-black); }
+        .desktop-icon:hover .icon-label { color: var(--amiga-orange); }
         
         .amiga-window {
-            position: absolute; width: 420px; max-width: 95%; height: 400px; max-height: 80vh;
+            position: absolute; width: 500px; max-width: 95%; height: 480px; max-height: 80vh;
             background-color: var(--amiga-white);
             border: 1px solid;
             border-color: var(--amiga-white) var(--amiga-black) var(--amiga-black) var(--amiga-white);
@@ -159,49 +157,53 @@
             padding: 1px;
         }
 
-        .window-bar { height: 19px; padding: 0 4px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
+        .window-bar { height: 28px; padding: 0 5px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
         .amiga-window.active .window-bar { color: var(--amiga-blue); }
         .amiga-window.inactive .window-bar { color: var(--amiga-black); }
         .window-title-container { display: flex; align-items: center; width: 100%; height: 100%; overflow: hidden; }
-        .window-title { transform: scaleY(1.2); transform-origin: top; padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .title-lines { flex-grow: 1; height: 100%; margin-left: 8px; position: relative; }
+        .window-title { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 22px; }
+        .title-lines { flex-grow: 1; height: 100%; margin-left: 10px; position: relative; }
         .title-lines::before, .title-lines::after { content: ''; position: absolute; left: 0; right: 0; }
         .amiga-window.active .title-lines::before, .amiga-window.active .title-lines::after { height: 2px; background-color: var(--amiga-blue); }
-        .amiga-window.active .title-lines::before { top: 6px; }
-        .amiga-window.active .title-lines::after { bottom: 6px; }
+        .amiga-window.active .title-lines::before { top: 8px; }
+        .amiga-window.active .title-lines::after { bottom: 8px; }
         .amiga-window.inactive .title-lines::before, .amiga-window.inactive .title-lines::after { height: 1px; background-color: transparent; background-image: repeating-linear-gradient(to right, var(--amiga-blue) 0, var(--amiga-blue) 2px, transparent 2px, transparent 4px); }
-        .amiga-window.inactive .title-lines::before { top: 7px; }
-        .amiga-window.inactive .title-lines::after { bottom: 7px; }
+        .amiga-window.inactive .title-lines::before { top: 9px; }
+        .amiga-window.inactive .title-lines::after { bottom: 9px; }
 
         .window-gadgets { display: flex; align-items: center; }
         .gadget { cursor: inherit; margin: 0 2px; }
         
-        .window-content-wrapper { flex-grow: 1; margin: 4px; border: 2px solid var(--amiga-black); background-color: var(--amiga-blue); overflow: hidden; display: flex; flex-direction: column; }
-        .window-content { flex-grow: 1; padding: 8px; overflow-y: auto; color: var(--amiga-white); font-size: 9px; line-height: 1.8; word-break: break-word; }
+        .window-content-wrapper { flex-grow: 1; margin: 5px; border: 2px solid var(--amiga-black); background-color: var(--amiga-blue); overflow: hidden; display: flex; flex-direction: column; }
+        .window-content { flex-grow: 1; padding: 10px; overflow-y: auto; color: var(--amiga-white); font-size: 20px; line-height: 1.8; word-break: break-word; }
         .window-content a { color: var(--amiga-orange) !important; text-decoration: underline !important; }
 
         
-        .amiga-widget { position: absolute; background-color: var(--amiga-white); border: 1px solid; border-color: var(--amiga-white) var(--amiga-black) var(--amiga-black) var(--amiga-white); z-index: 40; display: flex; flex-direction: column; padding: 1px; }
-        .widget-bar { height: 19px; padding: 0 8px; display: flex; align-items: center; justify-content: center; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); color: var(--amiga-blue); border-bottom: 1px solid var(--amiga-black); }
-        .widget-bar .window-title { padding-top: 2px; }
-        .widget-content { padding: 8px; }
+        .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px solid var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
+        .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; font-size: 28px; }
+        .widget-content { padding: 10px; color: var(--amiga-white); }
+        .widget-content a { color: var(--amiga-orange) !important; }
 
-        #weather-widget { top: 40px; left: calc(50% - 135px); color: var(--amiga-black); font-size: 8px; width: 250px; }
-        #google-widget { top: 180px; left: calc(50% - 150px); width: 280px; }
-        #wiki-widget { top: 320px; left: calc(50% - 165px); width: 310px; height: 250px; }
-        #bible-widget { top: 590px; left: calc(50% - 165px); width: 310px; }
-        
-        #browser-window .browser-bar { padding: 4px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 4px; }
+        #weather-widget { top: 40px; left: calc(50% - 135px); font-size: 18px; width: 320px; }
+        #google-widget { top: 200px; left: calc(50% - 150px); width: 300px; }
+        #wiki-widget { top: 340px; left: calc(50% - 165px); width: 330px; height: 280px; }
+        #bible-widget { top: 640px; left: calc(50% - 165px); width: 330px; }
+        #wiki-search-widget { top: 800px; left: calc(50% - 165px); width: 330px; }
+
+        #google-widget .widget-content { background-color: var(--amiga-blue); }
+        #google-widget .form-input { background-color: var(--amiga-white); font-size: 18px; }
+
+        #browser-window .browser-bar { padding: 5px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 5px; }
         #browser-window .browser-input { flex-grow: 1; }
 
-        .page-render-header { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-        .page-render-favicon { width: 24px; height: 24px; flex-shrink: 0; }
-        .page-render-main-image { max-width: 100%; margin-bottom: 8px; border: 1px solid var(--amiga-black); }
+        .page-render-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .page-render-favicon { width: 28px; height: 28px; flex-shrink: 0; }
+        .page-render-main-image { max-width: 100%; margin-bottom: 10px; border: 1px solid var(--amiga-black); }
         
-        .wiki-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-        .wiki-item canvas { width: 64px; height: auto; flex-shrink: 0; border: 1px solid black; }
-        .wiki-item a { color: var(--amiga-black); text-decoration: none; }
-        .wiki-item a:hover { color: var(--amiga-blue); }
+        .wiki-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .wiki-item canvas { width: 70px; height: auto; flex-shrink: 0; border: 1px solid black; }
+        .wiki-item a { color: var(--amiga-white); text-decoration: none; }
+        .wiki-item a:hover { color: var(--amiga-orange); }
 
 
         @media (max-width: 768px) {
@@ -227,12 +229,13 @@
         <div class="top-bar">
             <div id="top-bar-text" class="top-bar-text"></div>
             <div id="mobile-feeds-menu">
-                <button id="mobile-feeds-menu-btn">Feedy &#9662;</button>
+                <button id="mobile-feeds-menu-btn">RSS &#9662;</button>
                 <div id="mobile-feeds-dropdown"></div>
             </div>
             <div id="top-bar-right">
                 <div class="top-bar-text" id="date"></div>
                 <div class="top-bar-text" id="clock">12:00:00</div>
+                <div id="top-bar-gadget"></div>
             </div>
         </div>
 
@@ -240,25 +243,31 @@
             <div id="desktop-icons-right"></div>
             <div id="widget-container">
                 <div id="weather-widget" class="amiga-widget">
-                     <div class="widget-bar"><span class="window-title">Pogoda</span></div>
+                     <div class="widget-title">Pogoda</div>
                      <div class="widget-content" id="weather-widget-content"></div>
                 </div>
                 <div id="google-widget" class="amiga-widget">
-                    <div class="widget-bar"><span class="window-title">Wyszukiwarka</span></div>
+                    <div class="widget-title">Wyszukiwarka</div>
                     <div class="widget-content">
-                        <div style="font-size: 20px; text-align: center; margin-bottom: 8px;">
-                            <span style="color: #0050a8;">G</span><span style="color: #f77b22;">o</span><span style="color: #f77b22;">o</span><span style="color: #0050a8;">g</span><span style="color: #000;">l</span><span style="color: #f77b22;">e</span>
-                        </div>
+                        <div id="google-logo-container" style="margin-bottom: 8px; text-align: center;"></div>
                         <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
                     </div>
                 </div>
                 <div id="wiki-widget" class="amiga-widget">
-                    <div class="widget-bar"><span class="window-title">Top 5 - Wikipedia.pl</span></div>
+                    <div class="widget-title">Top 5 - Wikipedia.pl</div>
                     <div class="widget-content" id="wiki-widget-content" style="overflow-y: auto;">Ładowanie...</div>
                 </div>
                 <div id="bible-widget" class="amiga-widget">
-                    <div class="widget-bar"><span class="window-title">Słowo na dziś</span></div>
+                    <div class="widget-title">Słowo na dziś</div>
                     <div class="widget-content" id="bible-widget-content">Ładowanie...</div>
+                </div>
+                 <div id="wiki-search-widget" class="amiga-widget">
+                    <div class="widget-title">Wyszukiwarka Wikipedii</div>
+                    <div class="widget-content">
+                        <form id="wiki-search-form">
+                            <input type="text" class="form-input" placeholder="Szukaj w Wikipedii...">
+                        </form>
+                    </div>
                 </div>
             </div>
             <div id="desktop-icons-left"></div>
@@ -295,10 +304,9 @@
             iconsLeft.innerHTML = '';
             iconsRight.innerHTML = '';
 
-            const gmailSVG = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#f77b22" d="M2 5h20v2H2zM2 7h2v12H2zM20 7h2v12h-2zM4 17h16v2H4zM4 9l8 6 8-6v-2l-8 6-8-6z"/></svg>`;
-            
-            // --- NEW PIXEL ART ICONS ---
             const iconBasePath = 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/';
+            const gmailIcon = `<img src="${iconBasePath}gmail_04.jpg" alt="Gmail" class="w-full h-full object-contain">`;
+            const youtubeIcon = `<img src="${iconBasePath}youtube.jpg" alt="YouTube" class="w-full h-full object-contain">`;
             const internetIcon = `<img src="${iconBasePath}internet.jpg" alt="Internet Browser" class="w-full h-full object-contain">`;
             const sayIcon = `<img src="${iconBasePath}say.jpg" alt="Say" class="w-full h-full object-contain">`;
             const workbenchIcon = `<img src="${iconBasePath}workbench.jpg" alt="Workbench" class="w-full h-full object-contain">`;
@@ -307,24 +315,28 @@
             const feedsIcon = `<img src="${iconBasePath}tekst.jpg" alt="Text file" class="w-full h-full object-contain">`;
             const leonardoIcon = `<img src="${iconBasePath}zajaczolw.jpg" alt="Leonardo" class="w-full h-full object-contain">`;
             const ytMusicIcon = `<img src="${iconBasePath}music.jpg" alt="YouTube Music" class="w-full h-full object-contain">`;
-            const youtubeIcon = `<img src="${iconBasePath}youtube.jpg" alt="YouTube" class="w-full h-full object-contain">`;
 
-            iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailSVG);
+            iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailIcon);
             iconsLeft.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeIcon);
             iconsLeft.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('Feedy RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
+            iconsLeft.innerHTML += createInteractiveIconHTML('RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
             iconsLeft.innerHTML += createLinkIconHTML('Leonardo', 'https://app.leonardo.ai', leonardoIcon);
             iconsLeft.innerHTML += createLinkIconHTML('YT Music', 'https://music.youtube.com', ytMusicIcon);
             
-            iconsRight.innerHTML += createInteractiveIconHTML('Ram Disk', 'ram-disk-window', ramDiskIcon);
+            iconsRight.innerHTML += createInteractiveIconHTML('RAM Disk', 'ram-disk-window', ramDiskIcon);
             iconsRight.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
             iconsRight.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
+            
+            const topBarGadget = document.getElementById('top-bar-gadget');
+            topBarGadget.innerHTML = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="black"/><rect x="1" y="4" width="10" height="10" fill="white" stroke="white" stroke-width="2"/><rect x="4" y="1" width="10" height="10" fill="white" stroke="white" stroke-width="2"/></svg>`;
 
+            const ramInfo = `<p>Model: Amiga 600</p><p>Chip RAM: 1.0 MB</p><p>Fast RAM: 0.0 MB</p><p>Wolna pamięć: 804844 bajtów</p><p>Zajęta pamięć: 243732 bajtów</p>`;
             createBrowserWindow();
             createFeedsWindow();
-            createWindowHTML('ram-disk-window', 'Ram Disk', '<p>Zawartość Ram Disk...</p>');
-            createWindowHTML('workbench-window', 'Workbench', '<p>Zawartość Workbench...</p>');
+            createWindowHTML('ram-disk-window', 'RAM Disk', ramInfo);
+            const workbenchWindow = createWindowHTML('workbench-window', 'Workbench', 'Ładowanie informacji z Wikipedii...');
+            fetchAndRenderPage(workbenchWindow, 'https://pl.wikipedia.org/wiki/AmigaOS', false);
             createWindowHTML('trash-window', 'Kosz', '<p>Kosz jest pusty.</p>');
             setupMobileMenu();
 
@@ -344,21 +356,37 @@
             loadWikipediaWidget();
             loadBibleWidget();
             const googleForm = document.getElementById('google-widget-form');
+            const googleLogoContainer = document.getElementById('google-logo-container');
+            googleLogoContainer.innerHTML = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/google.jpg" alt="Google" style="height: 30px; display: inline-block;">`;
             googleForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const input = e.target.querySelector('input');
                 const query = input.value.trim();
                 if (query) { window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank'); input.value = ''; }
             });
+            const wikiSearchForm = document.getElementById('wiki-search-form');
+            wikiSearchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const input = wikiSearchForm.querySelector('input');
+                const query = input.value.trim();
+                if (!query) return;
+                const url = `https://pl.wikipedia.org/wiki/${encodeURIComponent(query)}`;
+                const winId = `wiki-result-${Date.now()}`;
+                const newWindow = createWindowHTML(winId, `Wikipedia: ${query}`, 'Ładowanie...');
+                openWindow(newWindow);
+                fetchAndRenderPage(newWindow, url, false);
+                input.value = '';
+            });
             makeElementDraggable(document.getElementById('weather-widget'));
             makeElementDraggable(document.getElementById('google-widget'));
             makeElementDraggable(document.getElementById('wiki-widget'));
             makeElementDraggable(document.getElementById('bible-widget'));
+            makeElementDraggable(document.getElementById('wiki-search-widget'));
         }
 
         async function loadWeather() {
             const contentEl = document.getElementById('weather-widget-content');
-            const kielceHerbSVG = `<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M4 3 h16 v10 l-8 8 l-8 -8 z" fill="#0050a8" stroke="black" stroke-width="1"/><path d="M7 6 h10 v2 H7z M8 5 h1 v1 H8z M11 5 h2 v1 h-2z M15 5 h1 v1 h-1z" fill="#f77b22"/><path d="M10 11 h-3 v1 h2 v3 h-2 v1 h3 v-5z" fill="white"/><path d="M12 11 h1 v2 l2-2 h1 v5 h-1 v-2 l-2 2 h-1z" fill="white"/></svg>`;
+            const kielceHerbIcon = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 48px; height: 48px; object-fit: contain;">`;
             const weatherIcons = {
                 sunny: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><circle cx="12" cy="12" r="5" fill="#f77b22"/><path d="M12 1V3 M23 12H21 M12 23V21 M1 12H3 M4.22 4.22L5.64 5.64 M18.36 18.36L19.78 19.78 M4.22 19.78L5.64 18.36 M18.36 5.64L19.78 4.22" stroke="#f77b22" stroke-width="2"/></svg>`,
                 cloudy: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 18.5 A4.5 4.5 0 1 1 18 9.5 A6.5 6.5 0 1 1 13 6 A6.5 6.5 0 0 1 19.5 12.5" fill="white" stroke="black" stroke-width="1"/></svg>`,
@@ -387,9 +415,9 @@
             } catch (error) { console.error("Error fetching weather:", error); }
 
             contentEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 4px;">${dynamicIconHTML}${kielceHerbSVG}</div>
+                <div style="display: flex; align-items: center; gap: 4px;">${dynamicIconHTML}${kielceHerbIcon}</div>
                 <div style="text-align: right; line-height: 1.5;">
-                    <div>Kielce</div><div style="font-size: 12px; font-weight: bold;">${temp}</div>
+                    <div>Kielce</div><div style="font-size: 16px; font-weight: bold;">${temp}</div>
                     <div>${cloud}</div><div>${precip}</div>
                 </div>`;
         }
@@ -451,20 +479,11 @@
 
         async function loadBibleWidget() {
             const contentEl = document.getElementById('bible-widget-content');
-            const proxyUrl = 'https://corsproxy.io/?';
-            const apiUrl = 'https://www.biblia-deon.pl/api/czytania.json';
             try {
-                const response = await fetch(`${proxyUrl}${encodeURIComponent(apiUrl)}`);
-                if (!response.ok) throw new Error(`Błąd sieci: ${response.status}`);
+                const response = await fetch('https://beta.ourmanna.com/api/v1/get?format=json&order=daily');
                 const data = await response.json();
-                const firstReading = data.czytania[0]; 
-                const reference = firstReading.skrot;
-                
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(firstReading.tresc, "text/html");
-                const firstParagraph = doc.querySelector('p')?.textContent || "Nie udało się wczytać fragmentu.";
-
-                contentEl.innerHTML = `<p>"${firstParagraph}..."</p><p style="text-align: right;">- ${reference}</p>`;
+                const verse = data.verse.details;
+                contentEl.innerHTML = `<p>"${verse.text}"</p><p style="text-align: right;">- ${verse.reference}</p>`;
             } catch (error) {
                 console.error("Error fetching Bible verse:", error);
                 contentEl.innerHTML = 'Błąd ładowania cytatu.';
@@ -505,7 +524,7 @@
         }
 
         function makeElementDraggable(element) {
-            const bar = element.querySelector('.window-bar, .widget-bar');
+            const bar = element.querySelector('.window-bar, .widget-bar, .widget-title');
             let isDragging = false, offsetX, offsetY;
 
             const onDragStart = (clientX, clientY) => {
@@ -621,7 +640,7 @@
             const linksHTML = initialFeeds.map(feed => 
                 `<p><a href="#" class="feed-link" data-url="${feed.url}" data-name="${feed.name}">${feed.name}</a></p>`
             ).join('');
-            const win = createWindowHTML('feeds-window', 'Feedy RSS', linksHTML, {top: '50px', left: '250px'});
+            const win = createWindowHTML('feeds-window', 'RSS', linksHTML, {top: '50px', left: '250px'});
             win.addEventListener('click', handleFeedLinkClick);
         }
 
@@ -712,7 +731,7 @@
                         if (imageUrl) {
                             setTimeout(() => {
                                 const canvas = document.getElementById(canvasId);
-                                if (canvas) loadImageToPixelArt(canvas, imageUrl, proxyUrl, 64);
+                                if (canvas) loadImageToPixelArt(canvas, imageUrl, proxyUrl, 128);
                             }, 0);
                         }
                     }
@@ -741,7 +760,7 @@
                         canvas.id = `img-canvas-${Math.random().toString(36).substring(7)}`;
                         canvas.style.maxWidth = '100%';
                         img.replaceWith(canvas);
-                        return loadImageToPixelArt(canvas, img.src, proxyUrl, 64);
+                        return loadImageToPixelArt(canvas, img.src, proxyUrl, 128);
                     });
 
                     await Promise.all(imagePromises);
