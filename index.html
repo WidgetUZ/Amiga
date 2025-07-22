@@ -19,6 +19,9 @@
         }
 
         html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
 
@@ -39,11 +42,12 @@
         .workbench-screen {
             background-color: var(--amiga-blue);
             height: 100vh;
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
             padding: 20px;
             padding-top: 40px;
-            padding-bottom: 50px; /* Adjusted bottom margin */
+            padding-bottom: 100px; /* Adjusted bottom margin */
             box-sizing: border-box;
         }
 
@@ -126,7 +130,23 @@
             overflow: hidden;
         }
         
-        .icon-label { background-color: transparent; color: var(--amiga-white); padding: 2px 4px; font-size: 8px; text-align: center; border: 1px solid transparent; width: 100%; white-space: nowrap; transform: scaleY(1.2); transform-origin: center; }
+        .icon-label { 
+            background-color: transparent; 
+            color: var(--amiga-white); 
+            padding: 2px 4px; 
+            font-size: 8px; 
+            text-align: center; 
+            border: 1px solid transparent; 
+            width: 100%; 
+            white-space: normal; /* Allow wrapping */
+            word-break: break-word;
+            transform: scaleY(1.2); 
+            transform-origin: center; 
+            min-height: 24px; /* Space for two lines */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .desktop-icon:hover .icon-label { background-color: var(--amiga-white); color: var(--amiga-black); }
         
         .amiga-window {
@@ -165,13 +185,9 @@
         .widget-bar .window-title { padding-top: 2px; }
         .widget-content { padding: 8px; }
 
-        #weather-widget { top: 120px; left: 50%; transform: translateX(-50%); color: var(--amiga-black); font-size: 8px; width: 250px; }
-        #google-widget { top: 250px; left: 50%; transform: translateX(-50%); width: 280px; }
-        
-        .form-row { margin-bottom: 10px; }
-        .form-row label { display: block; margin-bottom: 5px; color: var(--amiga-white); }
-        .form-input { width: 100%; background-color: var(--amiga-white); border: 2px solid var(--amiga-black); padding: 5px; font-family: inherit; font-size: 10px; color: var(--amiga-black); }
-        .form-button { background-color: var(--amiga-orange); border: 2px solid var(--amiga-black); color: var(--amiga-white); padding: 5px 10px; font-family: inherit; font-size: 10px; cursor: inherit; }
+        #weather-widget { top: 40px; left: calc(50% - 135px); color: var(--amiga-black); font-size: 8px; width: 250px; }
+        #google-widget { top: 180px; left: calc(50% - 150px); width: 280px; }
+        #wiki-widget { top: 320px; left: calc(50% - 165px); width: 310px; height: 250px; }
         
         #browser-window .browser-bar { padding: 4px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 4px; }
         #browser-window .browser-input { flex-grow: 1; }
@@ -179,6 +195,12 @@
         .page-render-header { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
         .page-render-favicon { width: 24px; height: 24px; flex-shrink: 0; }
         .page-render-main-image { max-width: 100%; margin-bottom: 8px; border: 1px solid var(--amiga-black); }
+        
+        .wiki-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .wiki-item canvas { width: 64px; height: auto; flex-shrink: 0; border: 1px solid black; }
+        .wiki-item a { color: var(--amiga-black); text-decoration: none; }
+        .wiki-item a:hover { color: var(--amiga-blue); }
+
 
         @media (max-width: 768px) {
             .desktop { flex-direction: column; }
@@ -188,9 +210,15 @@
             .icon-image { width: 48px; height: 42px; }
             .desktop-icon.hide-on-mobile { display: none; }
             #mobile-feeds-menu { display: block; }
-            #weather-widget, #google-widget { left: 50%; transform: translateX(-50%); width: 90%; }
-            #weather-widget { top: 220px; }
-            #google-widget { top: 360px; }
+
+            .amiga-widget {
+                position: relative;
+                top: auto !important;
+                left: auto !important;
+                transform: none !important;
+                width: 90%;
+                margin: 10px auto 0 auto;
+            }
         }
     </style>
 </head>
@@ -230,12 +258,18 @@
                 <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
             </div>
         </div>
+
+        <div id="wiki-widget" class="amiga-widget">
+            <div class="widget-bar"><span class="window-title">Top 5 - Wikipedia.pl</span></div>
+            <div class="widget-content" id="wiki-widget-content" style="overflow-y: auto;">Ładowanie...</div>
+        </div>
     </div>
 
     <script>
         let highestZIndex = 100;
         const initialFeeds = [
             { name: 'Polsat News', url: 'https://www.polsatnews.pl/rss/wszystkie.xml' },
+            { name: 'Defence24', url: 'https://www.defence24.pl/rss' },
             { name: 'Aleteia.pl', url: 'https://aleteia.org/pl/feed/' },
             { name: 'Superman Homepage', url: 'http://www.supermanhomepage.com/feed/' },
             { name: 'Sport Interia', url: 'https://sport.interia.pl/feed' },
@@ -260,8 +294,8 @@
             const gmailSVG = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#f77b22" d="M2 5h20v2H2zM2 7h2v12H2zM20 7h2v12h-2zM4 17h16v2H4zM4 9l8 6 8-6v-2l-8 6-8-6z"/></svg>`;
             const youtubeSVG = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#0050a8" d="M4 4h16v16H4z"/><path fill="#ffffff" d="M10 8l6 4-6 4z"/></svg>`;
             iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailSVG);
-            iconsLeft.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeSVG);
             
+            // --- NEW PIXEL ART ICONS ---
             const iconBasePath = 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/';
             const internetIcon = `<img src="${iconBasePath}internet.jpg" alt="Internet Browser" class="w-full h-full object-contain">`;
             const sayIcon = `<img src="${iconBasePath}say.jpg" alt="Say" class="w-full h-full object-contain">`;
@@ -269,10 +303,14 @@
             const ramDiskIcon = `<img src="${iconBasePath}floppy.jpg" alt="Floppy Disk" class="w-full h-full object-contain">`;
             const trashcanIcon = `<img src="${iconBasePath}kosz.jpg" alt="Trashcan" class="w-full h-full object-contain">`;
             const feedsIcon = `<img src="${iconBasePath}tekst.jpg" alt="Text file" class="w-full h-full object-contain">`;
+            const leonardoIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M0 0h12v10H0z" fill="#000"/><path d="M2 2h2v6H2z M5 2h1v1H5zm2 0h1v1H7zm2 0h1v1H9z M5 4h5v1H5zm0 2h5v1H5z" fill="#fff"/></svg>`;
+            const ytMusicIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M1 1h10v8H1z" fill="#f00" stroke="#000" stroke-width="1"/><circle cx="6" cy="5" r="3" fill="none" stroke="#fff" stroke-width="1"/><circle cx="6" cy="5" r="1" fill="#fff"/></svg>`;
 
             iconsLeft.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Feedy RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
+            iconsLeft.innerHTML += createLinkIconHTML('Leonardo', 'https://app.leonardo.ai', leonardoIcon);
+            iconsLeft.innerHTML += createLinkIconHTML('YT Music', 'https://music.youtube.com', ytMusicIcon);
             
             iconsRight.innerHTML += createInteractiveIconHTML('Ram Disk', 'ram-disk-window', ramDiskIcon);
             iconsRight.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
@@ -284,10 +322,21 @@
             createWindowHTML('workbench-window', 'Workbench', '<p>Zawartość Workbench...</p>');
             createWindowHTML('trash-window', 'Kosz', '<p>Kosz jest pusty.</p>');
             setupMobileMenu();
+
+            if (window.innerWidth > 768) {
+                const polsatFeed = initialFeeds.find(f => f.name === 'Polsat News');
+                if (polsatFeed) {
+                    const feedId = 'polsat-news-on-start';
+                    const newWindow = createWindowHTML(feedId, polsatFeed.name, 'Ładowanie...');
+                    openWindow(newWindow);
+                    fetchAndRenderPage(newWindow, polsatFeed.url, true);
+                }
+            }
         }
         
         function setupWidgets() {
             loadWeather();
+            loadWikipediaWidget();
             const googleForm = document.getElementById('google-widget-form');
             googleForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -297,15 +346,16 @@
             });
             makeElementDraggable(document.getElementById('weather-widget'));
             makeElementDraggable(document.getElementById('google-widget'));
+            makeElementDraggable(document.getElementById('wiki-widget'));
         }
 
         async function loadWeather() {
             const contentEl = document.getElementById('weather-widget-content');
             const kielceHerbSVG = `<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M4 3 h16 v10 l-8 8 l-8 -8 z" fill="#0050a8" stroke="black" stroke-width="1"/><path d="M7 6 h10 v2 H7z M8 5 h1 v1 H8z M11 5 h2 v1 h-2z M15 5 h1 v1 h-1z" fill="#f77b22"/><path d="M10 11 h-3 v1 h2 v3 h-2 v1 h3 v-5z" fill="white"/><path d="M12 11 h1 v2 l2-2 h1 v5 h-1 v-2 l-2 2 h-1z" fill="white"/></svg>`;
             const weatherIcons = {
-                sunny: `<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><circle cx="12" cy="12" r="5" fill="#f77b22"/><path d="M12 1V3 M23 12H21 M12 23V21 M1 12H3 M4.22 4.22L5.64 5.64 M18.36 18.36L19.78 19.78 M4.22 19.78L5.64 18.36 M18.36 5.64L19.78 4.22" stroke="#f77b22" stroke-width="2"/></svg>`,
-                cloudy: `<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 18.5 A4.5 4.5 0 1 1 18 9.5 A6.5 6.5 0 1 1 13 6 A6.5 6.5 0 0 1 19.5 12.5" fill="white" stroke="black" stroke-width="1"/></svg>`,
-                rain: `<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 14.5 A4.5 4.5 0 1 1 18 5.5 A6.5 6.5 0 1 1 13 2 A6.5 6.5 0 0 1 19.5 8.5" fill="white" stroke="black" stroke-width="1"/><path d="M10 16 L8 18 M14 16 L12 18 M18 16 L16 18 M10 20 L8 22 M14 20 L12 22" stroke="#0050a8" stroke-width="2"/></svg>`,
+                sunny: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><circle cx="12" cy="12" r="5" fill="#f77b22"/><path d="M12 1V3 M23 12H21 M12 23V21 M1 12H3 M4.22 4.22L5.64 5.64 M18.36 18.36L19.78 19.78 M4.22 19.78L5.64 18.36 M18.36 5.64L19.78 4.22" stroke="#f77b22" stroke-width="2"/></svg>`,
+                cloudy: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 18.5 A4.5 4.5 0 1 1 18 9.5 A6.5 6.5 0 1 1 13 6 A6.5 6.5 0 0 1 19.5 12.5" fill="white" stroke="black" stroke-width="1"/></svg>`,
+                rain: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 14.5 A4.5 4.5 0 1 1 18 5.5 A6.5 6.5 0 1 1 13 2 A6.5 6.5 0 0 1 19.5 8.5" fill="white" stroke="black" stroke-width="1"/><path d="M10 16 L8 18 M14 16 L12 18 M18 16 L16 18 M10 20 L8 22 M14 20 L12 22" stroke="#0050a8" stroke-width="2"/></svg>`,
             };
             
             let dynamicIconHTML = weatherIcons.cloudy;
@@ -337,6 +387,61 @@
                 </div>`;
         }
         
+        async function loadWikipediaWidget() {
+            const contentEl = document.getElementById('wiki-widget-content');
+            try {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const year = yesterday.getFullYear();
+                const month = String(yesterday.getMonth() + 1).padStart(2, '0');
+                const day = String(yesterday.getDate()).padStart(2, '0');
+
+                const topViewsUrl = `https://wikimedia.org/api/rest_v1/metrics/pageviews/top/pl.wikipedia.org/all-access/${year}/${month}/${day}`;
+                const response = await fetch(topViewsUrl);
+                const data = await response.json();
+                const articles = data.items[0].articles
+                    .filter(a => !a.article.includes(':')) // Filter out special pages
+                    .slice(0, 5);
+                
+                const titles = articles.map(a => a.article).join('|');
+                const imagesUrl = `https://pl.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=thumbnail&pithumbsize=100&titles=${encodeURIComponent(titles)}&origin=*`;
+                
+                const imgResponse = await fetch(imagesUrl);
+                const imgData = await imgResponse.json();
+                const pages = imgData.query.pages;
+
+                let html = '';
+                for (const article of articles) {
+                    const page = Object.values(pages).find(p => p.title === article.article.replace(/_/g, ' '));
+                    const imageUrl = page?.thumbnail?.source;
+                    const canvasId = `wiki-canvas-${page?.pageid || Math.random()}`;
+                    
+                    html += `<div class="wiki-item">`;
+                    if (imageUrl) {
+                        html += `<canvas id="${canvasId}"></canvas>`;
+                    }
+                    html += `<a href="https://pl.wikipedia.org/wiki/${article.article}" target="_blank">${article.article.replace(/_/g, ' ')}</a></div>`;
+                }
+                contentEl.innerHTML = html;
+
+                for (const article of articles) {
+                    const page = Object.values(pages).find(p => p.title === article.article.replace(/_/g, ' '));
+                    const imageUrl = page?.thumbnail?.source;
+                    if (imageUrl) {
+                        const canvasId = `wiki-canvas-${page.pageid}`;
+                        setTimeout(() => {
+                           const canvas = document.getElementById(canvasId);
+                           if (canvas) loadImageToPixelArt(canvas, imageUrl, 'https://corsproxy.io/?', 48);
+                        }, 0);
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error fetching Wikipedia data:", error);
+                contentEl.innerHTML = 'Błąd ładowania danych.';
+            }
+        }
+        
         function createLinkIconHTML(name, url, svgContent) {
             return `<a href="${url}" target="_blank" class="desktop-icon"><div class="icon-image">${svgContent}</div><div class="icon-label">${name}</div></a>`;
         }
@@ -355,12 +460,13 @@
 
             const closeGadgetSVG = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"/><rect x="4" y="4" width="7" height="7" fill="black"/></svg>`;
             const depthGadgetSVG = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"/><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"/></svg>`;
-            
+            const zoomGadgetSVG = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="4" width="10" height="10" fill="black"/><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"/></svg>`;
+
             windowEl.innerHTML = `
                 <div class="window-bar">
                     <div class="window-gadgets"><div class="gadget gadget-close">${closeGadgetSVG}</div></div>
                     <div class="window-title-container"><span class="window-title">${title}</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth">${depthGadgetSVG}</div></div>
+                    <div class="window-gadgets"><div class="gadget gadget-depth">${depthGadgetSVG}</div><div class="gadget gadget-zoom">${zoomGadgetSVG}</div></div>
                 </div>
                 <div class="window-content-wrapper"><div class="window-content">${contentHTML}</div></div>`;
             
@@ -419,14 +525,15 @@
             if(closeGadget) closeGadget.addEventListener('click', () => { element.style.display = 'none'; });
         }
         
-        function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 96) {
+        function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 48) {
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let img = new Image();
             img.crossOrigin = "Anonymous";
             img.onload = function() {
                 const ratio = img.width / img.height;
-                canvas.height = canvas.width / ratio;
+                canvas.width = maxPixelSize;
+                canvas.height = maxPixelSize / ratio;
                 const tempCanvas = document.createElement('canvas');
                 const tempCtx = tempCanvas.getContext('2d');
                 tempCanvas.width = maxPixelSize;
@@ -567,7 +674,7 @@
                         if (imageUrl) {
                             setTimeout(() => {
                                 const canvas = document.getElementById(canvasId);
-                                if (canvas) loadImageToPixelArt(canvas, imageUrl, proxyUrl, 256);
+                                if (canvas) loadImageToPixelArt(canvas, imageUrl, proxyUrl, 64);
                             }, 0);
                         }
                     }
@@ -596,7 +703,7 @@
                         canvas.id = `img-canvas-${Math.random().toString(36).substring(7)}`;
                         canvas.style.maxWidth = '100%';
                         img.replaceWith(canvas);
-                        return loadImageToPixelArt(canvas, img.src, proxyUrl, 256);
+                        return loadImageToPixelArt(canvas, img.src, proxyUrl, 64);
                     });
 
                     await Promise.all(imagePromises);
@@ -629,3 +736,4 @@
     </script>
 </body>
 </html>
+
