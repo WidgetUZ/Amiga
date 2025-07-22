@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/amiga-forever" rel="stylesheet">
     <!-- Add Readability.js for better text extraction -->
     <script src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.min.js"></script>
     <style>
@@ -26,7 +26,7 @@
         }
 
         body {
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'Amiga Forever', 'Press Start 2P', cursive;
             font-size: 10px;
             color: var(--amiga-black);
             -webkit-font-smoothing: none;
@@ -46,7 +46,7 @@
             overflow-x: hidden;
             position: relative;
             padding: 20px;
-            padding-top: 40px;
+            padding-top: 50px; /* Adjusted top margin */
             padding-bottom: 100px; /* Adjusted bottom margin */
             box-sizing: border-box;
         }
@@ -70,6 +70,7 @@
         .top-bar-text {
             transform: scaleY(1.2);
             transform-origin: top;
+            white-space: nowrap;
         }
         
         #top-bar-right {
@@ -188,6 +189,7 @@
         #weather-widget { top: 40px; left: calc(50% - 135px); color: var(--amiga-black); font-size: 8px; width: 250px; }
         #google-widget { top: 180px; left: calc(50% - 150px); width: 280px; }
         #wiki-widget { top: 320px; left: calc(50% - 165px); width: 310px; height: 250px; }
+        #bible-widget { top: 590px; left: calc(50% - 165px); width: 310px; }
         
         #browser-window .browser-bar { padding: 4px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 4px; }
         #browser-window .browser-input { flex-grow: 1; }
@@ -203,21 +205,18 @@
 
 
         @media (max-width: 768px) {
-            .desktop { flex-direction: column; }
+            .desktop { flex-direction: column; align-items: center; }
             #desktop-icons-left, #desktop-icons-right { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
-            #desktop-icons-right { order: -1; margin-bottom: 20px; }
-            .desktop-icon { width: 70px; }
-            .icon-image { width: 48px; height: 42px; }
-            .desktop-icon.hide-on-mobile { display: none; }
-            #mobile-feeds-menu { display: block; }
+            #desktop-icons-right { order: 1; margin-bottom: 20px; }
+            #widget-container { order: 2; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+            #desktop-icons-left { order: 3; }
 
             .amiga-widget {
-                position: relative;
+                position: relative !important;
                 top: auto !important;
                 left: auto !important;
                 transform: none !important;
                 width: 90%;
-                margin: 10px auto 0 auto;
             }
         }
     </style>
@@ -226,7 +225,7 @@
 
     <div class="workbench-screen">
         <div class="top-bar">
-            <div id="top-bar-text" class="top-bar-text">Workbench M 1.4</div>
+            <div id="top-bar-text" class="top-bar-text"></div>
             <div id="mobile-feeds-menu">
                 <button id="mobile-feeds-menu-btn">Feedy &#9662;</button>
                 <div id="mobile-feeds-dropdown"></div>
@@ -238,31 +237,34 @@
         </div>
 
         <div class="desktop">
-            <div id="desktop-icons-left"></div>
             <div id="desktop-icons-right"></div>
+            <div id="widget-container">
+                <div id="weather-widget" class="amiga-widget">
+                     <div class="widget-bar"><span class="window-title">Pogoda</span></div>
+                     <div class="widget-content" id="weather-widget-content"></div>
+                </div>
+                <div id="google-widget" class="amiga-widget">
+                    <div class="widget-bar"><span class="window-title">Wyszukiwarka</span></div>
+                    <div class="widget-content">
+                        <div style="font-size: 20px; text-align: center; margin-bottom: 8px;">
+                            <span style="color: #0050a8;">G</span><span style="color: #f77b22;">o</span><span style="color: #f77b22;">o</span><span style="color: #0050a8;">g</span><span style="color: #000;">l</span><span style="color: #f77b22;">e</span>
+                        </div>
+                        <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
+                    </div>
+                </div>
+                <div id="wiki-widget" class="amiga-widget">
+                    <div class="widget-bar"><span class="window-title">Top 5 - Wikipedia.pl</span></div>
+                    <div class="widget-content" id="wiki-widget-content" style="overflow-y: auto;">Ładowanie...</div>
+                </div>
+                <div id="bible-widget" class="amiga-widget">
+                    <div class="widget-bar"><span class="window-title">Słowo na dziś</span></div>
+                    <div class="widget-content" id="bible-widget-content">Ładowanie...</div>
+                </div>
+            </div>
+            <div id="desktop-icons-left"></div>
         </div>
 
         <div id="windows-container"></div>
-        
-        <div id="weather-widget" class="amiga-widget">
-             <div class="widget-bar"><span class="window-title">Pogoda</span></div>
-             <div class="widget-content" id="weather-widget-content"></div>
-        </div>
-
-        <div id="google-widget" class="amiga-widget">
-            <div class="widget-bar"><span class="window-title">Wyszukiwarka</span></div>
-            <div class="widget-content">
-                <div style="font-size: 20px; text-align: center; margin-bottom: 8px;">
-                    <span style="color: #0050a8;">G</span><span style="color: #f77b22;">o</span><span style="color: #f77b22;">o</span><span style="color: #0050a8;">g</span><span style="color: #000;">l</span><span style="color: #f77b22;">e</span>
-                </div>
-                <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
-            </div>
-        </div>
-
-        <div id="wiki-widget" class="amiga-widget">
-            <div class="widget-bar"><span class="window-title">Top 5 - Wikipedia.pl</span></div>
-            <div class="widget-content" id="wiki-widget-content" style="overflow-y: auto;">Ładowanie...</div>
-        </div>
     </div>
 
     <script>
@@ -279,8 +281,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupDesktop();
             setupWidgets();
+            updateTopBarText();
             updateClock();
             setInterval(updateClock, 1000);
+            window.addEventListener('resize', updateTopBarText);
         });
 
         function setupDesktop() {
@@ -292,8 +296,6 @@
             iconsRight.innerHTML = '';
 
             const gmailSVG = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#f77b22" d="M2 5h20v2H2zM2 7h2v12H2zM20 7h2v12h-2zM4 17h16v2H4zM4 9l8 6 8-6v-2l-8 6-8-6z"/></svg>`;
-            const youtubeSVG = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#0050a8" d="M4 4h16v16H4z"/><path fill="#ffffff" d="M10 8l6 4-6 4z"/></svg>`;
-            iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailSVG);
             
             // --- NEW PIXEL ART ICONS ---
             const iconBasePath = 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/';
@@ -303,9 +305,12 @@
             const ramDiskIcon = `<img src="${iconBasePath}floppy.jpg" alt="Floppy Disk" class="w-full h-full object-contain">`;
             const trashcanIcon = `<img src="${iconBasePath}kosz.jpg" alt="Trashcan" class="w-full h-full object-contain">`;
             const feedsIcon = `<img src="${iconBasePath}tekst.jpg" alt="Text file" class="w-full h-full object-contain">`;
-            const leonardoIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M0 0h12v10H0z" fill="#000"/><path d="M2 2h2v6H2z M5 2h1v1H5zm2 0h1v1H7zm2 0h1v1H9z M5 4h5v1H5zm0 2h5v1H5z" fill="#fff"/></svg>`;
-            const ytMusicIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M1 1h10v8H1z" fill="#f00" stroke="#000" stroke-width="1"/><circle cx="6" cy="5" r="3" fill="none" stroke="#fff" stroke-width="1"/><circle cx="6" cy="5" r="1" fill="#fff"/></svg>`;
+            const leonardoIcon = `<img src="${iconBasePath}zajaczolw.jpg" alt="Leonardo" class="w-full h-full object-contain">`;
+            const ytMusicIcon = `<img src="${iconBasePath}music.jpg" alt="YouTube Music" class="w-full h-full object-contain">`;
+            const youtubeIcon = `<img src="${iconBasePath}youtube.jpg" alt="YouTube" class="w-full h-full object-contain">`;
 
+            iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailSVG);
+            iconsLeft.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeIcon);
             iconsLeft.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Feedy RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
@@ -337,6 +342,7 @@
         function setupWidgets() {
             loadWeather();
             loadWikipediaWidget();
+            loadBibleWidget();
             const googleForm = document.getElementById('google-widget-form');
             googleForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -347,6 +353,7 @@
             makeElementDraggable(document.getElementById('weather-widget'));
             makeElementDraggable(document.getElementById('google-widget'));
             makeElementDraggable(document.getElementById('wiki-widget'));
+            makeElementDraggable(document.getElementById('bible-widget'));
         }
 
         async function loadWeather() {
@@ -439,6 +446,28 @@
             } catch (error) {
                 console.error("Error fetching Wikipedia data:", error);
                 contentEl.innerHTML = 'Błąd ładowania danych.';
+            }
+        }
+
+        async function loadBibleWidget() {
+            const contentEl = document.getElementById('bible-widget-content');
+            const proxyUrl = 'https://corsproxy.io/?';
+            const apiUrl = 'https://www.biblia-deon.pl/api/czytania.json';
+            try {
+                const response = await fetch(`${proxyUrl}${encodeURIComponent(apiUrl)}`);
+                if (!response.ok) throw new Error(`Błąd sieci: ${response.status}`);
+                const data = await response.json();
+                const firstReading = data.czytania[0]; 
+                const reference = firstReading.skrot;
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(firstReading.tresc, "text/html");
+                const firstParagraph = doc.querySelector('p')?.textContent || "Nie udało się wczytać fragmentu.";
+
+                contentEl.innerHTML = `<p>"${firstParagraph}..."</p><p style="text-align: right;">- ${reference}</p>`;
+            } catch (error) {
+                console.error("Error fetching Bible verse:", error);
+                contentEl.innerHTML = 'Błąd ładowania cytatu.';
             }
         }
         
@@ -562,6 +591,15 @@
                 const now = new Date();
                 clockElement.textContent = now.toLocaleTimeString('pl-PL');
                 dateElement.textContent = now.toLocaleDateString('pl-PL');
+            }
+        }
+        
+        function updateTopBarText() {
+            const textEl = document.getElementById('top-bar-text');
+            if (window.innerWidth <= 768) {
+                textEl.textContent = 'Amiga 600';
+            } else {
+                textEl.textContent = 'Amiga 600 Workbench 1.3';
             }
         }
         
@@ -736,4 +774,3 @@
     </script>
 </body>
 </html>
-
