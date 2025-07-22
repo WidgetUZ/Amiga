@@ -32,7 +32,7 @@
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
             user-select: none;
-            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMjYiIHZpZXdCb3g9IjAgMCAxOCAyNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCAwTDE3LjAxMjcgMTIuMDMwM0w4LjUwNjMzIDE0LjQzNjRMMTIuMDMwMyAyNS41MjVTDguNTA2MzMgMTYuODQyNEwwIDIxLjA1NDVWMFoiIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4='), auto;
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjEiIHZpZXdCb3g9IjAgMCAxNCAyMSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCAwTDE0IDEwTDcgMTJMMTAgMjFMNyAxNEwwIDE3VjBaIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9zdmc+'), auto;
             background-color: var(--amiga-blue);
         }
 
@@ -66,6 +66,11 @@
         .top-bar-text {
             transform: scaleY(1.2);
             transform-origin: top;
+        }
+
+        #top-bar-right {
+            display: flex;
+            gap: 16px;
         }
 
         #mobile-feeds-menu {
@@ -119,9 +124,6 @@
             overflow: hidden;
         }
         
-        .disk-icon::before { content: ''; position: absolute; width: 100%; height: 10px; background-color: var(--amiga-orange); top: 0; left: 0; }
-        .disk-icon::after { content: ''; position: absolute; width: 16px; height: 8px; background-color: var(--amiga-white); border: 2px solid var(--amiga-black); bottom: 6px; left: 50%; transform: translateX(-50%); }
-        
         .icon-label { background-color: transparent; color: var(--amiga-white); padding: 2px 4px; font-size: 8px; text-align: center; border: 1px solid transparent; width: 100%; white-space: nowrap; transform: scaleY(1.2); transform-origin: center; }
         .desktop-icon:hover .icon-label { background-color: var(--amiga-white); color: var(--amiga-black); }
         
@@ -153,6 +155,8 @@
         
         .window-content-wrapper { flex-grow: 1; margin: 4px; border: 2px solid var(--amiga-black); background-color: var(--amiga-blue); overflow: hidden; display: flex; flex-direction: column; }
         .window-content { flex-grow: 1; padding: 8px; overflow-y: auto; color: var(--amiga-white); font-size: 9px; line-height: 1.8; word-break: break-word; }
+        .window-content a { color: var(--amiga-orange) !important; text-decoration: underline !important; }
+
         
         .amiga-widget { position: absolute; background-color: var(--amiga-white); border: 1px solid; border-color: var(--amiga-white) var(--amiga-black) var(--amiga-black) var(--amiga-white); z-index: 40; display: flex; flex-direction: column; padding: 1px; }
         .widget-bar { height: 19px; padding: 0 8px; display: flex; align-items: center; justify-content: center; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); color: var(--amiga-blue); border-bottom: 1px solid var(--amiga-black); }
@@ -197,7 +201,10 @@
                 <button id="mobile-feeds-menu-btn">Feedy &#9662;</button>
                 <div id="mobile-feeds-dropdown"></div>
             </div>
-            <div class="top-bar-text" id="clock">12:00:00</div>
+            <div id="top-bar-right">
+                <div class="top-bar-text" id="date"></div>
+                <div class="top-bar-text" id="clock">12:00:00</div>
+            </div>
         </div>
 
         <div class="desktop">
@@ -231,12 +238,7 @@
             { name: 'Superman Homepage', url: 'http://www.supermanhomepage.com/feed/' },
             { name: 'Sport Interia', url: 'https://sport.interia.pl/feed' },
         ];
-        const customIconSVGs = {
-            folder: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M4 4h6l2 2h8v12H4z" fill="#f77b22" stroke="#000" stroke-width="1.5"/></svg>`,
-            globe: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><circle cx="12" cy="12" r="9" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M12 3v18M3 12h18M5 6a12 12 0 0114 0M5 18a12 12 0 0014 0" fill="none" stroke="#0050a8" stroke-width="1.5"/></svg>`,
-            tool: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M7 2l-2 5l4 4l-5 5l5 5l5 -5l4 -4l5 2l-5 -19z" fill="#aaa" stroke="#000" stroke-width="1.5"/></svg>`,
-        };
-
+        
         // --- Main Setup ---
         document.addEventListener('DOMContentLoaded', () => {
             setupDesktop();
@@ -253,27 +255,30 @@
             iconsLeft.innerHTML = '';
             iconsRight.innerHTML = '';
 
-            const gmailSVG = `<svg viewBox="0 0 24 24" width="48" height="48" shape-rendering="crispEdges"><path fill="#f77b22" d="M2 5h20v2H2zM2 7h2v12H2zM20 7h2v12h-2zM4 17h16v2H4zM4 9l8 6 8-6v-2l-8 6-8-6z"/></svg>`;
-            const youtubeSVG = `<svg viewBox="0 0 24 24" width="48" height="48" shape-rendering="crispEdges"><path fill="#0050a8" d="M4 4h16v16H4z"/><path fill="#ffffff" d="M10 8l6 4-6 4z"/></svg>`;
+            const gmailSVG = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#f77b22" d="M2 5h20v2H2zM2 7h2v12H2zM20 7h2v12h-2zM4 17h16v2H4zM4 9l8 6 8-6v-2l-8 6-8-6z"/></svg>`;
+            const youtubeSVG = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#0050a8" d="M4 4h16v16H4z"/><path fill="#ffffff" d="M10 8l6 4-6 4z"/></svg>`;
             iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailSVG);
             iconsLeft.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeSVG);
             
-            const browserIcon = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M2 2h20v20H2z" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M2 7h20" stroke="#000" stroke-width="1.5"/><circle cx="5" cy="4.5" r="1" fill="#f77b22"/><path d="M10 10h8v2h-8zm0 4h6v2h-6z" fill="#0050a8"/></svg>`;
-            const addIcon = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M2 2h20v20H2z" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M11 6h2v12h-2zM6 11h12v2H6z" fill="#0050a8"/></svg>`;
-            const feedsIcon = `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M2 2h20v20H2z" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M5 17h3v-3H5v3zm0-5h14V9H5v3zm0-5h14V4H5v3z" fill="#f77b22"/></svg>`;
-            iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', browserIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('Dodaj Skrót', 'add-shortcut-window', addIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('Feedy RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
+            // --- NEW PIXEL ART ICONS ---
+            const internetIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M5 0 a 5 5 0 0 1 0 10 a 5 5 0 0 1 0 -10" fill="#fff" stroke="#000" stroke-width="1"/><path d="M5 0v10 M0 5h12 M1 2a6 6 0 0110 0 M1 8a6 6 0 0010 0" fill="none" stroke="#0050a8" stroke-width="1"/></svg>`;
+            const sayIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M1 0h10v7H7l-2 3v-3H1z" fill="#fff" stroke="#000" stroke-width="1"/><path d="M3 2h6v1H3zm0 2h6v1H3z" fill="#0050a8"/></svg>`;
+            const workbenchIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M0 0h12v8H0z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M1 1h10v6H1z" fill="#0050a8"/><path d="M4 8h4v2H4z" fill="#aaa" stroke="#000" stroke-width="1"/></svg>`;
+            const ramDiskIcon = `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M1 0h5l3 3v7H1z" fill="#fff" stroke="#000" stroke-width="1"/><path d="M6 0v3h3" fill="none" stroke="#000" stroke-width="1"/><path d="M3 5h4v1H3zm0 2h4v1H3z" fill="#0050a8"/></svg>`;
+            const trashcanIcon = `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M1 2h8v8H1z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M0 2h10v1H0z M3 0h4v2H3z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M3 4h1v5H3zm3 0h1v5H4z" fill="#000"/></svg>`;
 
-            renderCustomShortcuts();
-
-            iconsRight.innerHTML += createIconHTML('Ram Disk', false);
-            iconsRight.innerHTML += createIconHTML('Workbench', false);
-            iconsRight.innerHTML += createTrashcanIconHTML();
+            iconsLeft.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
+            iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
+            
+            iconsRight.innerHTML += createInteractiveIconHTML('Ram Disk', 'ram-disk-window', ramDiskIcon);
+            iconsRight.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
+            iconsRight.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
 
             createBrowserWindow();
-            createAddShortcutWindow();
             createFeedsWindow();
+            createWindowHTML('ram-disk-window', 'Ram Disk', '<p>Zawartość Ram Disk...</p>');
+            createWindowHTML('workbench-window', 'Workbench', '<p>Zawartość Workbench...</p>');
+            createWindowHTML('trash-window', 'Kosz', '<p>Kosz jest pusty.</p>');
             setupMobileMenu();
         }
         
@@ -303,7 +308,6 @@
             let temp = 'N/A', cloud = 'N/A', precip = 'N/A';
 
             try {
-                // Using Open-Meteo API for Kielce
                 const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.87&longitude=20.63&current=temperature_2m,weather_code,cloud_cover,precipitation_probability&hourly=precipitation_probability&daily=weather_code&timezone=Europe/Warsaw');
                 if (response.ok) {
                     const data = await response.json();
@@ -335,16 +339,6 @@
 
         function createInteractiveIconHTML(name, windowId, svgContent, extraClass = '') {
             return `<div class="desktop-icon interactive-icon ${extraClass}" data-window-id="${windowId}"><div class="icon-image">${svgContent}</div><div class="icon-label">${name}</div></div>`;
-        }
-
-        function createIconHTML(name, isInteractive, id = '') {
-            const dataAttr = isInteractive ? `data-window-id="window-${id}"` : '';
-            const className = isInteractive ? 'desktop-icon interactive-icon' : 'desktop-icon';
-            return `<div class="${className}" ${dataAttr}><div class="icon-image disk-icon"></div><div class="icon-label">${name}</div></div>`;
-        }
-        
-        function createTrashcanIconHTML() {
-            return `<div class="desktop-icon"><div class="icon-image" style="background-color: #fff;"><div style="width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22square%22 stroke-linejoin=%22arcs%22 shape-rendering=%22crispEdges%22><path d=%22M3 6h18%22></path><path d=%22M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2%22></path></svg>'); background-repeat: no-repeat; background-position: center; background-size: 32px 32px;"></div></div><div class="icon-label">Trashcan</div></div>`;
         }
         
         function createWindowHTML(id, title, contentHTML, pos = { top: '100px', left: '100px' }) {
@@ -420,58 +414,6 @@
             const closeGadget = element.querySelector('.gadget-close');
             if(closeGadget) closeGadget.addEventListener('click', () => { element.style.display = 'none'; });
         }
-
-        function createAddShortcutWindow() {
-            const iconsHTML = Object.keys(customIconSVGs).map((key, index) =>
-                `<div class="icon-image ${index === 0 ? 'selected' : ''}" data-icon-key="${key}">${customIconSVGs[key]}</div>`
-            ).join('');
-
-            const content = `
-                <form id="add-shortcut-form">
-                    <div class="form-row"><label for="shortcut-name">Nazwa:</label><input type="text" id="shortcut-name" class="form-input" required></div>
-                    <div class="form-row"><label for="shortcut-url">Adres URL:</label><input type="url" id="shortcut-url" class="form-input" placeholder="https://..." required></div>
-                    <div class="form-row"><label>Wybierz ikonę:</label><div class="icon-selector">${iconsHTML}</div></div>
-                    <button type="submit" class="form-button">Dodaj Skrót</button>
-                </form>`;
-            const win = createWindowHTML('add-shortcut-window', 'Nowy Skrót', content, {top: '200px', left: '200px'});
-            
-            const iconSelector = win.querySelector('.icon-selector');
-            iconSelector.addEventListener('click', (e) => {
-                const targetIcon = e.target.closest('.icon-image');
-                if (targetIcon) {
-                    iconSelector.querySelectorAll('.icon-image').forEach(img => img.classList.remove('selected'));
-                    targetIcon.classList.add('selected');
-                }
-            });
-            win.querySelector('#add-shortcut-form').addEventListener('submit', handleAddShortcutSubmit);
-        }
-
-        function handleAddShortcutSubmit(e) {
-            e.preventDefault();
-            const form = e.target;
-            const name = form.querySelector('#shortcut-name').value;
-            const url = form.querySelector('#shortcut-url').value;
-            const selectedIconEl = form.querySelector('.icon-selector .selected');
-            const iconKey = selectedIconEl.dataset.iconKey;
-
-            if (!name || !url || !iconKey) return;
-
-            const shortcuts = JSON.parse(localStorage.getItem('amigaShortcuts') || '[]');
-            shortcuts.push({ name, url, iconKey });
-            localStorage.setItem('amigaShortcuts', JSON.stringify(shortcuts));
-            
-            setupDesktop(); // Redraw desktop to show new icon
-            form.reset();
-            document.getElementById('add-shortcut-window').style.display = 'none';
-        }
-
-        function renderCustomShortcuts() {
-            const shortcuts = JSON.parse(localStorage.getItem('amigaShortcuts') || '[]');
-            const container = document.getElementById('desktop-icons-left');
-            shortcuts.forEach(sc => {
-                container.innerHTML += createLinkIconHTML(sc.name, sc.url, customIconSVGs[sc.iconKey]);
-            });
-        }
         
         function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 96) {
             if (!canvas) return;
@@ -504,7 +446,12 @@
 
         function updateClock() {
             const clockElement = document.getElementById('clock');
-            if (clockElement) clockElement.textContent = new Date().toLocaleTimeString('pl-PL');
+            const dateElement = document.getElementById('date');
+            if (clockElement) {
+                const now = new Date();
+                clockElement.textContent = now.toLocaleTimeString('pl-PL');
+                dateElement.textContent = now.toLocaleDateString('pl-PL');
+            }
         }
         
         function createBrowserWindow() {
@@ -632,25 +579,34 @@
                     let faviconUrl = doc.querySelector('link[rel="shortcut icon"]')?.href || doc.querySelector('link[rel="icon"]')?.href;
                     if (faviconUrl && !faviconUrl.startsWith('http')) faviconUrl = new URL(faviconUrl, url).href;
                     
-                    let mainImageUrl = doc.querySelector('meta[property="og:image"]')?.content;
-                    if (mainImageUrl && !mainImageUrl.startsWith('http')) mainImageUrl = new URL(mainImageUrl, url).href;
-
-                    const reader = new Readability(doc.cloneNode(true));
-                    const article = reader.parse();
-                    
                     const faviconCanvasId = `favicon-${windowEl.id}`;
-                    const mainImageCanvasId = `main-image-${windowEl.id}`;
                     
+                    const base = doc.createElement('base');
+                    base.href = url;
+                    doc.head.append(base);
+
+                    doc.body.querySelectorAll('script, style, link[rel="stylesheet"], iframe, video, audio').forEach(el => el.remove());
+                    
+                    const imagePromises = Array.from(doc.body.querySelectorAll('img')).map(img => {
+                        const canvas = document.createElement('canvas');
+                        canvas.id = `img-canvas-${Math.random().toString(36).substring(7)}`;
+                        canvas.style.maxWidth = '100%';
+                        img.replaceWith(canvas);
+                        return loadImageToPixelArt(canvas, img.src, proxyUrl, 256);
+                    });
+
+                    await Promise.all(imagePromises);
+
+                    const cleanHtml = doc.body.innerHTML;
+
                     let renderHTML = `<div class="page-render-header">`;
                     if(faviconUrl) renderHTML += `<canvas id="${faviconCanvasId}" class="page-render-favicon"></canvas>`;
-                    renderHTML += `<span>${article ? article.title : doc.title}</span></div>`;
-                    if(mainImageUrl) renderHTML += `<canvas id="${mainImageCanvasId}" class="page-render-main-image" width="256"></canvas>`;
-                    renderHTML += `<div>${article ? article.content : 'Nie można wyodrębnić treści artykułu. Wyświetlanie surowego tekstu...<br>' + doc.body.innerText.substring(0, 2000)}</div>`;
+                    renderHTML += `<span>${doc.title}</span></div>`;
+                    renderHTML += `<div>${cleanHtml}</div>`;
 
                     contentEl.innerHTML = renderHTML;
                     
                     if (faviconUrl) loadImageToPixelArt(document.getElementById(faviconCanvasId), faviconUrl, proxyUrl, 24);
-                    if (mainImageUrl) loadImageToPixelArt(document.getElementById(mainImageCanvasId), mainImageUrl, proxyUrl, 256);
                 }
 
             } catch (error) {
@@ -669,3 +625,4 @@
     </script>
 </body>
 </html>
+
