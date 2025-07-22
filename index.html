@@ -118,8 +118,10 @@
         }
 
         .icon-image {
-            width: 54px; height: 48px; background-color: var(--amiga-white);
-            border: 2px solid var(--amiga-black); position: relative;
+            width: 54px; height: 48px; 
+            background-color: transparent;
+            border: none;
+            position: relative;
             margin-bottom: 4px; display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
@@ -260,19 +262,19 @@
             iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailSVG);
             iconsLeft.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeSVG);
             
-            // --- NEW PIXEL ART ICONS ---
-            const internetIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M5 0 a 5 5 0 0 1 0 10 a 5 5 0 0 1 0 -10" fill="#fff" stroke="#000" stroke-width="1"/><path d="M5 0v10 M0 5h12 M1 2a6 6 0 0110 0 M1 8a6 6 0 0010 0" fill="none" stroke="#0050a8" stroke-width="1"/></svg>`;
-            const sayIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M1 0h10v7H7l-2 3v-3H1z" fill="#fff" stroke="#000" stroke-width="1"/><path d="M3 2h6v1H3zm0 2h6v1H3z" fill="#0050a8"/></svg>`;
-            const workbenchIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M0 0h12v8H0z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M1 1h10v6H1z" fill="#0050a8"/><path d="M4 8h4v2H4z" fill="#aaa" stroke="#000" stroke-width="1"/></svg>`;
-            const folderIcon = `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M1 0h5l3 3v7H1z" fill="#fff" stroke="#000" stroke-width="1"/><path d="M6 0v3h3" fill="none" stroke="#000" stroke-width="1"/><path d="M3 5h4v1H3zm0 2h4v1H3z" fill="#0050a8"/></svg>`;
-            const trashcanIcon = `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M1 2h8v8H1z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M0 2h10v1H0z M3 0h4v2H3z" fill="#aaa" stroke="#000" stroke-width="1"/><path d="M3 4h1v5H3zm3 0h1v5H4z" fill="#000"/></svg>`;
-            const feedsIcon = `<svg viewBox="0 0 12 10" shape-rendering="crispEdges"><path d="M1 7h2v2h-2z M1 4h8v2h-8z M1 1h10v2h-10z" fill="#f77b22" /><path d="M0 6h1v3h-1z M0 3h1v3h-1z M0 0h1v3h-1z M1 9h2v1h-2z M1 6h8v1h-8z M1 3h10v1h-10z" fill="#000" /></svg>`;
+            const iconBasePath = 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/';
+            const internetIcon = `<img src="${iconBasePath}internet.jpg" alt="Internet Browser" class="w-full h-full object-contain">`;
+            const sayIcon = `<img src="${iconBasePath}say.jpg" alt="Say" class="w-full h-full object-contain">`;
+            const workbenchIcon = `<img src="${iconBasePath}workbench.jpg" alt="Workbench" class="w-full h-full object-contain">`;
+            const ramDiskIcon = `<img src="${iconBasePath}floppy.jpg" alt="Floppy Disk" class="w-full h-full object-contain">`;
+            const trashcanIcon = `<img src="${iconBasePath}kosz.jpg" alt="Trashcan" class="w-full h-full object-contain">`;
+            const feedsIcon = `<img src="${iconBasePath}tekst.jpg" alt="Text file" class="w-full h-full object-contain">`;
 
             iconsLeft.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Feedy RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
             
-            iconsRight.innerHTML += createInteractiveIconHTML('Ram Disk', 'ram-disk-window', folderIcon);
+            iconsRight.innerHTML += createInteractiveIconHTML('Ram Disk', 'ram-disk-window', ramDiskIcon);
             iconsRight.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
             iconsRight.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
 
@@ -417,7 +419,7 @@
             if(closeGadget) closeGadget.addEventListener('click', () => { element.style.display = 'none'; });
         }
         
-        function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 64) {
+        function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 96) {
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let img = new Image();
