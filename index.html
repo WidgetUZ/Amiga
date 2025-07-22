@@ -417,7 +417,7 @@
             if(closeGadget) closeGadget.addEventListener('click', () => { element.style.display = 'none'; });
         }
         
-        function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 96) {
+        function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 64) {
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let img = new Image();
