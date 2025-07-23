@@ -54,7 +54,7 @@
         .top-bar {
             background-color: var(--amiga-black);
             color: var(--amiga-white);
-            height: 28px;
+            height: 32px;
             border-bottom: 2px solid var(--amiga-white);
             width: 100%;
             position: fixed;
@@ -135,7 +135,7 @@
             background-color: transparent; 
             color: var(--amiga-white); 
             padding: 3px 5px; 
-            font-size: 18px; 
+            font-size: 22px; 
             text-align: center; 
             border: 1px solid transparent; 
             width: 100%; 
@@ -145,6 +145,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1.2;
         }
         .desktop-icon:hover .icon-label { color: var(--amiga-orange); }
         
@@ -157,11 +158,11 @@
             padding: 1px;
         }
 
-        .window-bar { height: 28px; padding: 0 5px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
+        .window-bar { height: 32px; padding: 0 5px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
         .amiga-window.active .window-bar { color: var(--amiga-blue); }
         .amiga-window.inactive .window-bar { color: var(--amiga-black); }
         .window-title-container { display: flex; align-items: center; width: 100%; height: 100%; overflow: hidden; }
-        .window-title { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 22px; }
+        .window-title { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 26px; }
         .title-lines { flex-grow: 1; height: 100%; margin-left: 10px; position: relative; }
         .title-lines::before, .title-lines::after { content: ''; position: absolute; left: 0; right: 0; }
         .amiga-window.active .title-lines::before, .amiga-window.active .title-lines::after { height: 2px; background-color: var(--amiga-blue); }
@@ -175,23 +176,23 @@
         .gadget { cursor: inherit; margin: 0 2px; }
         
         .window-content-wrapper { flex-grow: 1; margin: 5px; border: 2px solid var(--amiga-black); background-color: var(--amiga-blue); overflow: hidden; display: flex; flex-direction: column; }
-        .window-content { flex-grow: 1; padding: 10px; overflow-y: auto; color: var(--amiga-white); font-size: 20px; line-height: 1.8; word-break: break-word; }
+        .window-content { flex-grow: 1; padding: 10px; overflow-y: auto; color: var(--amiga-white); font-size: 24px; line-height: 1.7; word-break: break-word; }
         .window-content a { color: var(--amiga-orange) !important; text-decoration: underline !important; }
 
         
         .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px solid var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
         .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; font-size: 28px; }
-        .widget-content { padding: 10px; color: var(--amiga-white); }
+        .widget-content { padding: 10px; color: var(--amiga-white); font-size: 20px; line-height: 1.7; }
         .widget-content a { color: var(--amiga-orange) !important; }
 
-        #weather-widget { top: 40px; left: calc(50% - 135px); font-size: 18px; width: 320px; }
+        #weather-widget { top: 40px; left: calc(50% - 135px); width: 320px; }
         #google-widget { top: 200px; left: calc(50% - 150px); width: 300px; }
-        #wiki-widget { top: 340px; left: calc(50% - 165px); width: 330px; height: 280px; }
+        #wiki-widget { top: 340px; left: calc(50% - 165px); width: 330px; height: auto; }
         #bible-widget { top: 640px; left: calc(50% - 165px); width: 330px; }
         #wiki-search-widget { top: 800px; left: calc(50% - 165px); width: 330px; }
 
         #google-widget .widget-content { background-color: var(--amiga-blue); }
-        #google-widget .form-input { background-color: var(--amiga-white); font-size: 18px; }
+        #google-widget .form-input { background-color: var(--amiga-white); font-size: 22px; }
 
         #browser-window .browser-bar { padding: 5px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 5px; }
         #browser-window .browser-input { flex-grow: 1; }
@@ -207,11 +208,16 @@
 
 
         @media (max-width: 768px) {
+            body { font-size: 20px; /* large on mobile */ }
             .desktop { flex-direction: column; align-items: center; }
-            #desktop-icons-left, #desktop-icons-right { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
-            #desktop-icons-right { order: 1; margin-bottom: 20px; }
+            #desktop-icons-left, #desktop-icons-right { order: 1; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
+            #desktop-icons-right { margin-bottom: 20px; }
             #widget-container { order: 2; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-            #desktop-icons-left { order: 3; }
+            .desktop-icon { width: 70px; }
+            .icon-image { width: 48px; height: 42px; }
+            .icon-label { font-size: 16px; min-height: 34px; }
+            .desktop-icon.hide-on-mobile { display: none; }
+            #mobile-feeds-menu { display: block; }
 
             .amiga-widget {
                 position: relative !important;
@@ -220,6 +226,8 @@
                 transform: none !important;
                 width: 90%;
             }
+            .widget-title { font-size: 24px; }
+            .widget-content { font-size: 18px; }
         }
     </style>
 </head>
@@ -253,20 +261,17 @@
                         <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
                     </div>
                 </div>
-                <div id="wiki-widget" class="amiga-widget">
-                    <div class="widget-title">Top 5 - Wikipedia.pl</div>
-                    <div class="widget-content" id="wiki-widget-content" style="overflow-y: auto;">Ładowanie...</div>
-                </div>
                 <div id="bible-widget" class="amiga-widget">
                     <div class="widget-title">Słowo na dziś</div>
                     <div class="widget-content" id="bible-widget-content">Ładowanie...</div>
                 </div>
-                 <div id="wiki-search-widget" class="amiga-widget">
-                    <div class="widget-title">Wyszukiwarka Wikipedii</div>
+                <div id="wiki-widget" class="amiga-widget">
+                    <div class="widget-title">Wikipedia</div>
                     <div class="widget-content">
-                        <form id="wiki-search-form">
+                        <form id="wiki-search-form" style="margin-bottom: 10px;">
                             <input type="text" class="form-input" placeholder="Szukaj w Wikipedii...">
                         </form>
+                        <div id="wiki-top5-content" style="overflow-y: auto;">Ładowanie...</div>
                     </div>
                 </div>
             </div>
@@ -312,21 +317,23 @@
             const workbenchIcon = `<img src="${iconBasePath}workbench.jpg" alt="Workbench" class="w-full h-full object-contain">`;
             const ramDiskIcon = `<img src="${iconBasePath}floppy.jpg" alt="Floppy Disk" class="w-full h-full object-contain">`;
             const trashcanIcon = `<img src="${iconBasePath}kosz.jpg" alt="Trashcan" class="w-full h-full object-contain">`;
-            const feedsIcon = `<img src="${iconBasePath}tekst.jpg" alt="Text file" class="w-full h-full object-contain">`;
+            const feedsIcon = `<img src="${iconBasePath}feed.jpg" alt="Feed Reader" class="w-full h-full object-contain">`;
             const leonardoIcon = `<img src="${iconBasePath}zajaczolw.jpg" alt="Leonardo" class="w-full h-full object-contain">`;
             const ytMusicIcon = `<img src="${iconBasePath}music.jpg" alt="YouTube Music" class="w-full h-full object-contain">`;
+            const folderIcon = `<img src="${iconBasePath}folder.jpg" alt="Folder" class="w-full h-full object-contain">`;
 
-            iconsLeft.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailIcon);
-            iconsLeft.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeIcon);
-            iconsLeft.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
-            iconsLeft.innerHTML += createLinkIconHTML('Leonardo', 'https://app.leonardo.ai', leonardoIcon);
-            iconsLeft.innerHTML += createLinkIconHTML('YT Music', 'https://music.youtube.com', ytMusicIcon);
+            iconsRight.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailIcon);
+            iconsRight.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeIcon);
+            iconsRight.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
+            iconsRight.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
+            iconsRight.innerHTML += createInteractiveIconHTML('RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
+            iconsRight.innerHTML += createLinkIconHTML('Leonardo', 'https://app.leonardo.ai', leonardoIcon);
+            iconsRight.innerHTML += createLinkIconHTML('YT Music', 'https://music.youtube.com', ytMusicIcon);
             
-            iconsRight.innerHTML += createInteractiveIconHTML('RAM Disk', 'ram-disk-window', ramDiskIcon);
-            iconsRight.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
-            iconsRight.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
+            iconsLeft.innerHTML += createInteractiveIconHTML('RAM Disk', 'ram-disk-window', ramDiskIcon);
+            iconsLeft.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
+            iconsLeft.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
+            iconsLeft.innerHTML += createInteractiveIconHTML('AI', 'ai-window', folderIcon);
             
             const topBarGadget = document.getElementById('top-bar-gadget');
             topBarGadget.innerHTML = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="black"/><rect x="1" y="4" width="10" height="10" fill="white" stroke="white" stroke-width="2"/><rect x="4" y="1" width="10" height="10" fill="white" stroke="white" stroke-width="2"/></svg>`;
@@ -334,6 +341,7 @@
             const ramInfo = `<p>Model: Amiga 600</p><p>Chip RAM: 1.0 MB</p><p>Fast RAM: 0.0 MB</p><p>Wolna pamięć: 804844 bajtów</p><p>Zajęta pamięć: 243732 bajtów</p>`;
             createBrowserWindow();
             createFeedsWindow();
+            createAiWindow();
             createWindowHTML('ram-disk-window', 'RAM Disk', ramInfo);
             const workbenchWindow = createWindowHTML('workbench-window', 'Workbench', 'Ładowanie informacji z Wikipedii...');
             fetchAndRenderPage(workbenchWindow, 'https://pl.wikipedia.org/wiki/AmigaOS', false);
@@ -381,7 +389,6 @@
             makeElementDraggable(document.getElementById('google-widget'));
             makeElementDraggable(document.getElementById('wiki-widget'));
             makeElementDraggable(document.getElementById('bible-widget'));
-            makeElementDraggable(document.getElementById('wiki-search-widget'));
         }
 
         async function loadWeather() {
@@ -423,7 +430,7 @@
         }
         
         async function loadWikipediaWidget() {
-            const contentEl = document.getElementById('wiki-widget-content');
+            const contentEl = document.getElementById('wiki-top5-content');
             try {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
@@ -774,7 +781,7 @@
 
                     contentEl.innerHTML = renderHTML;
                     
-                    if (faviconUrl) loadImageToPixelArt(document.getElementById(faviconCanvasId), faviconUrl, proxyUrl, 24);
+                    if (faviconUrl) loadImageToPixelArt(document.getElementById(faviconCanvasId), proxyUrl, 24);
                 }
 
             } catch (error) {
@@ -793,3 +800,4 @@
     </script>
 </body>
 </html>
+
