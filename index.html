@@ -27,7 +27,7 @@
 
         body {
             font-family: 'VT323', monospace;
-            font-size: 22px;
+            font-size: 28px;
             color: var(--amiga-black);
             -webkit-font-smoothing: none;
             -moz-osx-font-smoothing: grayscale;
@@ -185,7 +185,7 @@
         .widget-content { padding: 10px; color: var(--amiga-white); font-size: 20px; line-height: 1.7; }
         .widget-content a { color: var(--amiga-orange) !important; }
 
-        #weather-widget { top: 40px; left: calc(50% - 135px); width: 320px; }
+        #weather-widget { top: 40px; left: calc(50% - 135px); width: 280px; }
         #google-widget { top: 200px; left: calc(50% - 150px); width: 300px; }
         #wiki-widget { top: 340px; left: calc(50% - 165px); width: 330px; height: auto; }
         #bible-widget { top: 640px; left: calc(50% - 165px); width: 330px; }
@@ -320,7 +320,6 @@
             const feedsIcon = `<img src="${iconBasePath}feed.jpg" alt="Feed Reader" class="w-full h-full object-contain">`;
             const leonardoIcon = `<img src="${iconBasePath}zajaczolw.jpg" alt="Leonardo" class="w-full h-full object-contain">`;
             const ytMusicIcon = `<img src="${iconBasePath}music.jpg" alt="YouTube Music" class="w-full h-full object-contain">`;
-            const folderIcon = `<img src="${iconBasePath}folder.jpg" alt="Folder" class="w-full h-full object-contain">`;
 
             iconsRight.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailIcon);
             iconsRight.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeIcon);
@@ -333,7 +332,6 @@
             iconsLeft.innerHTML += createInteractiveIconHTML('RAM Disk', 'ram-disk-window', ramDiskIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('AI', 'ai-window', folderIcon);
             
             const topBarGadget = document.getElementById('top-bar-gadget');
             topBarGadget.innerHTML = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="black"/><rect x="1" y="4" width="10" height="10" fill="white" stroke="white" stroke-width="2"/><rect x="4" y="1" width="10" height="10" fill="white" stroke="white" stroke-width="2"/></svg>`;
@@ -341,7 +339,6 @@
             const ramInfo = `<p>Model: Amiga 600</p><p>Chip RAM: 1.0 MB</p><p>Fast RAM: 0.0 MB</p><p>Wolna pamięć: 804844 bajtów</p><p>Zajęta pamięć: 243732 bajtów</p>`;
             createBrowserWindow();
             createFeedsWindow();
-            createAiWindow();
             createWindowHTML('ram-disk-window', 'RAM Disk', ramInfo);
             const workbenchWindow = createWindowHTML('workbench-window', 'Workbench', 'Ładowanie informacji z Wikipedii...');
             fetchAndRenderPage(workbenchWindow, 'https://pl.wikipedia.org/wiki/AmigaOS', false);
