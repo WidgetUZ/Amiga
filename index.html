@@ -419,10 +419,10 @@
             } catch (error) { console.error("Error fetching weather:", error); }
 
             contentEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 4px;">${dynamicIconHTML}${kielceHerbIcon}</div>
+                <div style="display: flex; align-items: center; gap: 4px;">${dynamicIconHTML}${kielceHerbIcon}
                 <div style="text-align: right; line-height: 1.5;">
                     <div>Kielce</div><div style="font-size: 16px; font-weight: bold;">${temp}</div>
-                    <div>${cloud}</div><div>${precip}</div>
+                    <div>${cloud}</div><div>${precip}</div></div>
                 </div>`;
         }
         
