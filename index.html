@@ -42,11 +42,19 @@
         b, strong {
             font-weight: normal;
         }
-
+         audio, canvas, embed, iframe, img, object, svg, video {
+            display: block;
+            vertical-align: middle;
+            height: -webkit-fill-available;
+        }
+ai-icon-Perplexity {
+ height: -webkit-fill-available;
+        }
+        
         audio, canvas, embed, iframe, img, object, svg, video {
             display: block;
             vertical-align: middle;
-            height: -webkit-fill-available !important;
+            height: -webkit-fill-available;
         }
 
         .workbench-screen {
