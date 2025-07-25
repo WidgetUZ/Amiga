@@ -185,7 +185,7 @@
         .widget-content { padding: 10px; color: var(--amiga-white); font-size: 20px; line-height: 1.7; }
         .widget-content a { color: var(--amiga-orange) !important; }
 
-        #weather-widget { top: 40px; left: calc(50% - 135px); width: 280px; }
+        #weather-widget { top: 40px; left: calc(50% - 135px); width: 320px; }
         #google-widget { top: 200px; left: calc(50% - 150px); width: 300px; }
         #wiki-widget { top: 340px; left: calc(50% - 165px); width: 330px; height: auto; }
         #bible-widget { top: 640px; left: calc(50% - 165px); width: 330px; }
@@ -199,7 +199,7 @@
 
         .page-render-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
         .page-render-favicon { width: 28px; height: 28px; flex-shrink: 0; }
-        .page-render-main-image { max-width: 100%; margin: 5px; float: left; border: 1px solid var(--amiga-black); }
+        .page-render-main-image { max-width: 100%; margin-bottom: 10px; border: 1px solid var(--amiga-black); }
         
         .wiki-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
         .wiki-item canvas { width: 70px; height: auto; flex-shrink: 0; border: 1px solid black; }
@@ -320,6 +320,7 @@
             const feedsIcon = `<img src="${iconBasePath}feed.jpg" alt="Feed Reader" class="w-full h-full object-contain">`;
             const leonardoIcon = `<img src="${iconBasePath}zajaczolw.jpg" alt="Leonardo" class="w-full h-full object-contain">`;
             const ytMusicIcon = `<img src="${iconBasePath}music.jpg" alt="YouTube Music" class="w-full h-full object-contain">`;
+            const folderIcon = `<img src="${iconBasePath}folder.jpg" alt="Folder" class="w-full h-full object-contain">`;
 
             iconsRight.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailIcon);
             iconsRight.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeIcon);
@@ -332,6 +333,7 @@
             iconsLeft.innerHTML += createInteractiveIconHTML('RAM Disk', 'ram-disk-window', ramDiskIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
             iconsLeft.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
+            iconsLeft.innerHTML += createInteractiveIconHTML('AI', 'ai-window', folderIcon);
             
             const topBarGadget = document.getElementById('top-bar-gadget');
             topBarGadget.innerHTML = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="black"/><rect x="1" y="4" width="10" height="10" fill="white" stroke="white" stroke-width="2"/><rect x="4" y="1" width="10" height="10" fill="white" stroke="white" stroke-width="2"/></svg>`;
@@ -339,6 +341,7 @@
             const ramInfo = `<p>Model: Amiga 600</p><p>Chip RAM: 1.0 MB</p><p>Fast RAM: 0.0 MB</p><p>Wolna pamięć: 804844 bajtów</p><p>Zajęta pamięć: 243732 bajtów</p>`;
             createBrowserWindow();
             createFeedsWindow();
+            createAiWindow();
             createWindowHTML('ram-disk-window', 'RAM Disk', ramInfo);
             const workbenchWindow = createWindowHTML('workbench-window', 'Workbench', 'Ładowanie informacji z Wikipedii...');
             fetchAndRenderPage(workbenchWindow, 'https://pl.wikipedia.org/wiki/AmigaOS', false);
@@ -419,10 +422,10 @@
             } catch (error) { console.error("Error fetching weather:", error); }
 
             contentEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 4px;">${dynamicIconHTML}${kielceHerbIcon}
+                <div style="display: flex; align-items: center; gap: 4px;">${dynamicIconHTML}${kielceHerbIcon}</div>
                 <div style="text-align: right; line-height: 1.5;">
                     <div>Kielce</div><div style="font-size: 16px; font-weight: bold;">${temp}</div>
-                    <div>${cloud}</div><div>${precip}</div></div>
+                    <div>${cloud}</div><div>${precip}</div>
                 </div>`;
         }
         
@@ -578,7 +581,7 @@
         }
         
         function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 48) {
-            if (!canvas) return;
+            if (!canvas || !url) return;
             const ctx = canvas.getContext('2d');
             let img = new Image();
             img.crossOrigin = "Anonymous";
@@ -646,6 +649,38 @@
             ).join('');
             const win = createWindowHTML('feeds-window', 'RSS', linksHTML, {top: '50px', left: '250px'});
             win.addEventListener('click', handleFeedLinkClick);
+        }
+
+        function createAiWindow() {
+            const aiServices = [
+                { name: 'Kling AI', url: 'https://kling.kuaishou.com' },
+                { name: 'Leonardo', url: 'https://app.leonardo.ai' },
+                { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
+                { name: 'Firefly', url: 'https://firefly.adobe.com/' },
+                { name: 'Civitai', url: 'https://civitai.com/' }
+            ];
+
+            let contentHTML = '<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">';
+            aiServices.forEach(service => {
+                const canvasId = `ai-icon-${service.name.replace(/\s/g, '')}`;
+                contentHTML += `
+                    <a href="${service.url}" target="_blank" class="desktop-icon">
+                        <div class="icon-image"><canvas id="${canvasId}"></canvas></div>
+                        <div class="icon-label">${service.name}</div>
+                    </a>
+                `;
+            });
+            contentHTML += '</div>';
+            const win = createWindowHTML('ai-window', 'AI Tools', contentHTML, {top: '100px', left: '300px'});
+            
+            aiServices.forEach(service => {
+                 const canvasId = `ai-icon-${service.name.replace(/\s/g, '')}`;
+                 const faviconUrl = `https://www.google.com/s2/favicons?domain=${service.url}&sz=64`;
+                 setTimeout(() => {
+                    const canvas = document.getElementById(canvasId);
+                    if(canvas) loadImageToPixelArt(canvas, faviconUrl, 'https://corsproxy.io/?', 16);
+                 }, 0);
+            });
         }
 
         function setupMobileMenu() {
@@ -797,4 +832,3 @@
     </script>
 </body>
 </html>
-
