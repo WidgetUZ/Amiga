@@ -700,7 +700,7 @@ ai-icon-Perplexity {
             aiServices.forEach(service => {
                 const canvasId = `ai-icon-${service.name.replace(/\s/g, '')}`;
                 contentHTML += `
-                    <a href="${service.url}" target="_blank" class="desktop-icon">
+                    <a href="${service.url}" target="_blank" class="desktop-icon style="height: -webkit-fill-available;" >
                         <div class="icon-image"><canvas id="${canvasId}"></canvas></div>
                         <div class="icon-label">${service.name}</div>
                     </a>
