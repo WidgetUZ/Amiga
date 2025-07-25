@@ -1,567 +1,312 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workbench 1.3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <!-- Add Readability.js for better text extraction -->
+    <script src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.min.js"></script>
+    <style>
+        :root {
+            --amiga-blue: #0050a8;
+            --amiga-orange: #f77b22;
+            --amiga-black: #000000;
+            --amiga-white: #ffffff;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            font-size: 28px;
+            color: var(--amiga-black);
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            user-select: none;
+            cursor: url('https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/kursor.png'), auto;
+            background-color: var(--amiga-blue);
+        }
+        
+        b, strong {
+            font-weight: normal;
+        }
+
+        audio, canvas, embed, iframe, img, object, svg, video {
+            display: block;
+            vertical-align: middle;
+            height: auto; /* Corrected from -webkit-fill-available */
+        }
+
+        .workbench-screen {
+            background-color: var(--amiga-blue);
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+            padding-top: 50px; /* Adjusted top margin */
+            padding-bottom: 100px; /* Adjusted bottom margin */
+            box-sizing: border-box;
+        }
+
+        .top-bar {
+            background-color: var(--amiga-black);
+            color: var(--amiga-white);
+            height: 32px;
+            border-bottom: 2px solid var(--amiga-white);
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 2px 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .top-bar-text {
+            white-space: nowrap;
+            font-size: 22px;
+        }
+        
+        #top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        #mobile-feeds-menu {
+            display: none; /* Hidden on desktop */
+            position: relative;
+        }
+        #mobile-feeds-menu-btn {
+            background: none; border: none; color: white; font-family: inherit;
+            cursor: pointer;
+        }
+        #mobile-feeds-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--amiga-black);
+            border: 1px solid var(--amiga-white);
+            z-index: 1001;
+        }
+        #mobile-feeds-dropdown a {
+            color: white; text-decoration: none; display: block; padding: 5px 10px;
+        }
+        #mobile-feeds-dropdown a:hover {
+            background-color: var(--amiga-blue);
+        }
+
+        .desktop {
+            display: flex;
+            justify-content: space-between;
+            min-height: calc(100% - 40px);
+        }
+        
+        #desktop-icons-left, #desktop-icons-right {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 24px;
+            align-content: flex-start;
+        }
+
+        .desktop-icon {
+            display: flex; flex-direction: column; align-items: center;
+            width: 110px; cursor: inherit;
+            text-decoration: none;
+        }
+
+        .icon-image {
+            width: 64px; height: 58px; 
+            background-color: transparent;
+            border: none;
+            position: relative;
+            margin-bottom: 5px; display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        
+        .icon-label { 
+            background-color: transparent; 
+            color: var(--amiga-white); 
+            padding: 3px 5px; 
+            font-size: 22px; 
+            text-align: center; 
+            border: 1px solid transparent; 
+            width: 100%; 
+            white-space: normal; /* Allow wrapping */
+            word-break: break-word;
+            min-height: 40px; /* Space for two lines */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+        .desktop-icon:hover .icon-label { color: var(--amiga-orange); }
+        
+        .amiga-window {
+            position: absolute; width: 500px; max-width: 95%; height: 480px; max-height: 80vh;
+            background-color: var(--amiga-white);
+            border: 1px solid;
+            border-color: var(--amiga-white) var(--amiga-black) var(--amiga-black) var(--amiga-white);
+            z-index: 50; display: none; flex-direction: column;
+            padding: 1px;
+        }
+
+        .window-bar { height: 32px; padding: 0 5px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
+        .amiga-window.active .window-bar { color: var(--amiga-blue); }
+        .amiga-window.inactive .window-bar { color: var(--amiga-black); }
+        .window-title-container { display: flex; align-items: center; width: 100%; height: 100%; overflow: hidden; }
+        .window-title { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 26px; }
+        .title-lines {
+            flex-grow: 1;
+            height: 80%;
+            margin-left: 10px;
+            position: relative;
+        }
+        .title-lines::before, .title-lines::after { content: ''; position: absolute; left: 0; right: 0; }
+        .amiga-window.active .title-lines::before, .amiga-window.active .title-lines::after { height: 2px; background-color: var(--amiga-blue); }
+        .amiga-window.active .title-lines::before { top: 8px; }
+        .amiga-window.active .title-lines::after { bottom: 8px; }
+        .amiga-window.inactive .title-lines::before, .amiga-window.inactive .title-lines::after { height: 1px; background-color: transparent; background-image: repeating-linear-gradient(to right, var(--amiga-blue) 0, var(--amiga-blue) 2px, transparent 2px, transparent 4px); }
+        .amiga-window.inactive .title-lines::before { top: 9px; }
+        .amiga-window.inactive .title-lines::after { bottom: 9px; }
+
+        .window-gadgets { display: flex; align-items: center; }
+        .gadget { cursor: inherit; margin: 0 2px; }
+        
+        .window-content-wrapper { flex-grow: 1; margin: 5px; border: 2px solid var(--amiga-black); background-color: var(--amiga-blue); overflow: hidden; display: flex; flex-direction: column; }
+        .window-content {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            color: var(--amiga-white);
+            font-size: 24px;
+            line-height: normal;
+            word-break: break-word;
+        }
+        .window-content a { color: var(--amiga-orange) !important; text-decoration: underline !important; }
+
+        
+        .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px solid var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
+        .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; font-size: 28px; }
+        .widget-content { padding: 10px; color: var(--amiga-white); font-size: 20px; line-height: 1.7; }
+        .widget-content a { color: var(--amiga-orange) !important; }
+
+        #weather-widget { top: 40px; left: calc(50% - 135px); width: 320px; }
+        #google-widget { top: 200px; left: calc(50% - 150px); width: 300px; }
+        #wiki-widget { top: 340px; left: calc(50% - 165px); width: 330px; height: auto; }
+        #bible-widget { top: 640px; left: calc(50% - 165px); width: 330px; }
+        #wiki-search-widget { top: 800px; left: calc(50% - 165px); width: 330px; }
+
+        #google-widget .widget-content { background-color: var(--amiga-blue); }
+        #google-widget .form-input { background-color: var(--amiga-white); font-size: 22px; }
+
+        #browser-window .browser-bar { padding: 5px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 5px; }
+        #browser-window .browser-input { flex-grow: 1; }
+
+        .page-render-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .page-render-favicon { width: 28px; height: 28px; flex-shrink: 0; }
+        .page-render-main-image {
+            max-width: 100%;
+            float: left;
+            margin: 5px 5px 0px 0px;
+            border: 1px solid var(--amiga-black);
+        }
+        
+        .wiki-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .wiki-item canvas { width: 70px; height: auto; flex-shrink: 0; border: 1px solid black; }
+        .wiki-item a { color: var(--amiga-white); text-decoration: none; }
+        .wiki-item a:hover { color: var(--amiga-orange); }
+
+
+        @media (max-width: 768px) {
+            body { font-size: 20px; /* large on mobile */ }
+            .desktop { flex-direction: column; align-items: center; }
+            #desktop-icons-left, #desktop-icons-right { order: 1; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
+            #desktop-icons-right { margin-bottom: 20px; }
+            #widget-container { order: 2; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+            .desktop-icon { width: 70px; }
+            .icon-image { width: 48px; height: 42px; }
+            .icon-label { font-size: 16px; min-height: 34px; }
+            .desktop-icon.hide-on-mobile { display: none; }
+            #mobile-feeds-menu { display: block; }
+
+            .amiga-widget {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                transform: none !important;
+                width: 90%;
+            }
+            .widget-title { font-size: 24px; }
+            .widget-content { font-size: 18px; }
+        }
+    </style>
+</head>
 <body>
 
     <div class="workbench-screen">
         <div class="top-bar">
-            <div id="top-bar-text" class="top-bar-text">Amiga 600 Workbench 1.3</div>
+            <div id="top-bar-text" class="top-bar-text"></div>
             <div id="mobile-feeds-menu">
-                <button id="mobile-feeds-menu-btn">RSS ▾</button>
-                <div id="mobile-feeds-dropdown" style="display: none;"><a href="#" class="feed-link" data-url="https://www.polsatnews.pl/rss/wszystkie.xml" data-name="Polsat News">Polsat News</a><a href="#" class="feed-link" data-url="https://www.defence24.pl/rss" data-name="Defence24">Defence24</a><a href="#" class="feed-link" data-url="https://aleteia.org/pl/feed/" data-name="Aleteia.pl">Aleteia.pl</a><a href="#" class="feed-link" data-url="http://www.supermanhomepage.com/feed/" data-name="Superman Homepage">Superman Homepage</a><a href="#" class="feed-link" data-url="https://sport.interia.pl/feed" data-name="Sport Interia">Sport Interia</a></div>
+                <button id="mobile-feeds-menu-btn">RSS &#9662;</button>
+                <div id="mobile-feeds-dropdown"></div>
             </div>
             <div id="top-bar-right">
-                <div class="top-bar-text" id="date">25.07.2025</div>
-                <div class="top-bar-text" id="clock">19:16:26</div>
-                <div id="top-bar-gadget"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="black"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="white" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="white" stroke-width="2"></rect></svg></div>
+                <div class="top-bar-text" id="date"></div>
+                <div class="top-bar-text" id="clock">12:00:00</div>
+                <div id="top-bar-gadget"></div>
             </div>
         </div>
 
         <div class="desktop">
-            <div id="desktop-icons-right"><a href="https://mail.google.com" target="_blank" class="desktop-icon"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/gmail_04.jpg" alt="Gmail" class="w-full h-full object-contain"></div><div class="icon-label">Gmail</div></a><a href="https://youtube.com" target="_blank" class="desktop-icon"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/youtube.jpg" alt="YouTube" class="w-full h-full object-contain"></div><div class="icon-label">YouTube</div></a><a href="https://gemini.google.com" target="_blank" class="desktop-icon"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/say.jpg" alt="Say" class="w-full h-full object-contain"></div><div class="icon-label">Gemini</div></a><div class="desktop-icon interactive-icon " data-window-id="browser-window"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/internet.jpg" alt="Internet Browser" class="w-full h-full object-contain"></div><div class="icon-label">Web Browser</div></div><div class="desktop-icon interactive-icon hide-on-mobile" data-window-id="feeds-window"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/feed.jpg" alt="Feed Reader" class="w-full h-full object-contain"></div><div class="icon-label">RSS</div></div><a href="https://app.leonardo.ai" target="_blank" class="desktop-icon"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/zajaczolw.jpg" alt="Leonardo" class="w-full h-full object-contain"></div><div class="icon-label">Leonardo</div></a><a href="https://music.youtube.com" target="_blank" class="desktop-icon"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/music.jpg" alt="YouTube Music" class="w-full h-full object-contain"></div><div class="icon-label">YT Music</div></a></div>
+            <div id="desktop-icons-right"></div>
             <div id="widget-container">
                 <div id="weather-widget" class="amiga-widget">
                      <div class="widget-title">Pogoda</div>
-                     <div class="widget-content" id="weather-widget-content">
-                <div style="display: flex; align-items: center; gap: 4px;"><svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 18.5 A4.5 4.5 0 1 1 18 9.5 A6.5 6.5 0 1 1 13 6 A6.5 6.5 0 0 1 19.5 12.5" fill="white" stroke="black" stroke-width="1"></path></svg><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 48px; height: 48px; object-fit: contain;"></div>
-                <div style="text-align: right; line-height: 1.5;">
-                    <div>Kielce</div><div style="font-size: 16px; font-weight: bold;">25.1°C</div>
-                    <div>Chmury: 100%</div><div>Opady: 20%</div>
-                </div></div>
+                     <div class="widget-content" id="weather-widget-content"></div>
                 </div>
                 <div id="google-widget" class="amiga-widget">
                     <div class="widget-title">Wyszukiwarka</div>
                     <div class="widget-content">
-                        <div id="google-logo-container" style="margin-bottom: 8px; text-align: center;"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/google.jpg" alt="Google" style="height: 30px; display: inline-block;"></div>
+                        <div id="google-logo-container" style="margin-bottom: 8px; text-align: center;"></div>
                         <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
                     </div>
                 </div>
                 <div id="bible-widget" class="amiga-widget">
                     <div class="widget-title">Słowo na dziś</div>
-                    <div class="widget-content" id="bible-widget-content"><p>"But just as he who called you is holy, so be holy in all you do; for it is written: “Be holy, because I am holy.”"</p><p style="text-align: right;">- 1 Peter 1:15-16</p></div>
+                    <div class="widget-content" id="bible-widget-content">Ładowanie...</div>
                 </div>
-                <div id="wiki-widget" class="amiga-widget" style="z-index: 104; left: 159.637px; top: 171.113px;">
+                <div id="wiki-widget" class="amiga-widget">
                     <div class="widget-title">Wikipedia</div>
                     <div class="widget-content">
                         <form id="wiki-search-form" style="margin-bottom: 10px;">
                             <input type="text" class="form-input" placeholder="Szukaj w Wikipedii...">
                         </form>
-                        <div id="wiki-top5-content" style="overflow-y: auto;"><div class="wiki-item"><canvas id="wiki-canvas-257449" width="48" height="80"></canvas><a href="https://pl.wikipedia.org/wiki/Hulk_Hogan" target="_blank">Hulk Hogan</a></div><div class="wiki-item"><canvas id="wiki-canvas-56929" width="48" height="63"></canvas><a href="https://pl.wikipedia.org/wiki/Ozzy_Osbourne" target="_blank">Ozzy Osbourne</a></div><div class="wiki-item"><canvas id="wiki-canvas-4152803" width="48" height="54"></canvas><a href="https://pl.wikipedia.org/wiki/Waldemar_Żurek" target="_blank">Waldemar Żurek</a></div><div class="wiki-item"><canvas id="wiki-canvas-4933984" width="48" height="72"></canvas><a href="https://pl.wikipedia.org/wiki/Paulina_Damaske" target="_blank">Paulina Damaske</a></div><div class="wiki-item"><canvas id="wiki-canvas-5379639" width="48" height="58"></canvas><a href="https://pl.wikipedia.org/wiki/Sławosz_Uznański-Wiśniewski" target="_blank">Sławosz Uznański-Wiśniewski</a></div></div>
+                        <div id="wiki-top5-content" style="overflow-y: auto;">Ładowanie...</div>
                     </div>
                 </div>
             </div>
-            <div id="desktop-icons-left"><div class="desktop-icon interactive-icon " data-window-id="ram-disk-window"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/floppy.jpg" alt="Floppy Disk" class="w-full h-full object-contain"></div><div class="icon-label">RAM Disk</div></div><div class="desktop-icon interactive-icon " data-window-id="workbench-window"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/workbench.jpg" alt="Workbench" class="w-full h-full object-contain"></div><div class="icon-label">Workbench</div></div><div class="desktop-icon interactive-icon " data-window-id="trash-window"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kosz.jpg" alt="Trashcan" class="w-full h-full object-contain"></div><div class="icon-label">Kosz</div></div><div class="desktop-icon interactive-icon " data-window-id="ai-window"><div class="icon-image"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/folder.jpg" alt="Folder" class="w-full h-full object-contain"></div><div class="icon-label">AI</div></div></div>
+            <div id="desktop-icons-left"></div>
         </div>
 
-        <div id="windows-container"><div id="browser-window" class="amiga-window inactive" style="top: 150px; left: 150px;">
-                <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"></rect><rect x="4" y="4" width="7" height="7" fill="black"></rect></svg></div></div>
-                    <div class="window-title-container"><span class="window-title">Web Browser</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div><div class="gadget gadget-zoom"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="black"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div></div>
-                </div>
-                <div class="window-content-wrapper">
-                <div class="browser-bar">
-                    <form class="browser-form" style="display: flex; flex-grow: 1; gap: 4px;">
-                        <input type="text" class="form-input browser-input" placeholder="example.com">
-                        <button type="submit" class="form-button">Wczytaj</button>
-                    </form>
-                </div>
-                <div class="window-content">Wpisz adres URL powyżej.</div></div></div><div id="feeds-window" class="amiga-window inactive" style="top: 50px; left: 250px;">
-                <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"></rect><rect x="4" y="4" width="7" height="7" fill="black"></rect></svg></div></div>
-                    <div class="window-title-container"><span class="window-title">RSS</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div><div class="gadget gadget-zoom"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="black"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div></div>
-                </div>
-                <div class="window-content-wrapper"><div class="window-content"><p><a href="#" class="feed-link" data-url="https://www.polsatnews.pl/rss/wszystkie.xml" data-name="Polsat News">Polsat News</a></p><p><a href="#" class="feed-link" data-url="https://www.defence24.pl/rss" data-name="Defence24">Defence24</a></p><p><a href="#" class="feed-link" data-url="https://aleteia.org/pl/feed/" data-name="Aleteia.pl">Aleteia.pl</a></p><p><a href="#" class="feed-link" data-url="http://www.supermanhomepage.com/feed/" data-name="Superman Homepage">Superman Homepage</a></p><p><a href="#" class="feed-link" data-url="https://sport.interia.pl/feed" data-name="Sport Interia">Sport Interia</a></p></div></div></div><div id="ai-window" class="amiga-window active" style="top: 129.238px; left: 468.875px; display: flex; z-index: 103;">
-                <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"></rect><rect x="4" y="4" width="7" height="7" fill="black"></rect></svg></div></div>
-                    <div class="window-title-container"><span class="window-title">AI Tools</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div><div class="gadget gadget-zoom"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="black"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div></div>
-                </div>
-                <div class="window-content-wrapper"><div class="window-content"><div style="display: flex;flex-wrap: wrap;gap: 10px;justify-content: center;height: -webkit-fill-available !important;">
-                    <a href="https://kling.kuaishou.com" target="_blank" class="desktop-icon">
-                        <div class="icon-image"><canvas id="ai-icon-KlingAI" width="16" height="16"></canvas></div>
-                        <div class="icon-label">Kling AI</div>
-                    </a>
-                
-                    <a href="https://app.leonardo.ai" target="_blank" class="desktop-icon">
-                        <div class="icon-image"><canvas id="ai-icon-Leonardo" width="16" height="16"></canvas></div>
-                        <div class="icon-label">Leonardo</div>
-                    </a>
-                
-                    <a href="https://www.perplexity.ai/" target="_blank" class="desktop-icon">
-                        <div class="icon-image"><canvas id="ai-icon-Perplexity" width="16" height="16"></canvas></div>
-                        <div class="icon-label">Perplexity</div>
-                    </a>
-                
-                    <a href="https://firefly.adobe.com/" target="_blank" class="desktop-icon">
-                        <div class="icon-image"><canvas id="ai-icon-Firefly" width="16" height="16"></canvas></div>
-                        <div class="icon-label">Firefly</div>
-                    </a>
-                
-                    <a href="https://civitai.com/" target="_blank" class="desktop-icon">
-                        <div class="icon-image"><canvas id="ai-icon-Civitai" width="16" height="16"></canvas></div>
-                        <div class="icon-label">Civitai</div>
-                    </a>
-                </div></div></div></div><div id="ram-disk-window" class="amiga-window inactive" style="top: 100px; left: 100px;">
-                <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"></rect><rect x="4" y="4" width="7" height="7" fill="black"></rect></svg></div></div>
-                    <div class="window-title-container"><span class="window-title">RAM Disk</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div><div class="gadget gadget-zoom"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="black"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div></div>
-                </div>
-                <div class="window-content-wrapper"><div class="window-content"><p>Model: Amiga 600</p><p>Chip RAM: 1.0 MB</p><p>Fast RAM: 0.0 MB</p><p>Wolna pamięć: 804844 bajtów</p><p>Zajęta pamięć: 243732 bajtów</p></div></div></div><div id="workbench-window" class="amiga-window inactive" style="top: 100px; left: 100px;">
-                <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"></rect><rect x="4" y="4" width="7" height="7" fill="black"></rect></svg></div></div>
-                    <div class="window-title-container"><span class="window-title">Workbench</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div><div class="gadget gadget-zoom"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="black"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div></div>
-                </div>
-                <div class="window-content-wrapper"><div class="window-content"><div class="page-render-header"><canvas id="favicon-workbench-window" class="page-render-favicon" style="display: none;"></canvas><span>AmigaOS – Wikipedia, wolna encyklopedia</span></div><div><div id="mw-mf-viewport">
-	<div id="mw-mf-page-center">
-		<a class="mw-mf-page-center__mask" href="#"></a>
-		<header class="header-container header-chrome">
-			<div class="minerva-header">
-				<nav class="navigation-drawer toggle-list view-border-box">
-					<input type="checkbox" id="main-menu-input" data-event-name="ui.mainmenu" class="toggle-list__checkbox" role="button" aria-haspopup="true" aria-expanded="false" aria-labelledby="mw-mf-main-menu-button">
-					<label for="main-menu-input" id="mw-mf-main-menu-button" aria-hidden="true" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet toggle-list__toggle">
-    <span class="minerva-icon minerva-icon--menu"></span>
-<span></span>
-</label>
-
-					<div id="mw-mf-page-left" class="menu view-border-box">
-	<ul id="p-navigation" class="toggle-list__list">
-			<li class="toggle-list-item ">
-				<a class="toggle-list-item__anchor menu__item--home" href="/wiki/Wikipedia:Strona_g%C5%82%C3%B3wna" data-mw="interface">
-					<span class="minerva-icon minerva-icon--home"></span>
-
-					<span class="toggle-list-item__label">Strona główna</span>
-				</a>
-			</li>
-			<li class="toggle-list-item ">
-				<a class="toggle-list-item__anchor menu__item--random" href="/wiki/Specjalna:Losowa_strona" data-mw="interface">
-					<span class="minerva-icon minerva-icon--die"></span>
-
-					<span class="toggle-list-item__label">Losuj</span>
-				</a>
-			</li>
-			<li class="toggle-list-item skin-minerva-list-item-jsonly">
-				<a class="toggle-list-item__anchor menu__item--nearby" href="/wiki/Specjalna:W_pobli%C5%BCu" data-event-name="menu.nearby" data-mw="interface">
-					<span class="minerva-icon minerva-icon--mapPin"></span>
-
-					<span class="toggle-list-item__label">W pobliżu</span>
-				</a>
-			</li>
-	</ul>
-	<ul id="p-personal" class="toggle-list__list">
-			<li class="toggle-list-item ">
-				<a class="toggle-list-item__anchor mw-list-item menu__item--login" href="/w/index.php?title=Specjalna:Zaloguj&amp;returnto=AmigaOS" data-event-name="menu.login" data-mw="interface">
-					<span class="minerva-icon minerva-icon--logIn"></span>
-
-					<span class="toggle-list-item__label">Zaloguj się</span>
-				</a>
-			</li>
-	</ul>
-	<ul id="pt-preferences" class="toggle-list__list">
-			<li class="toggle-list-item skin-minerva-list-item-jsonly">
-				<a class="toggle-list-item__anchor menu__item--settings" href="/w/index.php?title=Specjalna:Ustawienia_mobile&amp;returnto=AmigaOS" data-event-name="menu.settings" data-mw="interface">
-					<span class="minerva-icon minerva-icon--settings"></span>
-
-					<span class="toggle-list-item__label">Ustawienia</span>
-				</a>
-			</li>
-	</ul>
-			<div class="donate-banner">
-				<a href="https://donate.wikimedia.org/?wmf_source=donate&amp;wmf_medium=sidebar&amp;wmf_campaign=pl.wikipedia.org&amp;uselang=pl&amp;wmf_key=minerva" class="donate-banner__link" data-event-name="menu.donateBanner">
-					<div class="donate-banner__text-container">
-						<span class="donate-banner__text">Podaruj teraz</span>
-						<span class="donate-banner__subtitle">Jeśli Wikipedia jest dla ciebie użyteczna, podaruj jej coś.</span>
-					</div>
-					<picture>
-						<source srcset="https://en.wikipedia.org/static/images/donate/donate.png" media="(prefers-reduced-motion)">
-						<canvas id="img-canvas-kdxo8h" style="max-width: 100%;"></canvas>
-					</picture>
-				</a>
-			</div>
-	<ul class="hlist">
-			<li class="toggle-list-item ">
-				<a class="toggle-list-item__anchor menu__item--about" href="/wiki/Wikipedia:O_Wikipedii" data-mw="interface">
-					
-					<span class="toggle-list-item__label">O Wikipedii</span>
-				</a>
-			</li>
-			<li class="toggle-list-item ">
-				<a class="toggle-list-item__anchor menu__item--disclaimers" href="/wiki/Wikipedia:Korzystasz_z_Wikipedii_tylko_na_w%C5%82asn%C4%85_odpowiedzialno%C5%9B%C4%87" data-mw="interface">
-					
-					<span class="toggle-list-item__label">Korzystasz z Wikipedii tylko na własną odpowiedzialność</span>
-				</a>
-			</li>
-	</ul>
-</div>
-
-					<label class="main-menu-mask" for="main-menu-input"></label>
-				</nav>
-				<div class="branding-box">
-					<a href="/wiki/Wikipedia:Strona_g%C5%82%C3%B3wna">
-						<span><canvas id="img-canvas-k16lk" style="max-width: 100%;"></canvas>
-
-</span>
-						
-					</a>
-				</div>
-					<form role="search" action="/w/index.php" method="get" class="minerva-search-form">
-				<div class="search-box search-box--typeahead">
-					<div class="cdx-typeahead-search cdx-typeahead-search--show-thumbnail cdx-typeahead-search--auto-expand-width">
-						<div class="cdx-search-input">
-							<div class="cdx-search-input__input-wrapper">
-								<div class="cdx-text-input cdx-text-input--has-start-icon">
-									<input type="hidden" name="title" value="Specjalna:Szukaj">
-									<input class="search skin-minerva-search-trigger cdx-text-input__input" id="searchInput" type="search" name="search" placeholder="Przeszukaj Wikipedię" aria-label="Przeszukaj Wikipedię" autocapitalize="sentences" spellcheck="false" title="Przeszukaj Wikipedię [f]" accesskey="f">
-									<span class="cdx-text-input__icon cdx-text-input__start-icon"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<button id="searchIcon" class="cdx-button cdx-button--size-large cdx-button--icon-only cdx-button--weight-quiet skin-minerva-search-trigger">
-	    <span class="minerva-icon minerva-icon--search"></span>
-<span>Szukaj</span>
-	</button>
-</form>
-		<nav class="minerva-user-navigation" aria-label="Nawigacja użytkownika">
-					
-				</nav>
-			</div>
-		</header>
-		<main id="content" class="mw-body">
-			<div class="banner-container">
-			<div id="siteNotice"></div>
-			</div>
-			
-			<div class="pre-content heading-holder">
-				<div class="page-heading">
-					<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">AmigaOS</span></h1>
-					<div class="tagline">system operacyjny</div>
-				</div>
-				<nav class="page-actions-menu">
-	<ul id="p-views" class="page-actions-menu__list minerva-icon-only-menu">
-		<li id="language-selector" class="page-actions-menu__list-item">
-				<a role="button" href="#p-lang" data-mw="interface" data-event-name="menu.languages" title="Język" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet language-selector">
-				    <span class="minerva-icon minerva-icon--language"></span>
-<span>Język</span>
-				</a>
-		</li>
-		<li id="page-actions-watch" class="page-actions-menu__list-item">
-				<a role="button" id="ca-watch" href="/w/index.php?title=Specjalna:Zaloguj&amp;returnto=AmigaOS" data-event-name="menu.watch" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet menu__item--page-actions-watch">
-				    <span class="minerva-icon minerva-icon--star"></span>
-<span>Obserwuj</span>
-				</a>
-		</li>
-		<li id="page-actions-edit" class="page-actions-menu__list-item">
-				<a role="button" id="ca-edit" href="//pl.wikipedia.org/w/index.php?title=AmigaOS&amp;action=edit" data-event-name="menu.edit" data-mw="interface" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet edit-page menu__item--page-actions-edit">
-				    <span class="minerva-icon minerva-icon--edit"></span>
-<span>Edytuj</span>
-				</a>
-		</li>
-	</ul>
-</nav>
-<!-- version 1.0.2 (change every time you update a partial) -->
-				<div id="mw-content-subtitle"><div id="mw-fr-revision-messages"><div class="cdx-message mw-fr-message-box cdx-message--inline cdx-message--notice mw-fr-mobile-message-inline"><span class="cdx-message__icon"></span><div class="cdx-message__content">To jest najnowsza <a href="/wiki/Wikipedia:Wersje_przejrzane" title="Wikipedia:Wersje przejrzane">wersja przejrzana</a>, która została <a class="external text" href="https://pl.wikipedia.org/w/index.php?title=Specjalna:Rejestr&amp;type=review&amp;page=AmigaOS">oznaczona</a> <i>12 sty 2024</i>.
-Od tego czasu wykonano <a class="external text" href="https://pl.wikipedia.org/w/index.php?title=AmigaOS&amp;oldid=72486461&amp;diff=cur">2 zmiany</a>, które oczekują na przejrzenie.</div></div></div></div>
-			</div>
-			<div id="bodyContent" class="content">
-				<div id="mw-content-text" class="mw-body-content"><div class="mw-content-ltr mw-parser-output" lang="pl" dir="ltr"><section class="mf-section-0" id="mf-section-0"><p><b>AmigaOS</b> – <a href="/wiki/System_operacyjny" title="System operacyjny">system operacyjny</a> opracowany przez firmę <a href="/wiki/Commodore_International" title="Commodore International">Commodore International</a> dla produkowanych przez nią komputerów <a href="/wiki/Amiga" title="Amiga">Amiga</a>. Wersja 1.0 została wydana w <a href="/wiki/1985_w_informatyce" title="1985 w informatyce">1985</a> roku, wraz z premierą komputera <a href="/wiki/Amiga_1000" title="Amiga 1000">Amiga 1000</a>.
-</p><table class="infobox">
-<caption class="naglowek" style="background-color:#CCDFF2; color:#000000;"><div class="iboxt-1">AmigaOS</div>
-</caption>
-<tbody><tr class="grafika iboxs grafika-z-wikidanych">
-<td colspan="2"><span typeof="mw:File"><a href="/wiki/Plik:AmigaOS_3.5_Box.jpg" class="mw-file-description"><canvas id="img-canvas-aek4h" style="max-width: 100%;"></canvas></a></span>
-</td></tr>
-
-<tr>
-<th><a href="/wiki/Platforma_obliczeniowa" title="Platforma obliczeniowa">Architektura</a>
-</th>
-<td>
-<p>komputery <a href="/wiki/Amiga" title="Amiga">Amiga</a> z procesorami <a href="/wiki/M68000" title="M68000">Motorola 68k</a> oraz <a href="/wiki/PowerPC" title="PowerPC">PowerPC</a>
-</p>
-</td></tr>
-<tr>
-<th>Pierwsze wydanie
-</th>
-<td>
-<p><a href="/wiki/1985" title="1985">1985</a>
-</p>
-</td></tr>
-<tr>
-<th>Aktualna wersja
-</th>
-<td>
-<p>4.1 Final Edition<br><small>(18 grudnia 2014)</small>
-</p>
-</td></tr>
-<tr>
-<th><a href="/wiki/J%C4%85dro_systemu_operacyjnego" title="Jądro systemu operacyjnego">Jądro</a>
-</th>
-<td>
-<p><a href="/wiki/Mikroj%C4%85dro" title="Mikrojądro">Mikrokernel</a>
-</p>
-</td></tr>
-<tr>
-<th>Środowisko pracy
-</th>
-<td>
-<p><a href="/wiki/Workbench" title="Workbench">Workbench</a>
-</p>
-</td></tr>
-<tr>
-<th>Licencja
-</th>
-<td>
-<p>komercyjna, <a href="/wiki/Zamkni%C4%99te_oprogramowanie" title="Zamknięte oprogramowanie">zamknięte oprogramowanie</a>
-</p>
-</td></tr>
-<tr>
-<th><a href="/wiki/Live_CD" title="Live CD">Wersja Live</a>
-</th>
-<td>
-<p><span class="notpageimage skin-invert-image" typeof="mw:File"><span><canvas id="img-canvas-xr3ut" style="max-width: 100%;"></canvas></span></span> dostępna
-</p>
-</td></tr>
-<tr>
-<th>Poprzednik
-</th>
-<td>
-<p>4.1
-</p>
-</td></tr>
-<tr style="background:#CCDFF2; color:black;">
-<td colspan="2" class="naglowek" style="text-align:center; border-top: 1px solid var(--border-color-base, #a2a9b1)"><a rel="nofollow" class="external text" href="https://www.amigaos.net">Strona internetowa</a>
-</td></tr>
-</tbody></table>
-
-<div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none"><div class="toctitle" lang="pl" dir="ltr"><h2 id="mw-toc-heading">Spis treści</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
-<ul>
-<li class="toclevel-1 tocsection-1"><a href="#Charakterystyka"><span class="tocnumber">1</span> <span class="toctext">Charakterystyka</span></a>
-<ul>
-<li class="toclevel-2 tocsection-2"><a href="#AmigaOS_4.0"><span class="tocnumber">1.1</span> <span class="toctext">AmigaOS 4.0</span></a></li>
-<li class="toclevel-2 tocsection-3"><a href="#AmigaOS_4.1"><span class="tocnumber">1.2</span> <span class="toctext">AmigaOS 4.1</span></a></li>
-</ul>
-</li>
-<li class="toclevel-1 tocsection-4"><a href="#Oprogramowanie"><span class="tocnumber">2</span> <span class="toctext">Oprogramowanie</span></a></li>
-<li class="toclevel-1 tocsection-5"><a href="#Przypisy"><span class="tocnumber">3</span> <span class="toctext">Przypisy</span></a></li>
-<li class="toclevel-1 tocsection-6"><a href="#Linki_zewnętrzne"><span class="tocnumber">4</span> <span class="toctext">Linki zewnętrzne</span></a></li>
-</ul>
-</div>
-
-</section><div class="mw-heading mw-heading2 section-heading" onclick="mfTempOpenSection(1)"><span class="indicator mf-icon mf-icon-expand mf-icon--small"></span><h2 id="Charakterystyka">Charakterystyka</h2><span class="mw-editsection">
-<a role="button" href="/w/index.php?title=AmigaOS&amp;action=edit&amp;section=1" title="Edytuj sekcję: Charakterystyka" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet ">
-    <span class="minerva-icon minerva-icon--edit"></span>
-<span>edytuj</span>
-</a>
-
-</span>
-
-</div><section class="mf-section-1 collapsible-block" id="mf-section-1">
-<p>System od początku <a href="/wiki/Architektura_32-bitowa" title="Architektura 32-bitowa">32-bitowy</a>, napisany został dla procesora <a href="/wiki/M68000" title="M68000">Motorola 68000</a>. Obsługiwane procesory to: <a href="/wiki/MC68000" title="MC68000">MC68000</a>, <a href="/wiki/MC68010" title="MC68010">MC68010</a>, <a href="/wiki/MC68020" title="MC68020">MC68020</a>, <a href="/wiki/MC68030" title="MC68030">MC68030</a>, <a href="/wiki/MC68040" title="MC68040">MC68040</a>, <a href="/wiki/MC68060" title="MC68060">MC68060</a>. Systemy w wersjach 3.x obsługują również procesory <a href="/wiki/PowerPC" title="PowerPC">PowerPC</a> znane także jako PPC, dzięki podsystemom WarpOS albo PowerUP. System pracuje nadal na M68x00, istnieje jednak możliwość uruchamiania programów napisanych dla PPC. Konstrukcja i oprogramowanie kart procesorowych umożliwia jednoczesną pracę obu procesorów, przy czym PPC jest wykorzystywany jako <a href="/wiki/Koprocesor" title="Koprocesor">koprocesor</a>. W krótkim czasie od pojawienia się kart z układami PPC powstał projekt <a href="/wiki/MorphOS" title="MorphOS">MorphOS</a> – mający na celu przeniesienie systemu Amiga OS na architekturę PPC. Pracę programistów utrudniał brak dokumentacji – <a href="/wiki/Kod_%C5%BAr%C3%B3d%C5%82owy" title="Kod źródłowy">kody źródłowe</a> systemu v3.0/3.1 stały się niedostępne krótko po upadku firmy Commodore. Istnieje także otwarta <a href="/wiki/Implementacja_(informatyka)" title="Implementacja (informatyka)">implementacja</a> systemu AmigaOS pod nazwą <a href="/wiki/AROS_Research_Operating_System" title="AROS Research Operating System">AROS</a>. Dostępna jest ona między innymi na platformę <a href="/wiki/X86" title="X86">x86</a>.
-</p><p>Obecna wersja AmigaOS 4.1 została przepisana całkowicie dla procesorów PowerPC i działa na komputerach <a href="/wiki/AmigaOne" title="AmigaOne">AmigaOne</a>, micro A1, SAM440ep, SAM440 Flex, <a href="/wiki/Pegasos" title="Pegasos">Pegasos</a> II. Oprogramowanie, które zostało napisane dla klasycznych Amig wyposażonych w procesory serii MC68x może być uruchamiane dzięki dwóm wbudowanym w system emulatorom: interpretowanemu, zapewniającemu wysoką zgodność z oryginalnymi układami sprzętowymi oraz <a href="/wiki/JIT_(informatyka)" title="JIT (informatyka)">JIT</a> o nazwie Petunia zapewniającemu dużą prędkość emulacji.
-</p>
-<figure typeof="mw:File/Thumb"><a href="/wiki/Plik:AmigaOS_3_and_clones.svg" class="mw-file-description"><noscript><canvas id="img-canvas-z45g6" style="max-width: 100%;"></canvas></noscript><span class="lazy-image-placeholder" style="width: 200px;height: 158px;" data-mw-src="//upload.wikimedia.org/wikipedia/commons/thumb/f/f8/AmigaOS_3_and_clones.svg/250px-AmigaOS_3_and_clones.svg.png" data-width="200" data-height="158" data-mw-srcset="//upload.wikimedia.org/wikipedia/commons/thumb/f/f8/AmigaOS_3_and_clones.svg/330px-AmigaOS_3_and_clones.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/f/f8/AmigaOS_3_and_clones.svg/400px-AmigaOS_3_and_clones.svg.png 2x" data-class="mw-file-element">&nbsp;</span></a><figcaption>AmigaOS i jego klony</figcaption></figure>
-<p><a href="/wiki/J%C4%85dro_systemu_operacyjnego" title="Jądro systemu operacyjnego">Jądro systemu</a> charakteryzowało się <a href="/wiki/Wielozadaniowo%C5%9B%C4%87" title="Wielozadaniowość">wielozadaniowością</a>, zaawansowanymi możliwościami graficznymi, ściśle związanymi z budową komputerów <a href="/wiki/Amiga" title="Amiga">Amiga</a>, a także niskim czasem reakcji, dzięki czemu znalazł on miejsce w zastosowaniach <a href="/wiki/System_operacyjny_czasu_rzeczywistego" title="System operacyjny czasu rzeczywistego">real-time</a>, chociaż nie był do nich projektowany. Wadą był brak <i>ochrony <a href="/wiki/Pami%C4%99%C4%87_komputerowa" title="Pamięć komputerowa">pamięci</a></i>. Zgodność ze standardem <a href="/wiki/POSIX" title="POSIX">POSIX</a> oraz <a href="/wiki/X_Window_System" title="X Window System">X Window System</a> można uzyskać przy użyciu zewnętrznych <a href="/wiki/Biblioteka_(informatyka)" class="mw-redirect" title="Biblioteka (informatyka)">bibliotek</a>.
-</p><p>System oferował nowoczesny <a href="/wiki/Interfejs_graficzny" class="mw-redirect" title="Interfejs graficzny">system graficzny</a>, w którym rolę <a href="/wiki/Pow%C5%82oka_systemowa" title="Powłoka systemowa">powłoki</a> pełnił <a href="/wiki/Workbench" title="Workbench">Workbench</a>. Istnieją też niezależne powłoki tekstowe, działające w oknie <a href="/wiki/Graficzny_interfejs_u%C5%BCytkownika" title="Graficzny interfejs użytkownika">trybu graficznego</a>. Charakterystyczną cechą układów graficznych i samego systemu był brak czysto tekstowych trybów graficznych. System już w pierwszej fazie startu oferował graficzny interfejs.
-</p><p>Standardowymi <a href="/wiki/System_plik%C3%B3w" title="System plików">systemami plików</a> są <a href="/w/index.php?title=OFS&amp;action=edit&amp;redlink=1" class="new" title="OFS (strona nie istnieje)">OFS</a> (Old File System – kickstart w wersji poniżej 2.0) i <a href="/wiki/Amiga_Fast_File_System" title="Amiga Fast File System">FFS</a> (Fast File System). Dla tego systemu powstały również alternatywne systemy plików: <a href="/w/index.php?title=MUFS&amp;action=edit&amp;redlink=1" class="new" title="MUFS (strona nie istnieje)">MUFS</a> (Multi User File System), <a href="/w/index.php?title=Profesional_File_System&amp;action=edit&amp;redlink=1" class="new" title="Profesional File System (strona nie istnieje)">PFS</a> (Profesional File System), <a href="/wiki/SFS" class="mw-redirect" title="SFS">SFS</a> (Smart File System), <a href="/w/index.php?title=Budowa_modu%C5%82owa&amp;action=edit&amp;redlink=1" class="new" title="Budowa modułowa (strona nie istnieje)">budowa modułowa</a> umożliwiała prostą i bezproblemową instalację dodatkowych systemów plików np.: <a href="/wiki/ISO_9660" title="ISO 9660">ISO 9660</a>, <a href="/wiki/File_Allocation_Table" title="File Allocation Table">FAT</a>, <a href="/wiki/FAT32" title="FAT32">FAT32</a>, <a href="/wiki/HFS" class="mw-redirect" title="HFS">MacFS</a> itd.
-</p><p><a href="/wiki/Kickstart" title="Kickstart">Kickstart</a> – część systemu zawarta w pamięci <a href="/wiki/ROM" class="mw-redirect" title="ROM">ROM</a> lub na <a href="/wiki/Dysk_twardy" title="Dysk twardy">twardym dysku</a> komputerów <a href="/wiki/Amiga" title="Amiga">Amiga</a>, zawiera jądro systemu oraz biblioteki potrzebne do uruchomienia systemu.
-</p>
-<div class="mw-heading mw-heading3"><h3 id="AmigaOS_4.0">AmigaOS 4.0</h3><span class="mw-editsection">
-<a role="button" href="/w/index.php?title=AmigaOS&amp;action=edit&amp;section=2" title="Edytuj sekcję: AmigaOS 4.0" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet ">
-    <span class="minerva-icon minerva-icon--edit"></span>
-<span>edytuj</span>
-</a>
-
-</span>
-
-</div>
-<p>Czwarta generacja <a href="/wiki/System_operacyjny" title="System operacyjny">systemu operacyjnego</a> <a href="/wiki/Amiga" title="Amiga">Amigi</a> – AmigaOS. Prace nad systemem rozpoczęła firma <a href="/w/index.php?title=Hyperion_Entertainment&amp;action=edit&amp;redlink=1" class="new" title="Hyperion Entertainment (strona nie istnieje)">Hyperion Entertainment</a> na mocy podpisanej <a href="/wiki/1_listopada" title="1 listopada">1 listopada</a> 2001 r. umowy z firmą <a href="/w/index.php?title=Amiga_Inc&amp;action=edit&amp;redlink=1" class="new" title="Amiga Inc (strona nie istnieje)">Amiga Inc</a>. W czerwcu 2004 r. ukazała się pierwsza publiczna wersja systemu nazwana „<b>AmigaOS 4.0 Developer Pre-release</b>”. Kolejne aktualizacje AmigaOS 4.0 Pre-release ukazały się w październiku 2004 r. (pierwsza aktualizacja), w czerwcu 2005 r. (trzecia aktualizacja), luty 2006 r. (czwarta aktualizacja). <a href="/wiki/24_grudnia" title="24 grudnia">24 grudnia</a> 2006 r. ukazała się finalna wersja <b>AmigaOS 4.0</b> dla komputerów <a href="/wiki/Amiga_One" class="mw-redirect" title="Amiga One">Amiga One</a> i <a href="/w/index.php?title=Micro_Amiga_One&amp;action=edit&amp;redlink=1" class="new" title="Micro Amiga One (strona nie istnieje)">micro Amiga One</a>. W lipcu 2007 r. ukazała się kolejna aktualizacja AmigaOS 4.0. Wersja systemu na klasyczne Amigi wyposażone w karty z procesorem PowerPC ukazała się dnia 30.11.2007 (pierwszy pokaz tej wersji na AmiWest 21.10.2007).
-</p>
-<div class="mw-heading mw-heading3"><h3 id="AmigaOS_4.1">AmigaOS 4.1</h3><span class="mw-editsection">
-<a role="button" href="/w/index.php?title=AmigaOS&amp;action=edit&amp;section=3" title="Edytuj sekcję: AmigaOS 4.1" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet ">
-    <span class="minerva-icon minerva-icon--edit"></span>
-<span>edytuj</span>
-</a>
-
-</span>
-
-</div>
-<ul><li>11.07.2008 – <a href="/w/index.php?title=Hyperion_Entertainment&amp;action=edit&amp;redlink=1" class="new" title="Hyperion Entertainment (strona nie istnieje)">Hyperion Entertainment</a> zapowiedział wersję 4.1 systemu AmigaOS.</li>
-<li>17.09.2008 – Hyperion Entertainment wraz z firmą <a href="/w/index.php?title=Acube_Systems&amp;action=edit&amp;redlink=1" class="new" title="Acube Systems (strona nie istnieje)">Acube Systems</a> podpisał licencje OEM na dystrybucje systemu AmigaOS 4.1 wraz z płytami głównymi produkowanymi przez Acube Systems: <a href="/wiki/Sam440ep" title="Sam440ep">Sam440ep</a> i <a href="/w/index.php?title=Sam440ep-Flex&amp;action=edit&amp;redlink=1" class="new" title="Sam440ep-Flex (strona nie istnieje)">Sam440ep-Flex</a></li>
-<li>31.01.2009 – Hyperion Entertainment<sup id="cite_ref-1" class="reference"><a href="#cite_note-1"><span class="cite-bracket">[</span>1<span class="cite-bracket">]</span></a></sup> udostępnił wersję 4.1 systemu AmigaOS dla płyty głównej <a href="/wiki/Pegasos" title="Pegasos">Pegasos</a> II produkcji <a href="/w/index.php?title=Genesi&amp;action=edit&amp;redlink=1" class="new" title="Genesi (strona nie istnieje)">Genesi</a>.</li>
-<li>14.01.2010 – Hyperion Entertainment udostępnił uaktualnienie systemu AmigaOS 4.1 nazwane „Update 1”. Update dostępne jest dla Sam440ep, Sam440ep-Flex, <a href="/wiki/Amiga_One" class="mw-redirect" title="Amiga One">Amiga One</a>, <a href="/w/index.php?title=Micro_Amiga_One&amp;action=edit&amp;redlink=1" class="new" title="Micro Amiga One (strona nie istnieje)">micro Amiga One</a> i Pegasos II. Możliwość pobrania archiwum „lha” z obrazem płyty mają zarejestrowani użytkownicy poprzez stronę Hyperion Entertainment.</li>
-<li>30.04.2010 – Hyperion Entertainment udostępnił kolejne uaktualnienie systemu AmigaOS 4.1 nazwane „Update 2”. Update jest dostępne dla AmigaOne, Sam440ep i Pegasos II. Możliwość pobrania archiwum „lha” z obrazem płyty mają zarejestrowani użytkownicy poprzez stronę Hyperion Entertainment. Do instalowania „Update 2” potrzebny jest zainstalowany „Update 1” na komputerze.</li>
-<li>30.11.2012 – wersja „Update 6”</li>
-<li>18.12.2014 – ostatnia wersja „Final Edition”</li>
-<li>18.12.2015 – „AmigaOS 4.1 Final Edition Classic” (dla Amig klasycznych z procesorem PPC oraz pod emulatorem) na stronach pakietu „Amiga Forever”<sup id="cite_ref-2" class="reference"><a href="#cite_note-2"><span class="cite-bracket">[</span>2<span class="cite-bracket">]</span></a></sup><sup id="cite_ref-3" class="reference"><a href="#cite_note-3"><span class="cite-bracket">[</span>3<span class="cite-bracket">]</span></a></sup>.</li></ul>
-</section><div class="mw-heading mw-heading2 section-heading" onclick="mfTempOpenSection(2)"><span class="indicator mf-icon mf-icon-expand mf-icon--small"></span><h2 id="Oprogramowanie">Oprogramowanie</h2><span class="mw-editsection">
-<a role="button" href="/w/index.php?title=AmigaOS&amp;action=edit&amp;section=4" title="Edytuj sekcję: Oprogramowanie" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet ">
-    <span class="minerva-icon minerva-icon--edit"></span>
-<span>edytuj</span>
-</a>
-
-</span>
-
-</div><section class="mf-section-2 collapsible-block" id="mf-section-2">
-<p>Na AmigaOS serii 4.x istnieją porty współczesnego oprogramowania. Przykładowo <a href="/wiki/Procesor_tekstu" title="Procesor tekstu">procesor tekstu</a> zapisujący w formatach .odt – <a href="/wiki/AbiWord" title="AbiWord">AbiWord</a>, <a href="/wiki/Gnumeric" title="Gnumeric">Gnumeric</a> (<a href="/wiki/Arkusz_kalkulacyjny" title="Arkusz kalkulacyjny">arkusz kalkulacyjny</a>), czy <a href="/wiki/Gimp" class="mw-redirect" title="Gimp">Gimp</a><sup id="cite_ref-4" class="reference"><a href="#cite_note-4"><span class="cite-bracket">[</span>4<span class="cite-bracket">]</span></a></sup>. Istnieje także wersja przeglądarki <a href="/wiki/Firefox" title="Firefox">Firefox</a>, Timberwolf<sup id="cite_ref-5" class="reference"><a href="#cite_note-5"><span class="cite-bracket">[</span>5<span class="cite-bracket">]</span></a></sup>. W trakcie beta testów była także <a href="/wiki/LibreOffice" title="LibreOffice">LibreOffice</a><sup id="cite_ref-6" class="reference"><a href="#cite_note-6"><span class="cite-bracket">[</span>6<span class="cite-bracket">]</span></a></sup>.
-</p>
-</section><div class="mw-heading mw-heading2 section-heading" onclick="mfTempOpenSection(3)"><span class="indicator mf-icon mf-icon-expand mf-icon--small"></span><h2 id="Przypisy">Przypisy</h2><span class="mw-editsection">
-<a role="button" href="/w/index.php?title=AmigaOS&amp;action=edit&amp;section=5" title="Edytuj sekcję: Przypisy" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet ">
-    <span class="minerva-icon minerva-icon--edit"></span>
-<span>edytuj</span>
-</a>
-
-</span>
-
-</div><section class="mf-section-3 collapsible-block" id="mf-section-3">
-<div class="do-not-make-smaller refsection"><div class="mw-references-wrap"><ol class="references">
-<li id="cite_note-1"><span class="mw-cite-backlink"><a href="#cite_ref-1">↑</a></span> <span class="reference-text"><a rel="nofollow" class="external text" href="http://amigaworld.net/modules/news/article.php?storyid=4740">Amigaworld.net – The Amiga Computer Community Portal Website</a></span>
-</li>
-<li id="cite_note-2"><span class="mw-cite-backlink"><a href="#cite_ref-2">↑</a></span> <span class="reference-text"><cite class="citation web"><a rel="nofollow" class="external text" href="http://www.exec.pl/wydarzenie.jsp?nid=6651&amp;AmigaOS_4.1_Final_Edition_Classic_w_cyfrowej_dystrybucji"><i>AmigaOS 4.1 Final Edition Classic w cyfrowej dystrybucji</i></a> [online], www.exec.pl<span class="accessdate"> [dostęp 2017-11-21]</span><span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft.gengre=book&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.btitle=AmigaOS+4.1+Final+Edition+Classic+w+cyfrowej+dystrybucji&amp;rft_id=http%3A%2F%2Fwww.exec.pl%2Fwydarzenie.jsp%3Fnid%3D6651%26AmigaOS_4.1_Final_Edition_Classic_w_cyfrowej_dystrybucji" style="display:none">&nbsp;</span> <span class="lang-list tylko-pl">(<abbr title="Treść w języku polskim">pol.</abbr>)</span>.</cite></span>
-</li>
-<li id="cite_note-3"><span class="mw-cite-backlink"><a href="#cite_ref-3">↑</a></span> <span class="reference-text"><cite class="citation web"><a rel="nofollow" class="external text" href="http://www.amigapodcast.com/2015/01/amigaos-41-final-edition-winuaea1200-ppc.html"><i>Amiga Podcast: AmigaOS 4.1 Final Edition – WinUAE/A1200 PPC</i></a> [online], www.amigapodcast.com<span class="accessdate"> [dostęp 2017-11-21]</span><span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft.gengre=book&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.btitle=Amiga+Podcast%3A+AmigaOS+4.1+Final+Edition+%E2%80%93+WinUAE%2FA1200+PPC&amp;rft_id=http%3A%2F%2Fwww.amigapodcast.com%2F2015%2F01%2Famigaos-41-final-edition-winuaea1200-ppc.html" style="display:none">&nbsp;</span>.</cite></span>
-</li>
-<li id="cite_note-4"><span class="mw-cite-backlink"><a href="#cite_ref-4">↑</a></span> <span class="reference-text"><cite class="citation web"><a rel="nofollow" class="external text" href="https://amigaone.wordpress.com/okolice-amigi/amicygnix/"><i>AmiCygnix – AmigaOne</i></a> [online], amigaone.wordpress.com<span class="accessdate"> [dostęp 2017-11-21]</span><span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft.gengre=book&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.btitle=AmiCygnix+%E2%80%93+AmigaOne&amp;rft_id=https%3A%2F%2Famigaone.wordpress.com%2Fokolice-amigi%2Famicygnix%2F" style="display:none">&nbsp;</span> <span class="lang-list tylko-pl">(<abbr title="Treść w języku polskim">pol.</abbr>)</span>.</cite></span>
-</li>
-<li id="cite_note-5"><span class="mw-cite-backlink"><a href="#cite_ref-5">↑</a></span> <span class="reference-text"><cite class="citation web"><a rel="nofollow" class="external text" href="http://www.amigaos.net/software/53/timberwolf-browser"><i>Timberwolf Browser | AmigaOS</i></a> [online], www.amigaos.net<span class="accessdate"> [dostęp 2017-11-21]</span><span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft.gengre=book&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.btitle=Timberwolf+Browser+%26%23124%3B+AmigaOS&amp;rft_id=http%3A%2F%2Fwww.amigaos.net%2Fsoftware%2F53%2Ftimberwolf-browser" style="display:none">&nbsp;</span> <span class="lang-list">(<abbr title="Treść w języku angielskim (English)">ang.</abbr>)</span>.</cite></span>
-</li>
-<li id="cite_note-6"><span class="mw-cite-backlink"><a href="#cite_ref-6">↑</a></span> <span class="reference-text"><cite class="citation web"><a rel="nofollow" class="external text" href="https://web.archive.org/web/20180108095612/http://www.generationamiga.com/2017/02/28/new-beta-libreoffice-for-amigaos-4-1/"><i>New beta LibreOffice for AmigaOS 4.1 – GenerationAmiga.com</i></a> [online], www.generationamiga.com<span class="accessdate"> [dostęp 2017-11-21]</span> [zarchiwizowane z <a rel="nofollow" class="external text" href="http://www.generationamiga.com/2017/02/28/new-beta-libreoffice-for-amigaos-4-1/">adresu</a> 2018-01-08]<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft.gengre=book&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.btitle=New+beta+LibreOffice+for+AmigaOS+4.1+%E2%80%93+GenerationAmiga.com&amp;rft_id=http%3A%2F%2Fwww.generationamiga.com%2F2017%2F02%2F28%2Fnew-beta-libreoffice-for-amigaos-4-1%2F" style="display:none">&nbsp;</span> <span class="lang-list">(<abbr title="Treść w języku angielskim (English)">ang.</abbr>)</span>.</cite></span>
-</li>
-</ol></div></div>
-</section><div class="mw-heading mw-heading2 section-heading" onclick="mfTempOpenSection(4)"><span class="indicator mf-icon mf-icon-expand mf-icon--small"></span><h2 id="Linki_zewnętrzne"><span id="Linki_zewn.C4.99trzne"></span>Linki zewnętrzne</h2><span class="mw-editsection">
-<a role="button" href="/w/index.php?title=AmigaOS&amp;action=edit&amp;section=6" title="Edytuj sekcję: Linki zewnętrzne" class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--icon-only cdx-button--weight-quiet ">
-    <span class="minerva-icon minerva-icon--edit"></span>
-<span>edytuj</span>
-</a>
-
-</span>
-
-</div><section class="mf-section-4 collapsible-block" id="mf-section-4">
-<ul><li><a rel="nofollow" class="external text" href="http://www.amigaos.net/">Oficjalna strona systemu AmigaOS 4</a> <span class="lang-list">(<abbr title="Treść w języku angielskim (English)">ang.</abbr>)</span></li>
-<li><a rel="nofollow" class="external text" href="http://www.gregdonner.org/workbench/">Opis wszystkich edycji AmigaOS</a> <span class="lang-list">(<abbr title="Treść w języku angielskim (English)">ang.</abbr>)</span></li>
-<li><a rel="nofollow" class="external text" href="http://amigaos.pl">Polska strona w całości poświęcona AmigaOS</a> <span class="lang-list">(<abbr title="Treść w języku angielskim (English)">ang.</abbr>)</span></li></ul>
-<!-- 
-NewPP limit report
-Parsed by mw‐web.eqiad.main‐7c68895bdf‐s5v6f
-Cached time: 20250723132443
-Cache expiry: 2592000
-Reduced expiry: false
-Complications: [vary‐revision‐sha1, show‐toc]
-CPU time usage: 0.193 seconds
-Real time usage: 0.292 seconds
-Preprocessor visited node count: 1819/1000000
-Revision size: 9125/2097152 bytes
-Post‐expand include size: 15185/2097152 bytes
-Template argument size: 3077/2097152 bytes
-Highest expansion depth: 15/100
-Expensive parser function count: 1/500
-Unstrip recursion depth: 0/20
-Unstrip post‐expand size: 6240/5000000 bytes
-Lua time usage: 0.092/10.000 seconds
-Lua memory usage: 4497665/52428800 bytes
-Number of Wikibase entities loaded: 3/500
--->
-<!--
-Transclusion expansion time report (%,ms,calls,template)
-100.00%  252.208      1 -total
- 70.71%  178.346      1 Szablon:System_operacyjny_infobox
- 25.98%   65.526      1 Szablon:Przypisy
- 22.84%   57.616      5 Szablon:Cytuj
- 20.86%   52.615     13 Szablon:Infobox_wiersz_dodaj
- 16.74%   42.224      2 Szablon:Infobox_grafika
- 13.70%   34.563      1 Szablon:Infobox_tytuł
- 12.99%   32.753      2 Szablon:Wersja_oprogramowania
- 12.51%   31.558      1 Szablon:Infobox_www
- 11.96%   30.157      2 Szablon:Wersja_oprogramowania/format
--->
-
-<!-- Saved in parser cache with key plwiki:stable-pcache:15:|#|:idhash:canonical and timestamp 20250723132443 and revision id 72486461. Rendering was triggered because: unknown
- -->
-</section></div>
-<!-- MobileFormatter took 0.002 seconds --><!--esi <esi:include src="/esitest-fa8a495983347898/content" /> --><noscript><canvas id="img-canvas-rc38f8" style="max-width: 100%;"></canvas></noscript>
-<div class="printfooter" data-nosnippet="">Źródło: „<a dir="ltr" href="https://pl.wikipedia.org/w/index.php?title=AmigaOS&amp;oldid=72486461">https://pl.wikipedia.org/w/index.php?title=AmigaOS&amp;oldid=72486461</a>”</div></div>
-				
-			</div>
-			<div class="post-content" id="page-secondary-actions">
-			</div>
-		</main>
-		<footer class="mw-footer minerva-footer" role="contentinfo">
-		  <a class="last-modified-bar" href="/w/index.php?title=AmigaOS&amp;action=history">
-  	<div class="post-content last-modified-bar__content">
-  		 <span class="minerva-icon minerva-icon-size-medium minerva-icon--modified-history"></span>
- 
-  		<span class="last-modified-bar__text modified-enhancement" data-user-name="" data-user-gender="" data-timestamp="">
-  				<span>Zobacz historię zmian tej strony.</span>
-  		</span>
-  		 <span class="minerva-icon minerva-icon-size-small minerva-icon--expand"></span>
- 
-  	</div>
-  </a>
-	<div class="post-content footer-content">
-			<div id="mw-data-after-content">
-	<div class="read-more-container"></div>
-</div>
-
-			<div id="p-lang">
-	    <h4>Języki</h4>
-	    <section>
-	        <ul id="p-variants" class="minerva-languages"></ul>
-	        <ul class="minerva-languages"><li class="interlanguage-link interwiki-ar mw-list-item"><a href="https://ar.wikipedia.org/wiki/%D8%A3%D9%85%D9%8A%D8%BA%D8%A7_%D8%A3%D9%88_%D8%A5%D8%B3" title="أميغا أو إس – arabski" lang="ar" hreflang="ar" data-title="أميغا أو إس" data-language-autonym="العربية" data-language-local-name="arabski" class="interlanguage-link-target"><span>العربية</span></a></li><li class="interlanguage-link interwiki-bs mw-list-item"><a href="https://bs.wikipedia.org/wiki/Amiga_OS" title="Amiga OS – bośniacki" lang="bs" hreflang="bs" data-title="Amiga OS" data-language-autonym="Bosanski" data-language-local-name="bośniacki" class="interlanguage-link-target"><span>Bosanski</span></a></li><li class="interlanguage-link interwiki-ca mw-list-item"><a href="https://ca.wikipedia.org/wiki/AmigaOS" title="AmigaOS – kataloński" lang="ca" hreflang="ca" data-title="AmigaOS" data-language-autonym="Català" data-language-local-name="kataloński" class="interlanguage-link-target"><span>Català</span></a></li><li class="interlanguage-link interwiki-cs mw-list-item"><a href="https://cs.wikipedia.org/wiki/AmigaOS" title="AmigaOS – czeski" lang="cs" hreflang="cs" data-title="AmigaOS" data-language-autonym="Čeština" data-language-local-name="czeski" class="interlanguage-link-target"><span>Čeština</span></a></li><li class="interlanguage-link interwiki-da mw-list-item"><a href="https://da.wikipedia.org/wiki/AmigaOS" title="AmigaOS – duński" lang="da" hreflang="da" data-title="AmigaOS" data-language-autonym="Dansk" data-language-local-name="duński" class="interlanguage-link-target"><span>Dansk</span></a></li><li class="interlanguage-link interwiki-de mw-list-item"><a href="https://de.wikipedia.org/wiki/AmigaOS" title="AmigaOS – niemiecki" lang="de" hreflang="de" data-title="AmigaOS" data-language-autonym="Deutsch" data-language-local-name="niemiecki" class="interlanguage-link-target"><span>Deutsch</span></a></li><li class="interlanguage-link interwiki-en mw-list-item"><a href="https://en.wikipedia.org/wiki/AmigaOS" title="AmigaOS – angielski" lang="en" hreflang="en" data-title="AmigaOS" data-language-autonym="English" data-language-local-name="angielski" class="interlanguage-link-target"><span>English</span></a></li><li class="interlanguage-link interwiki-es mw-list-item"><a href="https://es.wikipedia.org/wiki/AmigaOS" title="AmigaOS – hiszpański" lang="es" hreflang="es" data-title="AmigaOS" data-language-autonym="Español" data-language-local-name="hiszpański" class="interlanguage-link-target"><span>Español</span></a></li><li class="interlanguage-link interwiki-eo mw-list-item"><a href="https://eo.wikipedia.org/wiki/AmigaOS" title="AmigaOS – esperanto" lang="eo" hreflang="eo" data-title="AmigaOS" data-language-autonym="Esperanto" data-language-local-name="esperanto" class="interlanguage-link-target"><span>Esperanto</span></a></li><li class="interlanguage-link interwiki-fa mw-list-item"><a href="https://fa.wikipedia.org/wiki/%D8%A2%D9%85%DB%8C%DA%AF%D8%A7%D8%A7%D9%88%D8%A7%D8%B3" title="آمیگااواس – perski" lang="fa" hreflang="fa" data-title="آمیگااواس" data-language-autonym="فارسی" data-language-local-name="perski" class="interlanguage-link-target"><span>فارسی</span></a></li><li class="interlanguage-link interwiki-fr mw-list-item"><a href="https://fr.wikipedia.org/wiki/AmigaOS" title="AmigaOS – francuski" lang="fr" hreflang="fr" data-title="AmigaOS" data-language-autonym="Français" data-language-local-name="francuski" class="interlanguage-link-target"><span>Français</span></a></li><li class="interlanguage-link interwiki-gl mw-list-item"><a href="https://gl.wikipedia.org/wiki/AmigaOS" title="AmigaOS – galicyjski" lang="gl" hreflang="gl" data-title="AmigaOS" data-language-autonym="Galego" data-language-local-name="galicyjski" class="interlanguage-link-target"><span>Galego</span></a></li><li class="interlanguage-link interwiki-ko mw-list-item"><a href="https://ko.wikipedia.org/wiki/%EC%95%84%EB%AF%B8%EA%B0%80OS" title="아미가OS – koreański" lang="ko" hreflang="ko" data-title="아미가OS" data-language-autonym="한국어" data-language-local-name="koreański" class="interlanguage-link-target"><span>한국어</span></a></li><li class="interlanguage-link interwiki-hr mw-list-item"><a href="https://hr.wikipedia.org/wiki/AmigaOS" title="AmigaOS – chorwacki" lang="hr" hreflang="hr" data-title="AmigaOS" data-language-autonym="Hrvatski" data-language-local-name="chorwacki" class="interlanguage-link-target"><span>Hrvatski</span></a></li><li class="interlanguage-link interwiki-io mw-list-item"><a href="https://io.wikipedia.org/wiki/AmigaOS" title="AmigaOS – ido" lang="io" hreflang="io" data-title="AmigaOS" data-language-autonym="Ido" data-language-local-name="ido" class="interlanguage-link-target"><span>Ido</span></a></li><li class="interlanguage-link interwiki-ilo mw-list-item"><a href="https://ilo.wikipedia.org/wiki/AmigaOS" title="AmigaOS – ilokano" lang="ilo" hreflang="ilo" data-title="AmigaOS" data-language-autonym="Ilokano" data-language-local-name="ilokano" class="interlanguage-link-target"><span>Ilokano</span></a></li><li class="interlanguage-link interwiki-id mw-list-item"><a href="https://id.wikipedia.org/wiki/AmigaOS" title="AmigaOS – indonezyjski" lang="id" hreflang="id" data-title="AmigaOS" data-language-autonym="Bahasa Indonesia" data-language-local-name="indonezyjski" class="interlanguage-link-target"><span>Bahasa Indonesia</span></a></li><li class="interlanguage-link interwiki-it mw-list-item"><a href="https://it.wikipedia.org/wiki/AmigaOS" title="AmigaOS – włoski" lang="it" hreflang="it" data-title="AmigaOS" data-language-autonym="Italiano" data-language-local-name="włoski" class="interlanguage-link-target"><span>Italiano</span></a></li><li class="interlanguage-link interwiki-lt mw-list-item"><a href="https://lt.wikipedia.org/wiki/AmigaOS" title="AmigaOS – litewski" lang="lt" hreflang="lt" data-title="AmigaOS" data-language-autonym="Lietuvių" data-language-local-name="litewski" class="interlanguage-link-target"><span>Lietuvių</span></a></li><li class="interlanguage-link interwiki-ml mw-list-item"><a href="https://ml.wikipedia.org/wiki/%E0%B4%85%E0%B4%AE%E0%B4%BF%E0%B4%97%E0%B4%92%E0%B4%8E%E0%B4%B8%E0%B5%8D" title="അമിഗഒഎസ് – malajalam" lang="ml" hreflang="ml" data-title="അമിഗഒഎസ്" data-language-autonym="മലയാളം" data-language-local-name="malajalam" class="interlanguage-link-target"><span>മലയാളം</span></a></li><li class="interlanguage-link interwiki-mr mw-list-item"><a href="https://mr.wikipedia.org/wiki/%E0%A4%85%E0%A4%AE%E0%A4%BF%E0%A4%97%E0%A4%BE%E0%A4%93%E0%A4%8F%E0%A4%B8" title="अमिगाओएस – marathi" lang="mr" hreflang="mr" data-title="अमिगाओएस" data-language-autonym="मराठी" data-language-local-name="marathi" class="interlanguage-link-target"><span>मराठी</span></a></li><li class="interlanguage-link interwiki-nl mw-list-item"><a href="https://nl.wikipedia.org/wiki/AmigaOS" title="AmigaOS – niderlandzki" lang="nl" hreflang="nl" data-title="AmigaOS" data-language-autonym="Nederlands" data-language-local-name="niderlandzki" class="interlanguage-link-target"><span>Nederlands</span></a></li><li class="interlanguage-link interwiki-ja mw-list-item"><a href="https://ja.wikipedia.org/wiki/AmigaOS" title="AmigaOS – japoński" lang="ja" hreflang="ja" data-title="AmigaOS" data-language-autonym="日本語" data-language-local-name="japoński" class="interlanguage-link-target"><span>日本語</span></a></li><li class="interlanguage-link interwiki-pt mw-list-item"><a href="https://pt.wikipedia.org/wiki/AmigaOS" title="AmigaOS – portugalski" lang="pt" hreflang="pt" data-title="AmigaOS" data-language-autonym="Português" data-language-local-name="portugalski" class="interlanguage-link-target"><span>Português</span></a></li><li class="interlanguage-link interwiki-ru mw-list-item"><a href="https://ru.wikipedia.org/wiki/AmigaOS" title="AmigaOS – rosyjski" lang="ru" hreflang="ru" data-title="AmigaOS" data-language-autonym="Русский" data-language-local-name="rosyjski" class="interlanguage-link-target"><span>Русский</span></a></li><li class="interlanguage-link interwiki-sh mw-list-item"><a href="https://sh.wikipedia.org/wiki/AmigaOS" title="AmigaOS – serbsko-chorwacki" lang="sh" hreflang="sh" data-title="AmigaOS" data-language-autonym="Srpskohrvatski / српскохрватски" data-language-local-name="serbsko-chorwacki" class="interlanguage-link-target"><span>Srpskohrvatski / српскохрватски</span></a></li><li class="interlanguage-link interwiki-fi mw-list-item"><a href="https://fi.wikipedia.org/wiki/AmigaOS" title="AmigaOS – fiński" lang="fi" hreflang="fi" data-title="AmigaOS" data-language-autonym="Suomi" data-language-local-name="fiński" class="interlanguage-link-target"><span>Suomi</span></a></li><li class="interlanguage-link interwiki-sv mw-list-item"><a href="https://sv.wikipedia.org/wiki/AmigaOS" title="AmigaOS – szwedzki" lang="sv" hreflang="sv" data-title="AmigaOS" data-language-autonym="Svenska" data-language-local-name="szwedzki" class="interlanguage-link-target"><span>Svenska</span></a></li><li class="interlanguage-link interwiki-tr mw-list-item"><a href="https://tr.wikipedia.org/wiki/AmigaOS" title="AmigaOS – turecki" lang="tr" hreflang="tr" data-title="AmigaOS" data-language-autonym="Türkçe" data-language-local-name="turecki" class="interlanguage-link-target"><span>Türkçe</span></a></li><li class="interlanguage-link interwiki-uk mw-list-item"><a href="https://uk.wikipedia.org/wiki/AmigaOS" title="AmigaOS – ukraiński" lang="uk" hreflang="uk" data-title="AmigaOS" data-language-autonym="Українська" data-language-local-name="ukraiński" class="interlanguage-link-target"><span>Українська</span></a></li><li class="interlanguage-link interwiki-vi mw-list-item"><a href="https://vi.wikipedia.org/wiki/AmigaOS" title="AmigaOS – wietnamski" lang="vi" hreflang="vi" data-title="AmigaOS" data-language-autonym="Tiếng Việt" data-language-local-name="wietnamski" class="interlanguage-link-target"><span>Tiếng Việt</span></a></li><li class="interlanguage-link interwiki-zh mw-list-item"><a href="https://zh.wikipedia.org/wiki/AmigaOS" title="AmigaOS – chiński" lang="zh" hreflang="zh" data-title="AmigaOS" data-language-autonym="中文" data-language-local-name="chiński" class="interlanguage-link-target"><span>中文</span></a></li></ul>
-	    </section>
-	</div>
-	<div class="minerva-footer-logo">
-				<canvas id="img-canvas-qt2rpk" style="max-width: 100%;"></canvas>
-
-
-				<ul id="footer-icons" class="footer-icons">
-	<li id="footer-copyrightico"><a href="https://www.wikimedia.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><picture><source media="(min-width: 500px)" srcset="/static/images/footer/wikimedia-button.svg" width="84" height="29"><canvas id="img-canvas-jvmr8" style="max-width: 100%;"></canvas></picture></a></li>
-	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><picture><source media="(min-width: 500px)" srcset="/w/resources/assets/poweredby_mediawiki.svg" width="88" height="31"><canvas id="img-canvas-3615dk" style="max-width: 100%;"></canvas></picture></a></li>
-</ul>
-			</div>
-			<ul id="footer-info" class="footer-info hlist hlist-separated">
-	<li id="footer-info-lastmod"> Tę stronę ostatnio edytowano 12 sty 2024, 20:21.</li>
-	<li id="footer-info-copyright">Treść udostępniana na licencji <a class="external" rel="nofollow" href="https://creativecommons.org/licenses/by-sa/4.0/deed.pl">CC BY-SA 4.0</a>, jeśli nie podano inaczej.</li>
-</ul>
-
-			<ul id="footer-places" class="footer-places hlist hlist-separated">
-	<li id="footer-places-privacy"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy">Polityka prywatności</a></li>
-	<li id="footer-places-about"><a href="/wiki/Wikipedia:O_Wikipedii">O Wikipedii</a></li>
-	<li id="footer-places-disclaimers"><a href="/wiki/Wikipedia:Korzystasz_z_Wikipedii_tylko_na_w%C5%82asn%C4%85_odpowiedzialno%C5%9B%C4%87">Korzystasz z Wikipedii tylko na własną odpowiedzialność</a></li>
-	<li id="footer-places-wm-codeofconduct"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct">Powszechne Zasady Postępowania</a></li>
-	<li id="footer-places-developers"><a href="https://developer.wikimedia.org">Dla deweloperów</a></li>
-	<li id="footer-places-statslink"><a href="https://stats.wikimedia.org/#/pl.wikipedia.org">Statystyki</a></li>
-	<li id="footer-places-cookiestatement"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement">Oświadczenie o ciasteczkach</a></li>
-	<li id="footer-places-terms-use"><a href="https://foundation.m.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use">Zasady użytkowania</a></li>
-	<li id="footer-places-desktop-toggle"><a id="mw-mf-display-toggle" href="//pl.wikipedia.org/w/index.php?title=AmigaOS&amp;mobileaction=toggle_view_desktop" data-event-name="switch_to_desktop">Wersja standardowa</a></li>
-</ul>
-
-			</div>
-		</footer>
-			</div>
-</div>
-<div class="mw-portlet mw-portlet-dock-bottom emptyPortlet" id="p-dock-bottom">
-        <ul>
-                
-        </ul>
-</div>
-<div class="mw-notification-area" data-mw="interface"></div>
-<!-- v:8.3.1 -->
-
-
-
-</div></div></div></div><div id="trash-window" class="amiga-window inactive" style="top: 100px; left: 100px;">
-                <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"></rect><rect x="4" y="4" width="7" height="7" fill="black"></rect></svg></div></div>
-                    <div class="window-title-container"><span class="window-title">Kosz</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div><div class="gadget gadget-zoom"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="black"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div></div>
-                </div>
-                <div class="window-content-wrapper"><div class="window-content"><p>Kosz jest pusty.</p></div></div></div><div id="polsat-news-on-start" class="amiga-window inactive" style="top: 116.684px; left: 211.773px; display: none; z-index: 101;">
-                <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"></rect><rect x="4" y="4" width="7" height="7" fill="black"></rect></svg></div></div>
-                    <div class="window-title-container"><span class="window-title">Polsat News</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div><div class="gadget gadget-zoom"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"></rect><rect x="1" y="4" width="10" height="10" fill="black"></rect><rect x="4" y="1" width="10" height="10" fill="white" stroke="black" stroke-width="2"></rect></svg></div></div>
-                </div>
-                <div class="window-content-wrapper"><div class="window-content"><div style="padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.4);"><canvas id="canvas-polsat-news-on-start-top" class="page-render-main-image" width="128" height="72"></canvas><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/lukaszenka-bialorus-szykuje-sie-do-wojny/" target="_blank" style="color:white;text-decoration:none;">Łukaszenka: Białoruś szykuje się do wojny</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/szymon-holownia-w-programie-gosc-wydarzen-1/" target="_blank" style="color:white; text-decoration:none;">Szymon Hołownia w programie "Gość Wydarzeń"</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/skandaliczne-slowa-grzegorza-brauna-sejm-przyjal-uchwale/" target="_blank" style="color:white; text-decoration:none;">Skandaliczne słowa Grzegorza Brauna. Sejm przyjął uchwałę</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/lesniczy-nie-mogl-uwierzyc-co-znalazl-w-lesie-wciaz-znajduja-sie-geniusze/" target="_blank" style="color:white; text-decoration:none;">Leśniczy nie mógł uwierzyć, co znalazł w lesie. "Wciąż znajdują się geniusze"</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/trybunal-stanu-dla-szefa-krrit-jest-decyzja-sejmu/" target="_blank" style="color:white; text-decoration:none;">Trybunał Stanu dla szefa KRRiT. Jest decyzja Sejmu</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/jaroslaw-kaczynski-wyciaga-reke-do-konfederacji-stawia-kilka-warunkow/" target="_blank" style="color:white; text-decoration:none;">Jarosław Kaczyński wyciąga rękę do Konfederacji. Mentzen odpowiedział</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/zatrzymanie-i-doprowadzenie-ziobry-poslowie-zdecydowali/" target="_blank" style="color:white; text-decoration:none;">Zatrzymanie i doprowadzenie Ziobry. Posłowie zdecydowali</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/65-latek-z-cholera-ruszyla-procedura-sanepidu/" target="_blank" style="color:white; text-decoration:none;">Podejrzenie cholery w Stargardzie. Są nowe informacje</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/urzad-ujawnil-dane-kilku-tysiecy-osob-mieszkaniec-gdanska-podniosl-alarm/" target="_blank" style="color:white; text-decoration:none;">Urząd ujawnił dane kilku tysięcy osób. Mieszkaniec Gdańska podniósł alarm</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/malzenstwo-albo-front-w-rosji-znalezli-sposob-na-niezonatych-mezczyzn/" target="_blank" style="color:white; text-decoration:none;">Małżeństwo albo front. W Rosji znaleźli sposób na nieżonatych mężczyzn</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/zgorzelec-sklada-skarge-do-komisji-europejskiej-skarzonym-niemiecki-rzad/" target="_blank" style="color:white; text-decoration:none;">Zgorzelec składa skargę do Komisji Europejskiej. Skarżonym niemiecki rząd</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/trwa-sledztwo-w-sprawie-tragedii-kononowicza-w-tle-grozby-i-zatajanie-dowodow/" target="_blank" style="color:white; text-decoration:none;">Trwa śledztwo w sprawie tragedii Kononowicza. W tle groźby i zatajanie dowodów</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/polak-walczy-po-stronie-kremla-prokuratura-wszczela-sledztwo/" target="_blank" style="color:white; text-decoration:none;">Polak walczy po stronie Kremla. Prokuratura wszczęła śledztwo</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/nowy-ambasador-rosji-w-polsce-putin-podjal-decyzje/" target="_blank" style="color:white; text-decoration:none;">Nowy ambasador Rosji w Polsce. Putin podjął decyzję</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/gis-ostrzega-przed-naczyniami-istotne-zagrozenie-dla-zdrowia-czlowieka/" target="_blank" style="color:white; text-decoration:none;">GIS ostrzega przed naczyniami. "Istotne zagrożenie dla zdrowia człowieka"</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/przekonali-trumpa-do-pomocy-ukrainie-media-o-waznym-telefonie-z-polski/" target="_blank" style="color:white; text-decoration:none;">Przekonali Trumpa do pomocy Ukrainie. Media o ważnym telefonie z Polski</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/ciekawostki/2025-07-25/wakacje-bez-tlumow-na-tych-sekretnych-plazach-europy-nacieszysz-sie-spokojem/" target="_blank" style="color:white; text-decoration:none;">Wakacje bez tłumów. Na tych "sekretnych" plażach Europy nacieszysz się spokojem</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/makabryczne-odkrycie-w-lasopolu-nadpalone-cialo-przy-drodze/" target="_blank" style="color:white; text-decoration:none;">Makabryczne odkrycie na Mazowszu. Policja zatrzymała księdza</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/burze-z-gradem-i-silny-wiatr-imgw-wydalo-ostrzezenia-i-stopnia/" target="_blank" style="color:white; text-decoration:none;">Burze z gradem i silny wiatr. IMGW wydało ostrzeżenia I stopnia</a></strong></p></div><div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="https://www.polsatnews.pl/wiadomosc/2025-07-25/bodnar-odpowiada-na-slowa-sienkiewicza-konkretni-niezalezni-prokuratorzy/" target="_blank" style="color:white; text-decoration:none;">Bodnar odpowiada na słowa Sienkiewicza. "Konkretni, niezależni prokuratorzy"</a></strong></p></div></div></div></div></div>
+        <div id="windows-container"></div>
     </div>
 
     <script>
@@ -1113,6 +858,5 @@ Transclusion expansion time report (%,ms,calls,template)
             }
         });
     </script>
-
-
 </body>
+</html>
