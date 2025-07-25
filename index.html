@@ -42,20 +42,23 @@
         b, strong {
             font-weight: normal;
         }
-         audio, canvas, embed, iframe, img, object, svg, video {
+
+        audio, embed, iframe, img, object, svg, video {
             display: block;
             vertical-align: middle;
-            height: -webkit-fill-available;
+            height: auto;
         }
-ai-icon-Perplexity {
- height: -webkit-fill-available !important;
-        }
-        
-        audio, canvas, embed, iframe, img, object, svg, video {
+        canvas {
             display: block;
             vertical-align: middle;
-            height: -webkit-fill-available;
+            height: auto;
         }
+        #ai-window .icon-image canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
 
         .workbench-screen {
             background-color: var(--amiga-blue);
@@ -208,7 +211,11 @@ ai-icon-Perplexity {
             line-height: normal;
             word-break: break-word;
         }
-        .window-content a { color: var(--amiga-orange) !important; text-decoration: underline !important; }
+        .window-content a {
+            color: var(--amiga-orange) !important;
+            text-decoration: none;
+            font-weight: normal;
+        }
 
         
         .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px solid var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
@@ -700,7 +707,7 @@ ai-icon-Perplexity {
             aiServices.forEach(service => {
                 const canvasId = `ai-icon-${service.name.replace(/\s/g, '')}`;
                 contentHTML += `
-                    <a href="${service.url}" target="_blank" class="desktop-icon style="height: -webkit-fill-available;" >
+                    <a href="${service.url}" target="_blank" class="desktop-icon">
                         <div class="icon-image"><canvas id="${canvasId}"></canvas></div>
                         <div class="icon-label">${service.name}</div>
                     </a>
