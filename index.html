@@ -219,8 +219,8 @@
 
         
         .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px solid var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
-        .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; font-size: 28px; }
-        .widget-content { padding: 10px; color: var(--amiga-white); font-size: 20px; line-height: 1.7; }
+        .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; font-size: 35px; }
+        .widget-content { padding: 5px; color: var(--amiga-white); font-size: 20px; line-height: 1.7; }
         .widget-content a { color: var(--amiga-orange) !important; }
 
         #weather-widget { top: 40px; left: calc(50% - 135px); width: 320px; }
@@ -230,7 +230,7 @@
         #wiki-search-widget { top: 800px; left: calc(50% - 165px); width: 330px; }
 
         #google-widget .widget-content { background-color: var(--amiga-blue); }
-        #google-widget .form-input { background-color: var(--amiga-white); font-size: 22px; }
+        #google-widget .form-input { background-color: var(--amiga-white); font-size: 22px; padding: 2 0 2 5px; color: var(--amiga-blue) }
 
         #browser-window .browser-bar { padding: 5px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 5px; }
         #browser-window .browser-input { flex-grow: 1; }
@@ -294,14 +294,13 @@
             <div id="desktop-icons-right"></div>
             <div id="widget-container">
                 <div id="weather-widget" class="amiga-widget">
-                     <div class="widget-title">Pogoda</div>
+                     <div class="widget-title">Pogoda w Kielcach</div>
                      <div class="widget-content" id="weather-widget-content"></div>
                 </div>
                 <div id="google-widget" class="amiga-widget">
-                    <div class="widget-title" style="visibility: hidden">Wyszukiwarka</div>
                     <div class="widget-content">
-                        <div id="google-logo-container" style="margin-bottom: 8px; text-align: center;"></div>
-                        <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."><span style="color: #000"></span></form>
+                        <div id="google-logo-container" style="margin-bottom: 5px; text-align: center;"></div>
+                        <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
                     </div>
                 </div>
                 <div id="bible-widget" class="amiga-widget">
@@ -436,7 +435,7 @@
 
         async function loadWeather() {
             const contentEl = document.getElementById('weather-widget-content');
-            const kielceHerbIcon = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 48px; height: 48px; object-fit: contain;">`;
+            const kielceHerbIcon = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 58px; height: 58px; object-fit: contain;">`;
             const weatherIcons = {
                 sunny: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><circle cx="12" cy="12" r="5" fill="#f77b22"/><path d="M12 1V3 M23 12H21 M12 23V21 M1 12H3 M4.22 4.22L5.64 5.64 M18.36 18.36L19.78 19.78 M4.22 19.78L5.64 18.36 M18.36 5.64L19.78 4.22" stroke="#f77b22" stroke-width="2"/></svg>`,
                 cloudy: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 18.5 A4.5 4.5 0 1 1 18 9.5 A6.5 6.5 0 1 1 13 6 A6.5 6.5 0 0 1 19.5 12.5" fill="white" stroke="black" stroke-width="1"/></svg>`,
@@ -465,7 +464,7 @@
             } catch (error) { console.error("Error fetching weather:", error); }
 
             contentEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 4px;">${dynamicIconHTML}${kielceHerbIcon}</div>
+                <div style="display: flex; align-items: center; gap: 4px; float: left;">${dynamicIconHTML}${kielceHerbIcon}</div>
                 <div style="text-align: right; line-height: 1.5;">
                     <div>Kielce</div><div style="font-size: 16px; font-weight: bold;">${temp}</div>
                     <div>${cloud}</div><div>${precip}</div>
