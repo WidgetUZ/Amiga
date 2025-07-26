@@ -39,6 +39,9 @@
             background-color: var(--amiga-blue);
         }
         
+		input  {
+			color: var(--amiga-black) !important;
+		}
         b, strong {
             font-weight: normal;
         }
@@ -74,7 +77,7 @@
 
         .top-bar {
             background-color: var(--amiga-black);
-            color: var(--amiga-white);
+            color: var(--amiga-white) !important;
             height: 32px;
             border-bottom: 2px solid var(--amiga-white);
             width: 100%;
@@ -179,32 +182,71 @@
             padding: 1px;
         }
 
-        .window-bar { height: 32px; padding: 0 5px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
-        .amiga-window.active .window-bar { color: var(--amiga-blue); }
-        .amiga-window.inactive .window-bar { color: var(--amiga-black); }
+        .window-bar { height: 32px; padding: 0 4px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
+        .amiga-window.active .window-bar .window-bar-bottom { color: var(--amiga-blue); }
+        .amiga-window.inactive .window-bar .window-bar-bottom { color: var(--amiga-black); }
+        .window-title-container { display: flex; align-items: center; width: 100%; height: 100%; overflow: hidden; }
+        .window-title { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 26px; }
+        .title-lines{
+            flex-grow: 1;
+            height: 80%;
+            margin-left: 5px;
+			margin-right: 5px;
+            position: relative;
+			border-left: 19px;
+			border-left-color: #000;
+        }
+		.bottom-lines{
+            flex-grow: 1;
+            height: 100%;
+            margin-left: 5px;
+			margin-right: 5px;
+            position: relative;
+        }
+		.window-bar-bottom { height: 32px; padding: 0 4px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
+        .amiga-window.active .window-bar .window-bar-bottom { color: var(--amiga-blue); }
+        .amiga-window.inactive .window-bar .window-bar-botto  { color: var(--amiga-black); }
         .window-title-container { display: flex; align-items: center; width: 100%; height: 100%; overflow: hidden; }
         .window-title { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 26px; }
         .title-lines {
             flex-grow: 1;
             height: 80%;
-            margin-left: 10px;
+            margin-left: 5px;
+			margin-right: 5px;
             position: relative;
         }
         .title-lines::before, .title-lines::after { content: ''; position: absolute; left: 0; right: 0; }
-        .amiga-window.active .title-lines::before, .amiga-window.active .title-lines::after { height: 2px; background-color: var(--amiga-blue); }
+        .amiga-window.active .title-lines::before, .amiga-window.active .title-lines::after { height: 3px; background-color: var(--amiga-blue); }
         .amiga-window.active .title-lines::before { top: 8px; }
         .amiga-window.active .title-lines::after { bottom: 8px; }
         .amiga-window.inactive .title-lines::before, .amiga-window.inactive .title-lines::after { height: 1px; background-color: transparent; background-image: repeating-linear-gradient(to right, var(--amiga-blue) 0, var(--amiga-blue) 2px, transparent 2px, transparent 4px); }
         .amiga-window.inactive .title-lines::before { top: 9px; }
         .amiga-window.inactive .title-lines::after { bottom: 9px; }
 
-        .window-gadgets { display: flex; align-items: center; }
-        .gadget { cursor: inherit; margin: 0 2px; }
+		.bottom-lines {
+            flex-grow: 1;
+            height: 80%;
+            margin-left: 5px;
+			margin-right: 5px;
+            position: relative;
+        }
+        .bottom-lines::before, .bottom-lines::after { content: ''; position: absolute; left: 0; right: 0; }
+        .amiga-window.active .bottom-lines::before, .amiga-window.active .bottom-lines::after { height: 50%; background-color: var(--amiga-blue); }
+        .amiga-window.active .bottom-lines::before { top:8px; }
+        .amiga-window.active .bottom-lines::after { bottom: 8px; }
+        .amiga-window.inactive .bottom-lines::before, .amiga-window.inactive .bottom-lines::after { height: 3px; background-color: transparent; background-image: repeating-linear-gradient(to right, var(--amiga-blue) 0, var(--amiga-blue) 2px, transparent 2px, transparent 4px); }
+        .amiga-window.inactive .bottom-lines::before { top: 9px; }
+        .amiga-window.inactive .bottom-lines::after { bottom: 9px; }
+		
+		
+        .window-gadgets { display: flex; align-items: center; border-left: 1px;
+			border-left-color: var(--amiga-blue);}
+        .gadget { cursor: inherit; margin: 0 5px;}
         
         .window-content-wrapper { flex-grow: 1; margin: 5px; border: 2px solid var(--amiga-black); background-color: var(--amiga-blue); overflow: hidden; display: flex; flex-direction: column; }
         .window-content {
             flex-grow: 1;
-            padding: 10px;
+            padding:10px;
             overflow-y: auto;
             color: var(--amiga-white);
             font-size: 24px;
@@ -230,9 +272,10 @@
         #wiki-search-widget { top: 800px; left: calc(50% - 165px); width: 330px; }
 
         #google-widget .widget-content { background-color: var(--amiga-blue); }
-        #google-widget .form-input { background-color: var(--amiga-white); font-size: 22px; padding: 2 0 2 5px; color: var(--amiga-blue) }
-
-        #browser-window .browser-bar { padding: 5px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 5px; }
+        #google-widget .form-input { background-color: var(--amiga-white); font-size: 22px; padding: 2 0 2 15px; color: var(--amiga-blue);}
+		#wiki-search-form { background-color: var(--amiga-blue); }
+        #google-widget .form-input {background-color: var(--amiga-white); font-size: 22px; padding: 2 0 2 15px; color: var(--amiga-blue);}
+        #browser-window .browser-bar {padding: 5px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 5px; color: var(--amiga-blue); background-color: var(--amiga-orange);}
         #browser-window .browser-input { flex-grow: 1; }
 
         .page-render-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
@@ -244,7 +287,7 @@
             border: 1px solid var(--amiga-black);
         }
         
-        .wiki-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .wiki-item { display: flex; gap: 10px; align-items: center; vertical-align: top; margin-bottom: 10px; }
         .wiki-item canvas { width: 70px; height: auto; flex-shrink: 0; border: 1px solid black; }
         .wiki-item a { color: var(--amiga-white); text-decoration: none; }
         .wiki-item a:hover { color: var(--amiga-orange); }
@@ -270,15 +313,15 @@
                 width: 90%;
             }
             .widget-title { font-size: 24px; }
-            .widget-content { font-size: 18px; }
-        }
+            .widget-content { font-size: 21px; line-height: normal }
+        
     </style>
 </head>
 <body>
 
     <div class="workbench-screen">
         <div class="top-bar">
-            <div id="top-bar-text" class="top-bar-text"></div>
+            <div id="top-bar-text" class="top-bar-text">Amiga 600 Workbench 1.3</div>
             <div id="mobile-feeds-menu">
                 <button id="mobile-feeds-menu-btn">RSS &#9662;</button>
                 <div id="mobile-feeds-dropdown"></div>
@@ -294,7 +337,7 @@
             <div id="desktop-icons-right"></div>
             <div id="widget-container">
                 <div id="weather-widget" class="amiga-widget">
-                     <div class="widget-title">Pogoda w Kielcach</div>
+                     <div class="widget-title">Pogoda</div>
                      <div class="widget-content" id="weather-widget-content"></div>
                 </div>
                 <div id="google-widget" class="amiga-widget">
@@ -304,9 +347,10 @@
                     </div>
                 </div>
                 <div id="bible-widget" class="amiga-widget">
-                    <div class="widget-title">Słowo na dziś</div>
+                    <div><div class="widget-title">Słowo na dziś</div><div style="float: left; padding: 0 10px 0 10px;border-style: none">
+					<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/jesus.png?raw=true" style="width: 60px; height: auto; border-style: none;"></div>
                     <div class="widget-content" id="bible-widget-content">Ładowanie...</div>
-                </div>
+					</div></div>
                 <div id="wiki-widget" class="amiga-widget">
                     <div class="widget-title">Wikipedia</div>
                     <div class="widget-content">
@@ -437,9 +481,9 @@
             const contentEl = document.getElementById('weather-widget-content');
             const kielceHerbIcon = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 58px; height: 58px; object-fit: contain;">`;
             const weatherIcons = {
-                sunny: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><circle cx="12" cy="12" r="5" fill="#f77b22"/><path d="M12 1V3 M23 12H21 M12 23V21 M1 12H3 M4.22 4.22L5.64 5.64 M18.36 18.36L19.78 19.78 M4.22 19.78L5.64 18.36 M18.36 5.64L19.78 4.22" stroke="#f77b22" stroke-width="2"/></svg>`,
-                cloudy: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 18.5 A4.5 4.5 0 1 1 18 9.5 A6.5 6.5 0 1 1 13 6 A6.5 6.5 0 0 1 19.5 12.5" fill="white" stroke="black" stroke-width="1"/></svg>`,
-                rain: `<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="M18 14.5 A4.5 4.5 0 1 1 18 5.5 A6.5 6.5 0 1 1 13 2 A6.5 6.5 0 0 1 19.5 8.5" fill="white" stroke="black" stroke-width="1"/><path d="M10 16 L8 18 M14 16 L12 18 M18 16 L16 18 M10 20 L8 22 M14 20 L12 22" stroke="#0050a8" stroke-width="2"/></svg>`,
+                sunny: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/sunny.png?raw=true"`,
+                cloudy: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/clouds.png?raw=true"`,
+                rain: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/rain.png?raw=true"`,
             };
             
             let dynamicIconHTML = weatherIcons.cloudy;
@@ -452,8 +496,8 @@
                     const weather = data.current;
                     
                     temp = `${weather.temperature_2m}°C`;
-                    cloud = `Chmury: ${weather.cloud_cover}%`;
-                    precip = `Opady: ${weather.precipitation_probability}%`;
+                    cloud = `Chmury: ${weather.cloud_cover}% pokrycia`;
+                    precip = `Opady: ${weather.precipitation_probability}% szans`;
 
                     const weatherCode = weather.weather_code;
                     if (weatherCode === 0) dynamicIconHTML = weatherIcons.sunny;
@@ -565,7 +609,12 @@
                     <div class="window-title-container"><span class="window-title">${title}</span><div class="title-lines"></div></div>
                     <div class="window-gadgets"><div class="gadget gadget-depth">${depthGadgetSVG}</div><div class="gadget gadget-zoom">${zoomGadgetSVG}</div></div>
                 </div>
-                <div class="window-content-wrapper"><div class="window-content">${contentHTML}</div></div>`;
+                <div class="window-content-wrapper"><div class="window-content">${contentHTML}</div></div>
+<div class="window-bar-bottom">
+                    <div class="window-gadgets"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/arrow-left.jpg"></div>
+                    <div class="bottom-lines"></div><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/arrow-right.jpg"></div>
+                 
+                </div>`;
             
             container.appendChild(windowEl);
             makeElementDraggable(windowEl);
@@ -681,7 +730,9 @@
                         <button type="submit" class="form-button">Wczytaj</button>
                     </form>
                 </div>
-                <div class="window-content">Wpisz adres URL powyżej.</div>`;
+                <div class="window-content">Wpisz adres URL powyżej.</div>
+`
+			;
             win.querySelector('.browser-form').addEventListener('submit', (e) => handleBrowserSubmit(e, win));
         }
 
