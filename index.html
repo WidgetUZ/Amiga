@@ -22,7 +22,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            overflow: hidden; /* Prevent body scrollbars */
         }
 
         body {
@@ -56,7 +56,8 @@
             vertical-align: middle;
             height: auto;
         }
-        #ai-window .icon-image canvas {
+        /* Ensure canvas in icon-image fills its container */
+        .icon-image canvas {
             width: 100%;
             height: 100%;
             object-fit: contain;
@@ -129,22 +130,48 @@
 
         .desktop {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Distribute icons and widgets */
             min-height: calc(100% - 40px);
+            position: relative; /* For absolute positioning of widget-container */
         }
         
         #desktop-icons-left, #desktop-icons-right {
             display: flex;
             flex-direction: column;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Allow wrapping into new columns */
             gap: 24px;
             align-content: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+            height: calc(100vh - 150px); /* Fill available height for wrapping */
         }
+
+        #desktop-icons-left {
+            align-items: flex-start; /* Align icons to the left */
+        }
+
+        #desktop-icons-right {
+            align-items: flex-end; /* Align icons to the right */
+        }
+
+        #widget-container {
+            position: absolute; /* Position widgets absolutely within desktop */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allow clicks to pass through to desktop icons */
+        }
+        #widget-container > * {
+            pointer-events: auto; /* Re-enable pointer events for individual widgets */
+        }
+
 
         .desktop-icon {
             display: flex; flex-direction: column; align-items: center;
             width: 110px; cursor: inherit;
             text-decoration: none;
+            flex-shrink: 0; /* Prevent icons from shrinking */
         }
 
         .icon-image {
@@ -287,21 +314,70 @@
         }
 
 
-        
-        .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px dotted var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
-        .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; padding: 0 10px 0 10px; font-size: 35px; }
-        .widget-content { padding: 5px; color: var(--amiga-white); font-size: 20px; line-height: normal; }
+        /* Widget Styling */
+        .amiga-widget { 
+            position: absolute; 
+            background-color: var(--amiga-blue); 
+            border: 2px dotted var(--amiga-white); 
+            z-index: 40; 
+            display: flex; 
+            flex-direction: column; 
+            /* Make the entire widget draggable */
+            cursor: grab; /* Indicate draggable */
+        }
+        .amiga-widget:active {
+            cursor: grabbing; /* Indicate dragging */
+        }
+
+        .widget-close-button { /* New class for the close gadget for widgets */
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            z-index: 51; /* Ensure it's above other widget content */
+            cursor: pointer;
+        }
+
+        .widget-title { 
+            /* Moved from .amiga-widget to .widget-bar for consistency */
+            color: var(--amiga-white); 
+            text-transform: uppercase; 
+            text-align: center; 
+            padding: 4px; 
+            font-size: 26px; /* Adjusted for bar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between title and logo */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 5px; /* Add some margin from the top border */
+            margin-bottom: 5px; /* Add some margin from the content */
+        }
+        .widget-title canvas {
+            width: 24px; /* Adjusted size for widget logo */
+            height: 24px;
+            object-fit: contain;
+        }
+        .widget-content { 
+            padding: 5px; 
+            color: var(--amiga-white); 
+            font-size: 20px; 
+            line-height: normal; 
+            flex-grow: 1; /* Allow content to fill remaining height */
+            overflow-y: auto; /* Enable scrolling for content */
+        }
         .widget-content a { color: var(--amiga-orange) !important; }
 
-        #weather-widget { top: 40px; left: calc(50% - 135px); width: 320px; }
-        #google-widget { top: 200px; left: calc(50% - 150px); width: 300px; }
-        #wiki-widget { top: 340px; left: calc(50% - 165px); width: 330px; height: auto; }
-        #bible-widget { top: 640px; left: calc(50% - 165px); width: 330px; }
-        #wiki-search-widget { top: 800px; left: calc(50% - 165px); width: 330px; }
+        /* Initial positions for widgets - will be randomized by JS */
+        #weather-widget { width: 300px; height: 100%; } /* Added height for better random positioning */
+        #google-widget { width: 300px; height: 100%; padding-bottom: 10px; text-align: center; }
+        #wiki-widget { width: 250px; height: 300px; text-align: center;}
+        #bible-widget { width: 330px; height: 180px; }
 
         #google-widget .widget-content { background-color: var(--amiga-blue); }
         #google-widget .form-input { background-color: var(--amiga-white); font-size: 22px; padding: 2 0 2 15px; color: var(--amiga-blue);}
-		#wiki-search-form { background-color: var(--amiga-blue); }
+		#wiki-search-form { background-color: var(--amiga-blue); margin: 0px 5px 0px 5px; padding: 5px;}
         #google-widget .form-input {background-color: var(--amiga-white); font-size: 22px; padding: 2 0 2 15px; color: var(--amiga-blue);}
         #browser-window .browser-bar {padding: 5px; border-bottom: 2px solid var(--amiga-black); display: flex; gap: 5px; color: var(--amiga-blue); background-color: var(--amiga-orange);}
         #browser-window .browser-input { flex-grow: 1; }
@@ -315,24 +391,53 @@
             border: 1px solid var(--amiga-black);
         }
         
-        .wiki-item { display: flex; gap: 10px; align-items: center; vertical-align: top; margin-bottom: 10px; }
+        .wiki-item { display: flex; flex-direction: column; gap: 5px; vertical-align: top; margin-bottom: 10px; } /* Changed to column for snippet */
+        .wiki-item .wiki-item-header { display: flex; gap: 10px; align-items: top;}
         .wiki-item canvas { width: 70px; height: auto; flex-shrink: 0; border: 1px solid black; }
         .wiki-item a { color: var(--amiga-white); text-decoration: none; }
         .wiki-item a:hover { color: var(--amiga-orange); }
+        .wiki-item-snippet {
+            font-size: 18px; /* Smaller font for snippet */
+            color: rgba(255,255,255,0.8);
+            margin-left: 80px; /* Indent snippet to align with title */
+        }
 
 
         @media (max-width: 768px) {
             body { font-size: 20px; /* large on mobile */ }
-            .desktop { flex-direction: column; align-items: center; }
-            #desktop-icons-left, #desktop-icons-right { order: 1; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
-            #desktop-icons-right { margin-bottom: 20px; }
-            #widget-container { order: 2; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-            .desktop-icon { width: 70px; }
-            .icon-image { width: 48px; height: 42px; }
-            .icon-label { font-size: 16px; min-height: 34px; }
-            .desktop-icon.hide-on-mobile { display: none; }
-            #mobile-feeds-menu { display: block; }
+            .desktop { 
+                flex-direction: column; 
+                align-items: center; 
+                justify-content: flex-start; /* Stack items at the top */
+            }
+            /* Desktop icons containers for mobile - stack horizontally at top */
+            #desktop-icons-left, #desktop-icons-right {
+                position: relative; /* Remove absolute positioning on mobile */
+                height: auto; /* Auto height on mobile */
+                flex-direction: row; /* Arrange icons in rows on mobile */
+                flex-wrap: wrap; /* Wrap to new rows */
+                justify-content: center; /* Center icons */
+                padding: 10px;
+                width: 100%; /* Take full width */
+                align-items: center; /* Center items in row */
+                gap: 10px; /* Smaller gap for mobile icons */
+            }
+            #desktop-icons-right { order: 1; } /* Order right icons first on mobile */
+            #desktop-icons-left { order: 2; } /* Then left icons */
 
+            #widget-container { 
+                position: relative; /* Remove absolute positioning on mobile */
+                top: auto;
+                left: auto;
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                pointer-events: auto; /* Re-enable pointer events for the container itself */
+                padding-bottom: 20px; /* Add some padding at the bottom of widgets on mobile */
+            }
             .amiga-widget {
                 position: relative !important;
                 top: auto !important;
@@ -342,6 +447,11 @@
             }
             .widget-title { font-size: 24px; }
             .widget-content { font-size: 21px; line-height: normal }
+
+            #top-bar-text {
+                content: "Amiga 600"; /* Set the content property for the mobile text */
+            }
+        }
         
     </style>
 </head>
@@ -351,7 +461,7 @@
         <div class="top-bar">
             <div id="top-bar-text" class="top-bar-text">Amiga 600 Workbench 1.3</div>
             <div id="mobile-feeds-menu">
-                <button id="mobile-feeds-menu-btn">RSS &#9662;</button>
+                <button id="mobile-feeds-menu-btn">RSS ▾</button>
                 <div id="mobile-feeds-dropdown"></div>
             </div>
             <div id="top-bar-right">
@@ -362,25 +472,43 @@
         </div>
 
         <div class="desktop">
+            <div id="desktop-icons-left"></div>
             <div id="desktop-icons-right"></div>
             <div id="widget-container">
                 <div id="weather-widget" class="amiga-widget">
-                     <div class="widget-title">Pogoda</div>
-                     <div class="widget-content" id="weather-widget-content"></div>
+                    <div class="widget-close-button">
+                        <div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"/><rect x="4" y="4" width="7" height="7" fill="black"/></svg></div>
+                    </div>
+                    <div class="widget-title">Pogoda-Kielce</div>
+                    <div class="widget-content" id="weather-widget-content"></div>
                 </div>
                 <div id="google-widget" class="amiga-widget">
+                    <div class="widget-close-button">
+                        <div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"/><rect x="4" y="4" width="7" height="7" fill="black"/></svg></div>
+                    </div>
+                    <div class="widget-title">Google</div>
                     <div class="widget-content">
                         <div id="google-logo-container" style="margin-bottom: 5px; text-align: center;"></div>
                         <form id="google-widget-form"><input type="text" class="form-input" placeholder="Szukaj..."></form>
                     </div>
                 </div>
                 <div id="bible-widget" class="amiga-widget">
-                    <div><div class="widget-title">Słowo na dziś</div><div style="float: left; padding: 0 10px 0 10px;border-style: none">
-					<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/jesus.png?raw=true" style="width: 60px; height: auto; border-style: none;"></div>
-                    <div class="widget-content" id="bible-widget-content">Ładowanie...</div>
-					</div></div>
+                    <div class="widget-close-button">
+                        <div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"/><rect x="4" y="4" width="7" height="7" fill="black"/></svg></div>
+                    </div>
+                    <div class="widget-title">Słowo na dziś</div>
+                    <div style="float: left; padding: 0px 10px 10px 10px;border-style: none">
+					<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/jesus.png?raw=true" style="width: 60px; height: auto; border-style: none; float: left;"> <div class="widget-content" id="bible-widget-content">Ładowanie...</div></div>
+                   
+					</div>
                 <div id="wiki-widget" class="amiga-widget">
-                    <div class="widget-title">Wikipedia</div>
+                    <div class="widget-close-button">
+                        <div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"/><rect x="4" y="4" width="7" height="7" fill="black"/></svg></div>
+                    </div>
+                    <div class="widget-title">
+                        <span id="wiki-title-text">Wikipedia</span>
+                        <canvas id="wiki-logo-canvas"></canvas>
+                    </div>
                     <div class="widget-content">
                         <form id="wiki-search-form" style="margin-bottom: 10px;">
                             <input type="text" class="form-input" placeholder="Szukaj w Wikipedii...">
@@ -389,7 +517,6 @@
                     </div>
                 </div>
             </div>
-            <div id="desktop-icons-left"></div>
         </div>
 
         <div id="windows-container"></div>
@@ -410,73 +537,128 @@
             setupDesktop();
             setupWidgets();
             updateTopBarText();
-            updateClock();
+            updateClock(); // Initial call to display time immediately
             setInterval(updateClock, 1000);
             window.addEventListener('resize', updateTopBarText);
         });
+
+        // Function to get random position for new windows/widgets
+        function getRandomPosition(elementWidth, elementHeight) {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const topBarHeight = 32; // Height of the top bar
+            const bottomPadding = 100; // Adjusted bottom padding
+
+            // Calculate max X and Y to ensure element is fully visible
+            const maxX = Math.max(0, viewportWidth - elementWidth - 40); // 40px margin from right
+            const maxY = Math.max(0, viewportHeight - elementHeight - topBarHeight - bottomPadding - 40); // 40px margin from bottom
+
+            // Generate random coordinates within the safe bounds
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY) + topBarHeight; // Ensure it's below the top bar
+
+            return { top: `${randomY}px`, left: `${randomX}px` };
+        }
 
         function setupDesktop() {
             const iconsLeft = document.getElementById('desktop-icons-left');
             const iconsRight = document.getElementById('desktop-icons-right');
             
-            document.getElementById('windows-container').innerHTML = '';
-            iconsLeft.innerHTML = '';
-            iconsRight.innerHTML = '';
+            iconsLeft.innerHTML = ''; // Clear existing icons
+            iconsRight.innerHTML = ''; // Clear existing icons
 
             const iconBasePath = 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/';
-            const gmailIcon = `<img src="${iconBasePath}gmail_04.jpg" alt="Gmail" class="w-full h-full object-contain">`;
-            const youtubeIcon = `<img src="${iconBasePath}youtube.jpg" alt="YouTube" class="w-full h-full object-contain">`;
-            const internetIcon = `<img src="${iconBasePath}internet.jpg" alt="Internet Browser" class="w-full h-full object-contain">`;
-            const sayIcon = `<img src="${iconBasePath}say.jpg" alt="Say" class="w-full h-full object-contain">`;
-            const workbenchIcon = `<img src="${iconBasePath}workbench.jpg" alt="Workbench" class="w-full h-full object-contain">`;
-            const ramDiskIcon = `<img src="${iconBasePath}floppy.jpg" alt="Floppy Disk" class="w-full h-full object-contain">`;
-            const trashcanIcon = `<img src="${iconBasePath}kosz.jpg" alt="Trashcan" class="w-full h-full object-contain">`;
-            const feedsIcon = `<img src="${iconBasePath}feed.jpg" alt="Feed Reader" class="w-full h-full object-contain">`;
-            const leonardoIcon = `<img src="${iconBasePath}zajaczolw.jpg" alt="Leonardo" class="w-full h-full object-contain">`;
-            const ytMusicIcon = `<img src="${iconBasePath}music.jpg" alt="YouTube Music" class="w-full h-full object-contain">`;
+            // General folder icon for interactive windows
             const folderIcon = `<img src="${iconBasePath}folder.jpg" alt="Folder" class="w-full h-full object-contain">`;
 
-            iconsRight.innerHTML += createLinkIconHTML('Gmail', 'https://mail.google.com', gmailIcon);
-            iconsRight.innerHTML += createLinkIconHTML('YouTube', 'https://youtube.com', youtubeIcon);
-            iconsRight.innerHTML += createLinkIconHTML('Gemini', 'https://gemini.google.com', sayIcon);
-            iconsRight.innerHTML += createInteractiveIconHTML('Web Browser', 'browser-window', internetIcon);
-            iconsRight.innerHTML += createInteractiveIconHTML('RSS', 'feeds-window', feedsIcon, 'hide-on-mobile');
-            iconsRight.innerHTML += createLinkIconHTML('Leonardo', 'https://app.leonardo.ai', leonardoIcon);
-            iconsRight.innerHTML += createLinkIconHTML('YT Music', 'https://music.youtube.com', ytMusicIcon);
-            
-            iconsLeft.innerHTML += createInteractiveIconHTML('RAM Disk', 'ram-disk-window', ramDiskIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('Workbench', 'workbench-window', workbenchIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('Kosz', 'trash-window', trashcanIcon);
-            iconsLeft.innerHTML += createInteractiveIconHTML('AI', 'ai-window', folderIcon);
+            // Icons that need favicon rendering or are interactive windows
+            const desktopIcons = [
+                { name: 'Gmail', url: 'https://mail.google.com', side: 'left' },
+                { name: 'YouTube', url: 'https://youtube.com', side: 'left' },
+                { name: 'Gemini', url: 'https://gemini.google.com', side: 'left' }, // Updated Gemini to be dynamic
+                { name: 'World Wide Web', windowId: 'browser-window', side: 'left' }, // Renamed Web Browser
+                { name: 'RSS', windowId: 'feeds-window', extraClass: 'hide-on-mobile', side: 'left' },
+                { name: 'Leonardo', url: 'https://app.leonardo.ai', side: 'left' }, // Updated Leonardo to be dynamic
+                { name: 'YT Music', url: 'https://music.youtube.com', side: 'left' },
+                { name: 'Kosz', windowId: 'trash-window', side: 'left' },
+                { name: 'AI', windowId: 'ai-window', side: 'left' },
+                { name: 'Dysk', url: 'https://drive.google.com/', side: 'right' }, // RAM Disk is now "Dysk"
+                { name: 'Workbench', windowId: 'workbench-window', side: 'right' },
+            ];
+
+            desktopIcons.forEach(item => {
+                let iconHTML;
+                const iconElement = document.createElement('div');
+                iconElement.className = `desktop-icon ${item.extraClass || ''}`;
+
+                if (item.url) { // It's a direct link with favicon
+                    const canvasId = `desktop-icon-${item.name.replace(/\s/g, '')}`;
+                    iconElement.innerHTML = `
+                        <a href="${item.url}" target="_blank" class="desktop-icon" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
+                            <div class="icon-image"><canvas id="${canvasId}"></canvas></div>
+                            <div class="icon-label">${item.name}</div>
+                        </a>`;
+                    
+                    if (item.side === 'left') {
+                        iconsLeft.appendChild(iconElement);
+                    } else {
+                        iconsRight.appendChild(iconElement);
+                    }
+
+                    // Load favicon after element is in DOM
+                    setTimeout(() => {
+                        const canvas = document.getElementById(canvasId);
+                        if (canvas) loadImageToPixelArt(canvas, `https://www.google.com/s2/favicons?domain=${item.url}&sz=64`, 'https://corsproxy.io/?', 16);
+                    }, 0);
+                } else { // It's an interactive icon opening a window
+                    iconElement.classList.add('interactive-icon');
+                    iconElement.dataset.windowId = item.windowId;
+                    iconElement.innerHTML = `
+                        <div class="icon-image">${folderIcon}</div>
+                        <div class="icon-label">${item.name}</div>`;
+                    
+                    if (item.side === 'left') {
+                        iconsLeft.appendChild(iconElement);
+                    } else {
+                        iconsRight.appendChild(iconElement);
+                    }
+                }
+            });
             
             const topBarGadget = document.getElementById('top-bar-gadget');
             topBarGadget.innerHTML = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="black"/><rect x="1" y="4" width="10" height="10" fill="white" stroke="white" stroke-width="2"/><rect x="4" y="1" width="10" height="10" fill="white" stroke="white" stroke-width="2"/></svg>`;
 
-            const ramInfo = `<p>Model: Amiga 600</p><p>Chip RAM: 1.0 MB</p><p>Fast RAM: 0.0 MB</p><p>Wolna pamięć: 804844 bajtów</p><p>Zajęta pamięć: 243732 bajtów</p>`;
             createBrowserWindow();
             createFeedsWindow();
             createAiWindow();
-            createWindowHTML('ram-disk-window', 'RAM Disk', ramInfo);
-            const workbenchWindow = createWindowHTML('workbench-window', 'Workbench', 'Ładowanie informacji z Wikipedii...');
-            fetchAndRenderPage(workbenchWindow, 'https://pl.wikipedia.org/wiki/AmigaOS', false);
-            createWindowHTML('trash-window', 'Kosz', '<p>Kosz jest pusty.</p>');
+            createWorkbenchWindow();
+            createWindowHTML('trash-window', 'Kosz', '<p>Kosz jest pusty.</p>', getRandomPosition(300, 200)); // Random position for trash
+            
             setupMobileMenu();
 
             if (window.innerWidth > 768) {
                 const polsatFeed = initialFeeds.find(f => f.name === 'Polsat News');
                 if (polsatFeed) {
                     const feedId = 'polsat-news-on-start';
-                    const newWindow = createWindowHTML(feedId, polsatFeed.name, 'Ładowanie...');
+                    // Create window first to get its dimensions for getRandomPosition
+                    const newWindow = createWindowHTML(feedId, polsatFeed.name, 'Ładowanie...', {top: '0px', left: '0px'}); // Temporary position
                     openWindow(newWindow);
+                    // Update position after rendering
+                    const pos = getRandomPosition(newWindow.offsetWidth, newWindow.offsetHeight);
+                    newWindow.style.top = pos.top;
+                    newWindow.style.left = pos.left;
                     fetchAndRenderPage(newWindow, polsatFeed.url, true);
                 }
             }
         }
         
         function setupWidgets() {
+            // Load widget content first
             loadWeather();
             loadWikipediaWidget();
             loadBibleWidget();
+
+            // Setup forms
             const googleForm = document.getElementById('google-widget-form');
             const googleLogoContainer = document.getElementById('google-logo-container');
             googleLogoContainer.innerHTML = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/google.jpg" alt="Google" style="height: 30px; display: inline-block;">`;
@@ -494,24 +676,48 @@
                 if (!query) return;
                 const url = `https://pl.wikipedia.org/wiki/${encodeURIComponent(query)}`;
                 const winId = `wiki-result-${Date.now()}`;
-                const newWindow = createWindowHTML(winId, `Wikipedia: ${query}`, 'Ładowanie...');
+                const newWindow = createWindowHTML(winId, `Wikipedia: ${query}`, 'Ładowanie...', {top: '0px', left: '0px'}); // Temporary position
                 openWindow(newWindow);
+                const pos = getRandomPosition(newWindow.offsetWidth, newWindow.offsetHeight);
+                newWindow.style.top = pos.top;
+                newWindow.style.left = pos.left;
                 fetchAndRenderPage(newWindow, url, false);
                 input.value = '';
             });
-            makeElementDraggable(document.getElementById('weather-widget'));
-            makeElementDraggable(document.getElementById('google-widget'));
-            makeElementDraggable(document.getElementById('wiki-widget'));
-            makeElementDraggable(document.getElementById('bible-widget'));
+
+            // Apply random positions and make draggable after content is loaded/set up
+            // Use a small delay to ensure elements are fully rendered in the DOM
+            setTimeout(() => {
+                const widgets = ['weather-widget', 'google-widget', 'wiki-widget', 'bible-widget'];
+                widgets.forEach(widgetId => {
+                    const widgetEl = document.getElementById(widgetId);
+                    if (widgetEl) {
+                        const pos = getRandomPosition(widgetEl.offsetWidth, widgetEl.offsetHeight);
+                        widgetEl.style.top = pos.top;
+                        widgetEl.style.left = pos.left;
+                        makeElementDraggable(widgetEl); // Make the entire widget draggable
+                    }
+                });
+
+                // Load Wikipedia logo after the widget is potentially moved
+                const wikiLogoCanvas = document.getElementById('wiki-logo-canvas');
+                if (wikiLogoCanvas) {
+                    loadImageToPixelArt(wikiLogoCanvas, 'https://www.google.com/s2/favicons?domain=wikipedia.org&sz=64', 'https://corsproxy.io/?', 24); // Adjusted size for widget title
+                }
+            }, 100); // Small delay
         }
 
         async function loadWeather() {
             const contentEl = document.getElementById('weather-widget-content');
-            const kielceHerbIcon = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 58px; height: 38px; object-fit: contain;">`;
+            const kielceHerbCanvasId = 'kielce-herb-canvas';
+            const kielceHerbHTML = `<canvas id="${kielceHerbCanvasId}" style="width: 58px; height: 38px; object-fit: contain;"></canvas>`;
+
             const weatherIcons = {
-                sunny: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/sunny.png?raw=true"`,
-                cloudy: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/clouds.png?raw=true"`,
-                rain: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/rain.png?raw=true"`,
+                sunny: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/sunny.png?raw=true" style="width: 64px; height: 64px; object-fit: contain;">`,
+                cloudy: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/clouds.png?raw=true" style="width: 64px; height: 64px; object-fit: contain;">`,
+                rain: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/rain.png?raw=true" style="width: 64px; height: 64px; object-fit: contain;">`,
+				storm: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/storm.png?raw=true" style="width: 64px; height: 64px; object-fit: contain;">`,
+				snow: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/snow.png?raw=true" style="width: 64px; height: 64px; object-fit: contain;">`,
             };
             
             let dynamicIconHTML = weatherIcons.cloudy;
@@ -532,14 +738,23 @@
                     else if (weatherCode >= 1 && weatherCode <= 3) dynamicIconHTML = weatherIcons.cloudy;
                     else if (weatherCode >= 51 && weatherCode <= 67) dynamicIconHTML = weatherIcons.rain;
                     else dynamicIconHTML = weatherIcons.cloudy;
+                } else {
+                    console.error("Weather API response not OK:", response.status, response.statusText);
                 }
-            } catch (error) { console.error("Error fetching weather:", error); }
+            } catch (error) {
+                console.error("Error fetching weather:", error);
+                contentEl.innerHTML = `<p style="color: var(--amiga-orange);">BŁĄD POGODY</p><p>${error.message}</p>`;
+            }
 
             contentEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 4px; float: left;">${dynamicIconHTML}${kielceHerbIcon}</div>
-                <div style="text-align: right; line-height: 1.5;">
-                    <div>Kielce ${temp} ${cloud}</div><div>${precip}</div>
+                <div style="display: flex; align-items: center; gap: 4px; float: left;">${dynamicIconHTML}${kielceHerbHTML}${temp} ${cloud} ${precip}</div>
                 </div>`;
+            
+            setTimeout(() => {
+                const canvas = document.getElementById(kielceHerbCanvasId);
+                // Increased maxPixelSize for the herb to 64 for better rendering
+                if (canvas) loadImageToPixelArt(canvas, 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg', 'https://corsproxy.io/?', 64);
+            }, 0);
         }
         
         async function loadWikipediaWidget() {
@@ -559,23 +774,27 @@
                     .slice(0, 5);
                 
                 const titles = articles.map(a => a.article).join('|');
-                const imagesUrl = `https://pl.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=thumbnail&pithumbsize=100&titles=${encodeURIComponent(titles)}&origin=*`;
+                // Fetch images and extracts in one go
+                const wikiApiUrl = `https://pl.wikipedia.org/w/api.php?action=query&prop=pageimages|extracts&format=json&piprop=thumbnail&pithumbsize=100&exintro=1&explaintext=1&titles=${encodeURIComponent(titles)}&origin=*`;
                 
-                const imgResponse = await fetch(imagesUrl);
-                const imgData = await imgResponse.json();
-                const pages = imgData.query.pages;
+                const wikiResponse = await fetch(wikiApiUrl);
+                const wikiData = await wikiResponse.json();
+                const pages = wikiData.query.pages;
 
                 let html = '';
                 for (const article of articles) {
                     const page = Object.values(pages).find(p => p.title === article.article.replace(/_/g, ' '));
                     const imageUrl = page?.thumbnail?.source;
+                    const extract = page?.extract ? page.extract.split('. ')[0] + '.' : 'Brak opisu.'; // Take first sentence
                     const canvasId = `wiki-canvas-${page?.pageid || Math.random()}`;
                     
                     html += `<div class="wiki-item">`;
+                    html += `<div class="wiki-item-header">`;
                     if (imageUrl) {
                         html += `<canvas id="${canvasId}"></canvas>`;
                     }
                     html += `<a href="https://pl.wikipedia.org/wiki/${article.article}" target="_blank">${article.article.replace(/_/g, ' ')}</a></div>`;
+                    html += `<div class="wiki-item-snippet">${extract}</div></div>`; // Add snippet
                 }
                 contentEl.innerHTML = html;
 
@@ -610,15 +829,17 @@
             }
         }
         
+        // This function is now only for simple image-based icons
         function createLinkIconHTML(name, url, svgContent) {
             return `<a href="${url}" target="_blank" class="desktop-icon"><div class="icon-image">${svgContent}</div><div class="icon-label">${name}</div></a>`;
         }
 
+        // This function is for interactive icons that open windows
         function createInteractiveIconHTML(name, windowId, svgContent, extraClass = '') {
             return `<div class="desktop-icon interactive-icon ${extraClass}" data-window-id="${windowId}"><div class="icon-image">${svgContent}</div><div class="icon-label">${name}</div></div>`;
         }
         
-        function createWindowHTML(id, title, contentHTML, pos = { top: '100px', left: '100px' }) {
+        function createWindowHTML(id, title, contentHTML, pos) { // pos is now mandatory
             const container = document.getElementById('windows-container');
             const windowEl = document.createElement('div');
             windowEl.id = id;
@@ -657,7 +878,17 @@
         }
 
         function makeElementDraggable(element) {
-            const bar = element.querySelector('.window-bar, .widget-bar, .widget-title');
+            if (!element) {
+                console.error("makeElementDraggable: Element is null or undefined.", element);
+                return; // Exit if element is not valid
+            }
+            // For windows, use the window-bar. For widgets, use the entire element.
+            const bar = element.classList.contains('amiga-window') ? element.querySelector('.window-bar') : element;
+            if (!bar) {
+                console.error("makeElementDraggable: Could not find draggable bar for element:", element.id, element);
+                return; // Exit if bar is not found
+            }
+
             let isDragging = false, offsetX, offsetY;
 
             const onDragStart = (clientX, clientY) => {
@@ -666,6 +897,7 @@
                 offsetY = clientY - element.offsetTop;
                 highestZIndex++;
                 element.style.zIndex = highestZIndex;
+                // Only apply active/inactive classes to amiga-window elements
                 if (element.classList.contains('amiga-window')) {
                     document.querySelectorAll('.amiga-window').forEach(win => {
                         win.classList.remove('active');
@@ -688,30 +920,36 @@
             };
 
             bar.addEventListener('mousedown', (e) => {
-                if (e.target.closest('.gadget')) return;
+                // If the click is on a gadget, don't start dragging
+                if (e.target.closest('.gadget') || e.target.closest('.widget-close-button')) return;
                 onDragStart(e.clientX, e.clientY);
             });
             document.addEventListener('mousemove', (e) => onDragMove(e.clientX, e.clientY));
             document.addEventListener('mouseup', onDragEnd);
 
             bar.addEventListener('touchstart', (e) => {
-                if (e.target.closest('.gadget')) return;
+                if (e.target.closest('.gadget') || e.target.closest('.widget-close-button')) return;
                 e.preventDefault();
                 onDragStart(e.touches[0].clientX, e.touches[0].clientY);
             }, { passive: false });
             document.addEventListener('touchmove', (e) => onDragMove(e.touches[0].clientX, e.touches[0].clientY));
             document.addEventListener('touchend', onDragEnd);
             
-            const closeGadget = element.querySelector('.gadget-close');
+            // Close gadget listener for both windows and widgets
+            const closeGadget = element.querySelector('.gadget-close') || element.querySelector('.widget-close-button .gadget-close');
             if(closeGadget) closeGadget.addEventListener('click', () => { element.style.display = 'none'; });
         }
         
         function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 48) {
-            if (!canvas || !url) return;
+            if (!canvas || !url) {
+                console.error("loadImageToPixelArt: Invalid canvas or URL provided.", {canvas, url});
+                return;
+            }
             const ctx = canvas.getContext('2d');
             let img = new Image();
-            img.crossOrigin = "Anonymous";
+            img.crossOrigin = "Anonymous"; // Essential for CORS
             img.onload = function() {
+                // console.log(`Image loaded successfully for canvas: ${canvas.id}, URL: ${url}`); // Debugging
                 const ratio = img.width / img.height;
                 canvas.width = maxPixelSize;
                 canvas.height = maxPixelSize / ratio;
@@ -725,24 +963,31 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, canvas.width, canvas.height);
             };
-            img.onerror = function() { console.error("Nie można załadować obrazka:", url); if(canvas) canvas.style.display = 'none'; }
+            img.onerror = function(e) {
+                console.error("Nie można załadować obrazka do canvasa:", url, e);
+                if(canvas) canvas.style.display = 'none'; // Hide canvas if image fails to load
+            }
             img.src = proxyUrl + encodeURIComponent(url);
         }
         
         function openWindow(windowEl) {
             if (windowEl) {
                 windowEl.style.display = 'flex';
-                windowEl.dispatchEvent(new MouseEvent('mousedown'));
+                // Trigger mousedown to bring to front and set active class
+                windowEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, clientX: windowEl.offsetLeft, clientY: windowEl.offsetTop }));
             }
         }
 
         function updateClock() {
             const clockElement = document.getElementById('clock');
             const dateElement = document.getElementById('date');
-            if (clockElement) {
+            if (clockElement && dateElement) { // Added check for dateElement too
                 const now = new Date();
                 clockElement.textContent = now.toLocaleTimeString('pl-PL');
                 dateElement.textContent = now.toLocaleDateString('pl-PL');
+                // console.log('Clock updated:', now.toLocaleTimeString('pl-PL')); // For debugging
+            } else {
+                // console.error('Clock or Date element not found!'); // For debugging
             }
         }
         
@@ -756,7 +1001,8 @@
         }
         
         function createBrowserWindow() {
-            const win = createWindowHTML('browser-window', 'Web Browser', '', {top: '150px', left: '150px'});
+            // Create window with temporary position, then update after rendering
+            const win = createWindowHTML('browser-window', 'World Wide Web', '', {top: '0px', left: '0px'}); 
             const contentWrapper = win.querySelector('.window-content-wrapper');
             contentWrapper.innerHTML = `
                 <div class="browser-bar">
@@ -769,14 +1015,27 @@
 `
 			;
             win.querySelector('.browser-form').addEventListener('submit', (e) => handleBrowserSubmit(e, win));
+            // Set random position after the window content is established
+            setTimeout(() => {
+                const pos = getRandomPosition(win.offsetWidth, win.offsetHeight);
+                win.style.top = pos.top;
+                win.style.left = pos.left;
+            }, 50); // Small delay
         }
 
         function createFeedsWindow() {
             const linksHTML = initialFeeds.map(feed => 
                 `<p><a href="#" class="feed-link" data-url="${feed.url}" data-name="${feed.name}">${feed.name}</a></p>`
             ).join('');
-            const win = createWindowHTML('feeds-window', 'RSS', linksHTML, {top: '50px', left: '250px'});
+            // Create window with temporary position, then update after rendering
+            const win = createWindowHTML('feeds-window', 'RSS', linksHTML, {top: '0px', left: '0px'}); 
             win.addEventListener('click', handleFeedLinkClick);
+            // Set random position after the window content is established
+            setTimeout(() => {
+                const pos = getRandomPosition(win.offsetWidth, win.offsetHeight);
+                win.style.top = pos.top;
+                win.style.left = pos.left;
+            }, 50); // Small delay
         }
 
         function createAiWindow() {
@@ -799,7 +1058,8 @@
                 `;
             });
             contentHTML += '</div>';
-            const win = createWindowHTML('ai-window', 'AI Tools', contentHTML, {top: '100px', left: '300px'});
+            // Create window with temporary position, then update after rendering
+            const win = createWindowHTML('ai-window', 'AI Tools', contentHTML, {top: '0px', left: '0px'}); 
             
             aiServices.forEach(service => {
                  const canvasId = `ai-icon-${service.name.replace(/\s/g, '')}`;
@@ -809,6 +1069,54 @@
                     if(canvas) loadImageToPixelArt(canvas, faviconUrl, 'https://corsproxy.io/?', 16);
                  }, 0);
             });
+            // Set random position after the window content is established
+            setTimeout(() => {
+                const pos = getRandomPosition(win.offsetWidth, win.offsetHeight);
+                win.style.top = pos.top;
+                win.style.left = pos.left;
+            }, 50); // Small delay
+        }
+
+        // Nowa funkcja do tworzenia okna Workbench z linkami do stron o Amidze
+        function createWorkbenchWindow() {
+            const amigaLinks = [
+                { name: 'Amiga Wiki (PL)', url: 'https://pl.wikipedia.org/wiki/Amiga' },
+                { name: 'Lemon Amiga (Gry)', url: 'https://www.lemonamiga.com/' },
+                { name: 'Amiga Games Database', url: 'https://amiga.abime.net/' },
+                { name: 'AmigaWorld.net', url: 'https://www.amigaworld.net/' },
+                { name: 'EAB (English Amiga Board)', url: 'https://eab.abime.net/' }
+            ];
+
+            let contentHTML = '<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">';
+            amigaLinks.forEach(link => {
+                const canvasId = `workbench-icon-${link.name.replace(/\s/g, '')}`;
+                contentHTML += `
+                    <a href="${link.url}" target="_blank" class="desktop-icon">
+                        <div class="icon-image"><canvas id="${canvasId}"></canvas></div>
+                        <div class="icon-label">${link.name}</div>
+                    </a>
+                `;
+            });
+            contentHTML += '</div>';
+
+            // Create window with temporary position, then update after rendering
+            const workbenchWin = createWindowHTML('workbench-window', 'Amiga Resources', contentHTML, {top: '0px', left: '0px'}); 
+            
+            // Załaduj favikony dla ikon Workbench
+            amigaLinks.forEach(link => {
+                 const canvasId = `workbench-icon-${link.name.replace(/\s/g, '')}`;
+                 const faviconUrl = `https://www.google.com/s2/favicons?domain=${link.url}&sz=64`;
+                 setTimeout(() => {
+                    const canvas = document.getElementById(canvasId);
+                    if(canvas) loadImageToPixelArt(canvas, faviconUrl, 'https://corsproxy.io/?', 16);
+                 }, 0);
+            });
+            // Set random position after the window content is established
+            setTimeout(() => {
+                const pos = getRandomPosition(workbenchWin.offsetWidth, workbenchWin.offsetHeight);
+                workbenchWin.style.top = pos.top;
+                workbenchWin.style.left = pos.left;
+            }, 50); // Small delay
         }
 
         function setupMobileMenu() {
@@ -834,8 +1142,15 @@
                 const url = e.target.dataset.url;
                 const name = e.target.dataset.name;
                 const feedId = 'feed-' + Date.now();
-                const newWindow = createWindowHTML(feedId, name, 'Ładowanie...');
+                // Create window with temporary position, then update after rendering
+                const newWindow = createWindowHTML(feedId, name, 'Ładowanie...', {top: '0px', left: '0px'}); 
                 openWindow(newWindow);
+                // Set random position after the window content is established
+                setTimeout(() => {
+                    const pos = getRandomPosition(newWindow.offsetWidth, newWindow.offsetHeight);
+                    newWindow.style.top = pos.top;
+                    newWindow.style.left = pos.left;
+                }, 50); // Small delay
                 fetchAndRenderPage(newWindow, url, true);
             }
         }
@@ -863,10 +1178,19 @@
             
             try {
                 const response = await fetch(`${proxyUrl}${encodeURIComponent(url)}`);
-                if (!response.ok) throw new Error(`Błąd sieci: ${response.status}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Błąd sieci: ${response.status} - ${response.statusText}. Szczegóły: ${errorText.substring(0, 100)}...`);
+                }
                 const textContent = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(textContent, isRss ? "application/xml" : "text/html");
+
+                // Check for XML parsing errors for RSS feeds
+                if (isRss && doc.querySelector('parsererror')) {
+                    const errorText = doc.querySelector('parsererror').textContent;
+                    throw new Error(`Błąd parsowania RSS: ${errorText}`);
+                }
 
                 if (isRss) {
                     let items = [...doc.querySelectorAll("item"), ...doc.querySelectorAll("entry")];
@@ -889,7 +1213,10 @@
                         }
                         
                         const title = (firstItem.querySelector("title")?.textContent || 'Brak tytułu').trim();
-                        const link = firstItem.querySelector("link")?.textContent || firstItem.querySelector("link")?.getAttribute('href') || '#';
+                        // Corrected link extraction for first item as well
+                        const linkElement = firstItem.querySelector("link");
+                        const link = linkElement ? (linkElement.textContent || linkElement.getAttribute('href') || '#') : '#';
+
                         const canvasId = `canvas-${windowEl.id}-top`;
                         const canvasHTML = imageUrl ? `<canvas id="${canvasId}" class="page-render-main-image" width="256"></canvas>` : '';
                         
@@ -905,7 +1232,9 @@
 
                     finalHtml += items.slice(0, 19).map(item => {
                         const title = (item.querySelector("title")?.textContent || 'Brak tytułu').trim();
-                        const link = item.querySelector("link")?.textContent || item.querySelector("link")?.getAttribute('href') || '#';
+                        // Corrected link extraction for subsequent items
+                        const linkElement = item.querySelector("link");
+                        const link = linkElement ? (linkElement.textContent || linkElement.getAttribute('href') || '#') : '#';
                         return `<div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="${link}" target="_blank" style="color:white; text-decoration:none;">${title}</a></strong></p></div>`;
                     }).join('');
                     contentEl.innerHTML = finalHtml;
@@ -941,7 +1270,7 @@
 
                     contentEl.innerHTML = renderHTML;
                     
-                    if (faviconUrl) loadImageToPixelArt(document.getElementById(faviconCanvasId), proxyUrl, 24);
+                    if (faviconUrl) loadImageToPixelArt(document.getElementById(faviconCanvasId), faviconUrl, proxyUrl, 24);
                 }
 
             } catch (error) {
