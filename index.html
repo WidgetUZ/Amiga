@@ -75,6 +75,7 @@
             box-sizing: border-box;
         }
 
+
         .top-bar {
             background-color: var(--amiga-black);
             color: var(--amiga-white) !important;
@@ -174,11 +175,12 @@
         .desktop-icon:hover .icon-label { color: var(--amiga-orange); }
         
         .amiga-window {
-            position: absolute; width: 500px; max-width: 95%; height: 480px; max-height: 80vh;
+            position: absolute; width: auto; max-width: 90%; height: auto; max-height: 80vh;
+			float: left;
             background-color: var(--amiga-white);
             border: 1px solid;
             border-color: var(--amiga-white) var(--amiga-black) var(--amiga-black) var(--amiga-white);
-            z-index: 50; display: none; flex-direction: column;
+            z-index: 50; display:none; flex-direction:column;
             padding: 1px;
         }
 
@@ -231,7 +233,7 @@
             position: relative;
         }
         .bottom-lines::before, .bottom-lines::after { content: ''; position: absolute; left: 0; right: 0; }
-        .amiga-window.active .bottom-lines::before, .amiga-window.active .bottom-lines::after { height: 50%; background-color: var(--amiga-blue); }
+        .amiga-window.active .bottom-lines::before, .amiga-window.active .bottom-lines::after { height: 40%; background-color: var(--amiga-white); border: 2px;border-bottom-color: var(--amiga-blue); border-style: solid;}
         .amiga-window.active .bottom-lines::before { top:8px; }
         .amiga-window.active .bottom-lines::after { bottom: 8px; }
         .amiga-window.inactive .bottom-lines::before, .amiga-window.inactive .bottom-lines::after { height: 3px; background-color: transparent; background-image: repeating-linear-gradient(to right, var(--amiga-blue) 0, var(--amiga-blue) 2px, transparent 2px, transparent 4px); }
@@ -239,19 +241,44 @@
         .amiga-window.inactive .bottom-lines::after { bottom: 9px; }
 		
 		
+		.vertical-lines {
+			float: left;
+			top: 40px;
+			width: 30px;
+			padding: 5px;
+			background-color: var(--amiga-white);
+			border: 2px;
+			border-style: solid;
+			border-color: var(--amiga-blue);
+            height: auto;
+            margin-left: 0px;
+			margin-right: 0px;
+        }
+        .vertical-lines::before, .bottom-lines::after { content: ''; position: absolute; left: 0; right: 0; }
+        .amiga-window.active .vertical-lines::before, .amiga-window.active .vertical-lines::after { height: 0%; background-color: var(--amiga-white); border: 0px;border-bottom-color: var(--amiga-blue); border-style: solid;}
+        .amiga-window.active .vertical-lines::before { top:0px; }
+        .amiga-window.active .vertical-lines::after { bottom: 0px; }
+        .amiga-window.inactive .vertical-lines::before, .amiga-window.inactive .vertical-lines::after { height: 0px; background-color: transparent; background-image: repeating-linear-gradient(to right, var(--amiga-blue) 0, var(--amiga-blue) 2px, transparent 2px, transparent 4px); }
+        .amiga-window.inactive .vertical-lines::before { top: 0px; }
+        .amiga-window.inactive .vertical-lines::after { bottom: 0px; }
+		
+		
         .window-gadgets { display: flex; align-items: center; border-left: 1px;
 			border-left-color: var(--amiga-blue);}
-        .gadget { cursor: inherit; margin: 0 5px;}
+        .gadget { cursor: inherit; margin: 0px 0px;}
         
-        .window-content-wrapper { flex-grow: 1; margin: 5px; border: 2px solid var(--amiga-black); background-color: var(--amiga-blue); overflow: hidden; display: flex; flex-direction: column; }
+        .window-content-wrapper { flex-grow: 1; margin: 5px 0 5px 5px; 
+			border-right: 30px double var(--amiga-white); 
+			background-color: var(--amiga-blue); overflow: hidden; display:flex; flex-direction: column; }
         .window-content {
             flex-grow: 1;
-            padding:10px;
+			padding:10px;
             overflow-y: auto;
             color: var(--amiga-white);
             font-size: 24px;
             line-height: normal;
             word-break: break-word;
+			
         }
         .window-content a {
             color: var(--amiga-orange) !important;
@@ -259,10 +286,11 @@
             font-weight: normal;
         }
 
+
         
-        .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px solid var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
-        .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; font-size: 35px; }
-        .widget-content { padding: 5px; color: var(--amiga-white); font-size: 20px; line-height: 1.7; }
+        .amiga-widget { position: absolute; background-color: var(--amiga-blue); border: 2px dotted var(--amiga-white); z-index: 40; display: flex; flex-direction: column; cursor: move; }
+        .widget-title { color: var(--amiga-white); text-transform: uppercase; text-align: center; padding: 4px; padding: 0 10px 0 10px; font-size: 35px; }
+        .widget-content { padding: 5px; color: var(--amiga-white); font-size: 20px; line-height: normal; }
         .widget-content a { color: var(--amiga-orange) !important; }
 
         #weather-widget { top: 40px; left: calc(50% - 135px); width: 320px; }
@@ -479,7 +507,7 @@
 
         async function loadWeather() {
             const contentEl = document.getElementById('weather-widget-content');
-            const kielceHerbIcon = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 58px; height: 58px; object-fit: contain;">`;
+            const kielceHerbIcon = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg" alt="Herb Kielc" style="width: 58px; height: 38px; object-fit: contain;">`;
             const weatherIcons = {
                 sunny: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/sunny.png?raw=true"`,
                 cloudy: `<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/clouds.png?raw=true"`,
@@ -496,8 +524,8 @@
                     const weather = data.current;
                     
                     temp = `${weather.temperature_2m}°C`;
-                    cloud = `Chmury: ${weather.cloud_cover}% pokrycia`;
-                    precip = `Opady: ${weather.precipitation_probability}% szans`;
+                    cloud = `Chmury: ${weather.cloud_cover}%`;
+                    precip = `Opady: ${weather.precipitation_probability}%`;
 
                     const weatherCode = weather.weather_code;
                     if (weatherCode === 0) dynamicIconHTML = weatherIcons.sunny;
@@ -510,8 +538,7 @@
             contentEl.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 4px; float: left;">${dynamicIconHTML}${kielceHerbIcon}</div>
                 <div style="text-align: right; line-height: 1.5;">
-                    <div>Kielce</div><div style="font-size: 16px; font-weight: bold;">${temp}</div>
-                    <div>${cloud}</div><div>${precip}</div>
+                    <div>Kielce ${temp} ${cloud}</div><div>${precip}</div>
                 </div>`;
         }
         
@@ -605,14 +632,22 @@
 
             windowEl.innerHTML = `
                 <div class="window-bar">
-                    <div class="window-gadgets"><div class="gadget gadget-close">${closeGadgetSVG}</div></div>
+                    <div class="window-gadgets"><div class="gadget gadget-close">${closeGadgetSVG}</div>
+	</div>
+
                     <div class="window-title-container"><span class="window-title">${title}</span><div class="title-lines"></div></div>
-                    <div class="window-gadgets"><div class="gadget gadget-depth">${depthGadgetSVG}</div><div class="gadget gadget-zoom">${zoomGadgetSVG}</div></div>
+                    <div class="window-gadgets"><div class="gadget gadget-depth"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/folder-front.jpg" style="float: left; height: 18px; width: 16px;"></div><div class="gadget gadget-zoom"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/folder-back.jpg" style="float: left; height: 18px; width: 100%;"></div></div>
                 </div>
-                <div class="window-content-wrapper"><div class="window-content">${contentHTML}</div></div>
+
+                <div class="window-content-wrapper">
+				<div class="window-content">${contentHTML}</div>
+				</div>
+
+	</div>
+
 <div class="window-bar-bottom">
                     <div class="window-gadgets"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/arrow-left.jpg"></div>
-                    <div class="bottom-lines"></div><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/arrow-right.jpg"></div>
+                    <div class="bottom-lines"></div><div><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/arrow-right.jpg" style="float: left; padding-right: 5px;"> <img src="https://github.com/WidgetUZ/Amiga/blob/main/images/ico-size-window_21.jpg?raw=true"></div>
                  
                 </div>`;
             
