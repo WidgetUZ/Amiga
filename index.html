@@ -22,7 +22,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent body scrollbars */
+            overflow: hidden; /* Zapobiega paskom przewijania na ciele strony */
         }
 
         body {
@@ -39,7 +39,7 @@
             background-color: var(--amiga-blue);
         }
         
-		input  {
+		input {
 			color: var(--amiga-black) !important;
 		}
         b, strong {
@@ -56,7 +56,7 @@
             vertical-align: middle;
             height: auto;
         }
-        /* Ensure canvas in icon-image fills its container */
+        /* Upewnij się, że canvas w icon-image wypełnia swój kontener */
         .icon-image canvas {
             width: 100%;
             height: 100%;
@@ -71,9 +71,10 @@
             overflow-x: hidden;
             position: relative;
             padding: 20px;
-            padding-top: 50px; /* Adjusted top margin */
-            padding-bottom: 100px; /* Adjusted bottom margin */
+            padding-top: 50px; /* Dostosowany górny margines */
+            padding-bottom: 100px; /* Dostosowany dolny margines */
             box-sizing: border-box;
+            display: none; /* Początkowo ukryty, pokazywany po ekranie startowym */
         }
 
 
@@ -105,7 +106,7 @@
         }
 
         #mobile-feeds-menu {
-            display: none; /* Hidden on desktop */
+            display: none; /* Ukryty na komputerach stacjonarnych */
             position: relative;
         }
         #mobile-feeds-menu-btn {
@@ -130,40 +131,40 @@
 
         .desktop {
             display: flex;
-            justify-content: space-between; /* Distribute icons and widgets */
+            justify-content: space-between; /* Rozkłada ikony i widżety */
             min-height: calc(100% - 40px);
-            position: relative; /* For absolute positioning of widget-container */
+            position: relative; /* Do absolutnego pozycjonowania widget-container */
         }
         
         #desktop-icons-left, #desktop-icons-right {
             display: flex;
             flex-direction: column;
-            flex-wrap: wrap; /* Allow wrapping into new columns */
+            flex-wrap: wrap; /* Pozwala na zawijanie w nowe kolumny */
             gap: 24px;
             align-content: flex-start;
             padding: 20px;
             box-sizing: border-box;
-            height: calc(100vh - 150px); /* Fill available height for wrapping */
+            height: calc(100vh - 150px); /* Wypełnia dostępną wysokość do zawijania */
         }
 
         #desktop-icons-left {
-            align-items: flex-start; /* Align icons to the left */
+            align-items: flex-start; /* Wyrównuje ikony do lewej */
         }
 
         #desktop-icons-right {
-            align-items: flex-end; /* Align icons to the right */
+            align-items: flex-end; /* Wyrównuje ikony do prawej */
         }
 
         #widget-container {
-            position: absolute; /* Position widgets absolutely within desktop */
+            position: absolute; /* Pozycjonuje widżety absolutnie w obrębie pulpitu */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Allow clicks to pass through to desktop icons */
+            pointer-events: none; /* Pozwala na przechodzenie kliknięć do ikon pulpitu */
         }
         #widget-container > * {
-            pointer-events: auto; /* Re-enable pointer events for individual widgets */
+            pointer-events: auto; /* Ponownie włącza zdarzenia wskaźnika dla poszczególnych widżetów */
         }
 
 
@@ -171,7 +172,7 @@
             display: flex; flex-direction: column; align-items: center;
             width: 110px; cursor: inherit;
             text-decoration: none;
-            flex-shrink: 0; /* Prevent icons from shrinking */
+            flex-shrink: 0; /* Zapobiega zmniejszaniu ikon */
         }
 
         .icon-image {
@@ -179,7 +180,8 @@
             background-color: transparent;
             border: none;
             position: relative;
-            margin-bottom: 5px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 2px; /* Zmniejszony odstęp */
+            display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
         
@@ -191,9 +193,9 @@
             text-align: center; 
             border: 1px solid transparent; 
             width: 100%; 
-            white-space: normal; /* Allow wrapping */
+            white-space: normal; /* Pozwala na zawijanie */
             word-break: break-word;
-            min-height: 40px; /* Space for two lines */
+            min-height: 40px; /* Miejsce na dwie linie */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -234,7 +236,7 @@
         }
 		.window-bar-bottom { height: 32px; padding: 0 4px; display: flex; align-items: center; justify-content: space-between; cursor: move; flex-shrink: 0; background-color: var(--amiga-white); }
         .amiga-window.active .window-bar .window-bar-bottom { color: var(--amiga-blue); }
-        .amiga-window.inactive .window-bar .window-bar-botto  { color: var(--amiga-black); }
+        .amiga-window.inactive .window-bar .window-bar-botto { color: var(--amiga-black); }
         .window-title-container { display: flex; align-items: center; width: 100%; height: 100%; overflow: hidden; }
         .window-title { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 26px; }
         .title-lines {
@@ -314,7 +316,7 @@
         }
 
 
-        /* Widget Styling */
+        /* Stylizacja widżetów */
         .amiga-widget { 
             position: absolute; 
             background-color: var(--amiga-blue); 
@@ -322,59 +324,59 @@
             z-index: 40; 
             display: flex; 
             flex-direction: column; 
-            /* Make the entire widget draggable */
-            cursor: grab; /* Indicate draggable */
+            /* Umożliwia przeciąganie całego widżetu */
+            cursor: grab; /* Wskazuje, że można przeciągać */
         }
         .amiga-widget:active {
-            cursor: grabbing; /* Indicate dragging */
+            cursor: grabbing; /* Wskazuje przeciąganie */
         }
 
-        .widget-close-button { /* New class for the close gadget for widgets */
+        .widget-close-button { /* Nowa klasa dla gadżetu zamykającego widżety */
             position: absolute;
             top: 5px;
             right: 5px;
-            z-index: 51; /* Ensure it's above other widget content */
+            z-index: 51; /* Upewnij się, że jest nad inną zawartością widżetu */
             cursor: pointer;
         }
 
         .widget-title { 
-            /* Moved from .amiga-widget to .widget-bar for consistency */
+            /* Przeniesiono z .amiga-widget do .widget-bar dla spójności */
             color: var(--amiga-white); 
             text-transform: uppercase; 
             text-align: center; 
             padding: 4px; 
-            font-size: 26px; /* Adjusted for bar */
+            font-size: 26px; /* Dostosowano do paska */
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px; /* Space between title and logo */
+            gap: 10px; /* Odstęp między tytułem a logo */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: 5px; /* Add some margin from the top border */
-            margin-bottom: 5px; /* Add some margin from the content */
+            margin-top: 5px; /* Dodaj margines od górnej krawędzi */
+            margin-bottom: 5px; /* Dodaj margines od zawartości */
         }
         .widget-title canvas {
-            width: 24px; /* Adjusted size for widget logo */
+            width: 24px; /* Dostosowany rozmiar dla logo widżetu */
             height: 24px;
             object-fit: contain;
         }
         .widget-content { 
             padding: 5px; 
-		max-width: 400px;
+		    max-width: 400px;
             color: var(--amiga-white); 
             font-size: 20px; 
             line-height: normal; 
-            flex-grow: 1; /* Allow content to fill remaining height */
-            overflow-y: auto; /* Enable scrolling for content */
+            flex-grow: 1; /* Pozwala zawartości wypełnić pozostałą wysokość */
+            overflow-y: auto; /* Włącza przewijanie dla zawartości */
         }
         .widget-content a { color: var(--amiga-orange) !important; }
 
-        /* Initial positions for widgets - will be randomized by JS */
-        #weather-widget { width: 300px; height: auto; } /* Added height for better random positioning */
+        /* Początkowe pozycje widżetów - będą losowane przez JS */
+        #weather-widget { width: 300px; height: auto; } /* Dodana wysokość dla lepszego losowego pozycjonowania */
         #google-widget { width: 300px; auto; padding-bottom: 10px; text-align: center; }
         #wiki-widget { width: 250px; height: auto; text-align: center;}
-	#wiki-top5-content {width: auto};
+	    #wiki-top5-content {width: auto};
         #bible-widget { width: 330px; auto; }
 
         #google-widget .widget-content { background-color: var(--amiga-blue); }
@@ -393,43 +395,167 @@
             border: 1px solid var(--amiga-black);
         }
         
-        .wiki-item { display: flex; text-align: left; flex-direction: row; gap: 5px; vertical-align: top; margin-bottom: 10px; } /* Changed to column for snippet */
-        .wiki-item .wiki-item-header { display: flex; gap: 5px; align-items: top;}
-        .wiki-item canvas { width: auto; height: auto; flex-shrink: 0; border: 1px solid black; }
-        .wiki-item a { color: var(--amiga-white); text-decoration: none; }
-        .wiki-item a:hover { color: var(--amiga-orange); }
+        /* Stylizacja elementów Wiki */
+        .wiki-item { 
+            display: flex; /* Użyj flexboxa dla układu wierszowego */
+            flex-direction: row; /* Obraz i zawartość tekstowa obok siebie */
+            align-items: flex-start; /* Wyrównaj elementy do góry */
+            gap: 10px; /* Odstęp między obrazem a zawartością tekstową */
+            text-align: left;
+            margin-bottom: 10px; 
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .wiki-item canvas { /* To jest obraz w elemencie wiki-item */
+            width: auto; 
+            height: auto; 
+            flex-shrink: 0; 
+            border: 1px solid black; 
+        }
+        .wiki-text-content { /* Nowy wrapper dla tytułu i fragmentu */
+            display: flex;
+            flex-direction: column; /* Tytuł i fragment układają się pionowo */
+            flex-grow: 1; /* Pozwala zawartości tekstowej zająć pozostałe miejsce */
+        }
+        .wiki-text-content a { /* To jest tytuł */
+            color: var(--amiga-white); 
+            text-decoration: none; 
+            font-weight: normal; 
+            line-height: 1.2; /* Dostosuj wysokość linii dla tytułu */
+        }
+        .wiki-text-content a:hover { 
+            color: var(--amiga-orange); 
+        }
         .wiki-item-snippet {
-            font-size: 18px; /* Smaller font for snippet */
-		text-align: left;
+            font-size: 18px; 
             color: rgba(255,255,255,0.8);
-            margin-left: 5px; /* Indent snippet to align with title */
+            margin-top: 5px; /* Odstęp między tytułem a fragmentem */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Ogranicz do 2 linii */
+            -webkit-box-orient: vertical;
+        }
+        .wiki-item-snippet a { /* Upewnij się, że link "więcej" jest pomarańczowy i podkreślony */
+            color: var(--amiga-orange) !important;
+            text-decoration: underline !important;
+            font-weight: normal; /* Dziedzicz normalną grubość czcionki */
+        }
+
+        /* Style ekranu startowego */
+        .boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #401040; /* Fioletowy z obrazka */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000; /* Upewnij się, że jest na wierzchu */
+            color: var(--amiga-white);
+            font-size: 32px;
+            text-align: center;
+            image-rendering: pixelated; /* Upewnij się, że renderowanie wszystkich elementów ekranu startowego jest pikselowane */
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            font-family: 'VT323', monospace; /* Zastosuj czcionkę retro */
+        }
+
+        .boot-logo-container { /* Kontener na logo Amigi */
+            position: absolute;
+            top: 50px; /* Podniesiono logo */
+            left: 100px; /* Dostosowano do obrazka */
+            width: 150px; /* Przybliżony rozmiar logo na obrazku */
+            height: auto; /* Zachowaj proporcje */
+        }
+
+        .boot-logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .rom-text-container {
+            position: absolute;
+            bottom: 150px; /* Podniesiono tekst ROM */
+            left: 100px; /* Dostosowano do obrazka */
+            text-align: left;
+            font-size: 20px;
+            line-height: 1.4;
+            color: var(--amiga-white);
+        }
+
+        .floppy-drive-area { /* Wrapper do pozycjonowania stacji dyskietek i dyskietki */
+            position: absolute;
+            bottom: 100px; /* Podniesiono całą animację dyskietki */
+            right: 100px; /* Pozycja od prawej */
+            width: 200px; /* Szerokość obrazu komputera */
+            height: 100px; /* Wysokość obrazu komputera */
+            overflow: hidden; /* Ukryj dyskietkę, gdy jest poza napędem */
+        }
+
+        .amiga-computer-img {
+            position: absolute;
+            bottom: 0; /* Umieść obraz komputera na dole kontenera */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Upewnij się, że pasuje do swojego kontenera */
+        }
+
+        .amiga-floppy-img {
+            position: absolute;
+            width: 100px; /* Szerokość dyskietki */
+            height: 90px; /* Wysokość dyskietki */
+            left: 50%;
+            transform: translateX(-50%); /* Wyśrodkuj poziomo w obszarze napędu */
+            /* Wartości animacji */
+            animation: insertFloppy 2s forwards;
+            animation-delay: 0.5s; /* Rozpocznij animację po krótkim opóźnieniu */
+        }
+
+        @keyframes insertFloppy {
+            0% { top: 100%; } /* Start z dołu kontenera floppy-drive-area */
+            100% {
+                /* Dyskietka wchodzi 27px od dołu grafiki amiga-computer.
+                   Ponieważ amiga-computer-img ma wysokość 100% kontenera (100px),
+                   27px od dołu to 73px od góry obrazu komputera.
+                   Wysokość dyskietki wynosi 90px.
+                   Zatem górna krawędź dyskietki powinna znajdować się na wysokości (73px - 90px) = -17px
+                   względem górnej krawędzi kontenera floppy-drive-area.
+                */
+                top: -17px;
+            }
         }
 
 
         @media (max-width: 768px) {
-            body { font-size: 20px; /* large on mobile */ }
+            body { font-size: 20px; /* duży na urządzeniach mobilnych */ }
             .desktop { 
                 flex-direction: column; 
                 align-items: center; 
-                justify-content: flex-start; /* Stack items at the top */
+                justify-content: flex-start; /* Układaj elementy na górze */
             }
-            /* Desktop icons containers for mobile - stack horizontally at top */
+            /* Kontenery ikon pulpitu dla urządzeń mobilnych - układaj poziomo na górze */
             #desktop-icons-left, #desktop-icons-right {
-                position: relative; /* Remove absolute positioning on mobile */
-                height: auto; /* Auto height on mobile */
-                flex-direction: row; /* Arrange icons in rows on mobile */
-                flex-wrap: wrap; /* Wrap to new rows */
-                justify-content: center; /* Center icons */
+                position: relative; /* Usuń absolutne pozycjonowanie na urządzeniach mobilnych */
+                height: auto; /* Automatyczna wysokość na urządzeniach mobilnych */
+                flex-direction: row; /* Układaj ikony w wierszach na urządzeniach mobilnych */
+                flex-wrap: wrap; /* Zawijaj w nowe wiersze */
+                justify-content: center; /* Wyśrodkuj ikony */
                 padding: 10px;
-                width: 100%; /* Take full width */
-                align-items: center; /* Center items in row */
-                gap: 10px; /* Smaller gap for mobile icons */
+                width: 100%; /* Zajmij całą szerokość */
+                align-items: center; /* Wyśrodkuj elementy w wierszu */
+                gap: 10px; /* Mniejszy odstęp dla ikon mobilnych */
             }
-            #desktop-icons-right { order: 1; } /* Order right icons first on mobile */
-            #desktop-icons-left { order: 2; } /* Then left icons */
+            #desktop-icons-right { order: 1; } /* Najpierw ikony po prawej na urządzeniach mobilnych */
+            #desktop-icons-left { order: 2; } /* Potem ikony po lewej */
 
             #widget-container { 
-                position: relative; /* Remove absolute positioning on mobile */
+                position: relative; /* Usuń absolutne pozycjonowanie na urządzeniach mobilnych */
                 top: auto;
                 left: auto;
                 width: 100%;
@@ -438,8 +564,8 @@
                 flex-direction: column;
                 align-items: center;
                 gap: 10px;
-                pointer-events: auto; /* Re-enable pointer events for the container itself */
-                padding-bottom: 20px; /* Add some padding at the bottom of widgets on mobile */
+                pointer-events: auto; /* Ponownie włącz zdarzenia wskaźnika dla samego kontenera */
+                padding-bottom: 20px; /* Dodaj trochę odstępu na dole widżetów na urządzeniach mobilnych */
             }
             .amiga-widget {
                 position: relative !important;
@@ -452,15 +578,56 @@
             .widget-content { font-size: 21px; line-height: normal }
 
             #top-bar-text {
-                content: "Amiga 600"; /* Set the content property for the mobile text */
+                content: "Amiga 600"; /* Ustaw właściwość content dla tekstu mobilnego */
             }
+
+            /* Dostosuj ekran startowy dla urządzeń mobilnych */
+            .boot-logo-container {
+                top: 50px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px; /* Mniejsze logo na urządzeniach mobilnych */
+            }
+            .rom-text-container {
+                bottom: 50px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                font-size: 16px; /* Mniejszy tekst na urządzeniach mobilnych */
+            }
+            .floppy-drive-area {
+                bottom: 30px; /* Dostosuj położenie pionowe dla urządzeń mobilnych */
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 150px; /* Mniejszy napęd na urządzeniach mobilnych */
+                height: 75px; /* Mniejsza wysokość napędu */
+            }
+            /* Animacja dyskietki na urządzeniach mobilnych będzie skalowana automatycznie */
         }
         
     </style>
 </head>
 <body>
 
-    <div class="workbench-screen">
+    <!-- Ekran startowy -->
+    <div class="boot-screen" id="boot-screen">
+        <div class="boot-logo-container">
+            <img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/amiga-logo.png" alt="Logo Amiga">
+        </div>
+        <div class="rom-text-container">
+            3.9 ROM 45.057<br>
+            Copyright &copy; 1985-2002<br>
+            Amiga, Inc.<br>
+            All Rights Reserved.
+        </div>
+        <div class="floppy-drive-area">
+            <img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/amiga-computer.png" alt="Komputer Amiga" class="amiga-computer-img">
+            <img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/amiga-floppy.png" alt="Dyskietka Amiga" class="amiga-floppy-img">
+        </div>
+    </div>
+
+    <div class="workbench-screen" id="workbench-screen">
         <div class="top-bar">
             <div id="top-bar-text" class="top-bar-text">Amiga 600 Workbench 1.3</div>
             <div id="mobile-feeds-menu">
@@ -502,8 +669,7 @@
                     <div class="widget-title">Słowo na dziś</div>
                     <div style="float: left; padding: 0px 10px 10px 10px;border-style: none">
 					<img src="https://github.com/WidgetUZ/Amiga/blob/main/images/jesus.png?raw=true" style="width: 60px; height: auto; border-style: none; float: left;"> <div class="widget-content" id="bible-widget-content">Ładowanie...</div></div>
-                   
-					</div>
+                </div>
                 <div id="wiki-widget" class="amiga-widget">
                     <div class="widget-close-button">
                         <div class="gadget gadget-close"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="15" height="15" fill="white"/><rect x="1" y="1" width="13" height="13" fill="white" stroke="#0050A8" stroke-width="2"/><rect x="4" y="4" width="7" height="7" fill="black"/></svg></div>
@@ -535,30 +701,42 @@
             { name: 'Sport Interia', url: 'https://sport.interia.pl/feed' },
         ];
         
-        // --- Main Setup ---
+        // --- Główna konfiguracja ---
         document.addEventListener('DOMContentLoaded', () => {
-            setupDesktop();
-            setupWidgets();
-            updateTopBarText();
-            updateClock(); // Initial call to display time immediately
-            setInterval(updateClock, 1000);
-            window.addEventListener('resize', updateTopBarText);
+            // Ukryj pulpit początkowo
+            document.getElementById('workbench-screen').style.display = 'none';
+
+            // Pokaż ekran startowy
+            const bootScreen = document.getElementById('boot-screen');
+            bootScreen.style.display = 'flex';
+
+            // Po opóźnieniu ukryj ekran startowy i pokaż pulpit
+            setTimeout(() => {
+                bootScreen.style.display = 'none';
+                document.getElementById('workbench-screen').style.display = 'block'; // Pokaż jako blok, aby umożliwić elastyczne rozmieszczenie wewnątrz
+                setupDesktop();
+                setupWidgets();
+                updateTopBarText();
+                updateClock(); // Początkowe wywołanie, aby natychmiast wyświetlić czas
+                setInterval(updateClock, 1000);
+                window.addEventListener('resize', updateTopBarText);
+            }, 3000); // 3 sekundy na animację startową (tylko wkładanie dyskietki)
         });
 
-        // Function to get random position for new windows/widgets
+        // Funkcja do uzyskiwania losowej pozycji dla nowych okien/widżetów
         function getRandomPosition(elementWidth, elementHeight) {
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
-            const topBarHeight = 32; // Height of the top bar
-            const bottomPadding = 100; // Adjusted bottom padding
+            const topBarHeight = 32; // Wysokość górnego paska
+            const bottomPadding = 100; // Dostosowany dolny padding
 
-            // Calculate max X and Y to ensure element is fully visible
-            const maxX = Math.max(0, viewportWidth - elementWidth - 40); // 40px margin from right
-            const maxY = Math.max(0, viewportHeight - elementHeight - topBarHeight - bottomPadding - 40); // 40px margin from bottom
+            // Oblicz maksymalne X i Y, aby upewnić się, że element jest w pełni widoczny
+            const maxX = Math.max(0, viewportWidth - elementWidth - 40); // 40px marginesu od prawej
+            const maxY = Math.max(0, viewportHeight - elementHeight - topBarHeight - bottomPadding - 40); // 40px marginesu od dołu
 
-            // Generate random coordinates within the safe bounds
+            // Wygeneruj losowe współrzędne w bezpiecznych granicach
             const randomX = Math.floor(Math.random() * maxX);
-            const randomY = Math.floor(Math.random() * maxY) + topBarHeight; // Ensure it's below the top bar
+            const randomY = Math.floor(Math.random() * maxY) + topBarHeight; // Upewnij się, że jest poniżej górnego paska
 
             return { top: `${randomY}px`, left: `${randomX}px` };
         }
@@ -567,25 +745,25 @@
             const iconsLeft = document.getElementById('desktop-icons-left');
             const iconsRight = document.getElementById('desktop-icons-right');
             
-            iconsLeft.innerHTML = ''; // Clear existing icons
-            iconsRight.innerHTML = ''; // Clear existing icons
+            iconsLeft.innerHTML = ''; // Wyczyść istniejące ikony
+            iconsRight.innerHTML = ''; // Wyczyść istniejące ikony
 
             const iconBasePath = 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/';
-            // General folder icon for interactive windows
+            // Ogólna ikona folderu dla interaktywnych okien
             const folderIcon = `<img src="${iconBasePath}folder.jpg" alt="Folder" class="w-full h-full object-contain">`;
 
-            // Icons that need favicon rendering or are interactive windows
+            // Ikony, które wymagają renderowania favicon lub są interaktywnymi oknami
             const desktopIcons = [
                 { name: 'Gmail', url: 'https://mail.google.com', side: 'left' },
                 { name: 'YouTube', url: 'https://youtube.com', side: 'left' },
-                { name: 'Gemini', url: 'https://gemini.google.com', side: 'left' }, // Updated Gemini to be dynamic
-                { name: 'World Wide Web', windowId: 'browser-window', side: 'left' }, // Renamed Web Browser
+                { name: 'Gemini', url: 'https://gemini.google.com', side: 'left' }, // Zaktualizowano Gemini, aby było dynamiczne
+                { name: 'World Wide Web', windowId: 'browser-window', side: 'left' }, // Zmieniono nazwę przeglądarki internetowej
                 { name: 'RSS', windowId: 'feeds-window', extraClass: 'hide-on-mobile', side: 'left' },
-                { name: 'Leonardo', url: 'https://app.leonardo.ai', side: 'left' }, // Updated Leonardo to be dynamic
+                { name: 'Leonardo', url: 'https://app.leonardo.ai', side: 'left' },
                 { name: 'YT Music', url: 'https://music.youtube.com', side: 'left' },
                 { name: 'Kosz', windowId: 'trash-window', side: 'left' },
                 { name: 'AI', windowId: 'ai-window', side: 'left' },
-                { name: 'Dysk', url: 'https://drive.google.com/', side: 'right' }, // RAM Disk is now "Dysk"
+                { name: 'Dysk', url: 'https://drive.google.com/', side: 'right' }, // Dysk RAM to teraz "Dysk"
                 { name: 'Workbench', windowId: 'workbench-window', side: 'right' },
             ];
 
@@ -594,7 +772,7 @@
                 const iconElement = document.createElement('div');
                 iconElement.className = `desktop-icon ${item.extraClass || ''}`;
 
-                if (item.url) { // It's a direct link with favicon
+                if (item.url) { // To jest bezpośredni link z faviconą
                     const canvasId = `desktop-icon-${item.name.replace(/\s/g, '')}`;
                     iconElement.innerHTML = `
                         <a href="${item.url}" target="_blank" class="desktop-icon" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
@@ -608,12 +786,12 @@
                         iconsRight.appendChild(iconElement);
                     }
 
-                    // Load favicon after element is in DOM
+                    // Załaduj faviconę po umieszczeniu elementu w DOM
                     setTimeout(() => {
                         const canvas = document.getElementById(canvasId);
                         if (canvas) loadImageToPixelArt(canvas, `https://www.google.com/s2/favicons?domain=${item.url}&sz=64`, 'https://corsproxy.io/?', 16);
                     }, 0);
-                } else { // It's an interactive icon opening a window
+                } else { // To jest interaktywna ikona otwierająca okno
                     iconElement.classList.add('interactive-icon');
                     iconElement.dataset.windowId = item.windowId;
                     iconElement.innerHTML = `
@@ -635,7 +813,7 @@
             createFeedsWindow();
             createAiWindow();
             createWorkbenchWindow();
-            createWindowHTML('trash-window', 'Kosz', '<p>Kosz jest pusty.</p>', getRandomPosition(300, 200)); // Random position for trash
+            createWindowHTML('trash-window', 'Kosz', '<p>Kosz jest pusty.</p>', getRandomPosition(300, 200)); // Losowa pozycja dla kosza
             
             setupMobileMenu();
 
@@ -643,10 +821,10 @@
                 const polsatFeed = initialFeeds.find(f => f.name === 'Polsat News');
                 if (polsatFeed) {
                     const feedId = 'polsat-news-on-start';
-                    // Create window first to get its dimensions for getRandomPosition
-                    const newWindow = createWindowHTML(feedId, polsatFeed.name, 'Ładowanie...', {top: '0px', left: '0px'}); // Temporary position
+                    // Utwórz okno najpierw, aby uzyskać jego wymiary dla getRandomPosition
+                    const newWindow = createWindowHTML(feedId, polsatFeed.name, 'Ładowanie...', {top: '0px', left: '0px'}); // Tymczasowa pozycja
                     openWindow(newWindow);
-                    // Update position after rendering
+                    // Zaktualizuj pozycję po renderowaniu
                     const pos = getRandomPosition(newWindow.offsetWidth, newWindow.offsetHeight);
                     newWindow.style.top = pos.top;
                     newWindow.style.left = pos.left;
@@ -656,12 +834,12 @@
         }
         
         function setupWidgets() {
-            // Load widget content first
+            // Załaduj zawartość widżetów najpierw
             loadWeather();
             loadWikipediaWidget();
             loadBibleWidget();
 
-            // Setup forms
+            // Skonfiguruj formularze
             const googleForm = document.getElementById('google-widget-form');
             const googleLogoContainer = document.getElementById('google-logo-container');
             googleLogoContainer.innerHTML = `<img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/google.jpg" alt="Google" style="height: 30px; display: inline-block;">`;
@@ -679,7 +857,7 @@
                 if (!query) return;
                 const url = `https://pl.wikipedia.org/wiki/${encodeURIComponent(query)}`;
                 const winId = `wiki-result-${Date.now()}`;
-                const newWindow = createWindowHTML(winId, `Wikipedia: ${query}`, 'Ładowanie...', {top: '0px', left: '0px'}); // Temporary position
+                const newWindow = createWindowHTML(winId, `Wikipedia: ${query}`, 'Ładowanie...', {top: '0px', left: '0px'}); // Tymczasowa pozycja
                 openWindow(newWindow);
                 const pos = getRandomPosition(newWindow.offsetWidth, newWindow.offsetHeight);
                 newWindow.style.top = pos.top;
@@ -688,26 +866,71 @@
                 input.value = '';
             });
 
-            // Apply random positions and make draggable after content is loaded/set up
-            // Use a small delay to ensure elements are fully rendered in the DOM
+            // Zastosuj losowe pozycje i spraw, aby można było przeciągać po załadowaniu/skonfigurowaniu zawartości
+            // Użyj małego opóźnienia, aby upewnić się, że elementy są w pełni wyrenderowane w DOM
             setTimeout(() => {
+                positionInitialWidgets(); // Wywołaj nową funkcję do początkowego pozycjonowania
                 const widgets = ['weather-widget', 'google-widget', 'wiki-widget', 'bible-widget'];
                 widgets.forEach(widgetId => {
                     const widgetEl = document.getElementById(widgetId);
                     if (widgetEl) {
-                        const pos = getRandomPosition(widgetEl.offsetWidth, widgetEl.offsetHeight);
-                        widgetEl.style.top = pos.top;
-                        widgetEl.style.left = pos.left;
-                        makeElementDraggable(widgetEl); // Make the entire widget draggable
+                        makeElementDraggable(widgetEl); // Spraw, aby cały widżet można było przeciągać
                     }
                 });
 
-                // Load Wikipedia logo after the widget is potentially moved
+                // Załaduj logo Wikipedii po ewentualnym przeniesieniu widżetu
                 const wikiLogoCanvas = document.getElementById('wiki-logo-canvas');
                 if (wikiLogoCanvas) {
-                    loadImageToPixelArt(wikiLogoCanvas, 'https://www.google.com/s2/favicons?domain=wikipedia.org&sz=64', 'https://corsproxy.io/?', 24); // Adjusted size for widget title
+                    loadImageToPixelArt(wikiLogoCanvas, 'https://www.google.com/s2/favicons?domain=wikipedia.org&sz=64', 'https://corsproxy.io/?', 24); // Dostosowany rozmiar dla tytułu widżetu
                 }
-            }, 100); // Small delay
+            }, 100); // Małe opóźnienie
+        }
+
+        function positionInitialWidgets() {
+            if (window.innerWidth <= 768) {
+                // Na urządzeniach mobilnych widżety są już obsługiwane przez CSS, aby układały się pionowo
+                return;
+            }
+
+            const topBarHeight = 32;
+            const padding = 20;
+            const widgetGap = 20; // Odstęp między widżetami
+
+            const weatherWidget = document.getElementById('weather-widget');
+            const googleWidget = document.getElementById('google-widget');
+            const wikiWidget = document.getElementById('wiki-widget');
+            const bibleWidget = document.getElementById('bible-widget');
+
+            // Zdefiniuj pozycje dla siatki 2x2 (dostosuj w razie potrzeby)
+            // Te pozycje są względne do ekranu workbench, z uwzględnieniem górnego paska
+            const positions = [
+                { top: topBarHeight + padding, left: padding }, // Górny lewy
+                { top: topBarHeight + padding, left: padding + weatherWidget.offsetWidth + widgetGap }, // Górny prawy (zakładając, że pogoda jest na lewo od Google)
+                { top: topBarHeight + padding + weatherWidget.offsetHeight + widgetGap, left: padding }, // Dolny lewy
+                { top: topBarHeight + padding + weatherWidget.offsetHeight + widgetGap, left: padding + weatherWidget.offsetWidth + widgetGap } // Dolny prawy
+            ];
+            
+            // Przypisz pozycje do widżetów
+            if (weatherWidget) {
+                weatherWidget.style.top = positions[0].top + 'px';
+                weatherWidget.style.left = positions[0].left + 'px';
+                weatherWidget.style.display = 'flex'; // Upewnij się, że jest widoczny
+            }
+            if (googleWidget) {
+                googleWidget.style.top = positions[0].top + 'px';
+                googleWidget.style.left = positions[1].left + 'px';
+                googleWidget.style.display = 'flex';
+            }
+            if (wikiWidget) {
+                wikiWidget.style.top = positions[2].top + 'px';
+                wikiWidget.style.left = positions[2].left + 'px';
+                wikiWidget.style.display = 'flex';
+            }
+            if (bibleWidget) {
+                bibleWidget.style.top = positions[2].top + 'px';
+                bibleWidget.style.left = positions[3].left + 'px';
+                bibleWidget.style.display = 'flex';
+            }
         }
 
         async function loadWeather() {
@@ -755,7 +978,7 @@
             
             setTimeout(() => {
                 const canvas = document.getElementById(kielceHerbCanvasId);
-                // Increased maxPixelSize for the herb to 64 for better rendering
+                // Zwiększono maxPixelSize dla herbu do 64 dla lepszego renderowania
                 if (canvas) loadImageToPixelArt(canvas, 'https://raw.githubusercontent.com/WidgetUZ/Amiga/main/images/kielce_10.jpg', 'https://corsproxy.io/?', 64);
             }, 0);
         }
@@ -773,12 +996,13 @@
                 const response = await fetch(topViewsUrl);
                 const data = await response.json();
                 const articles = data.items[0].articles
-                    .filter(a => !a.article.includes(':')) // Filter out special pages
+                    .filter(a => !a.article.includes(':')) // Filtruj strony specjalne
                     .slice(0, 5);
                 
                 const titles = articles.map(a => a.article).join('|');
-                // Fetch images and extracts in one go
-                const wikiApiUrl = `https://pl.wikipedia.org/w/api.php?action=query&prop=pageimages|extracts&format=json&piprop=thumbnail&pithumbsize=100&exintro=1&explaintext=1&titles=${encodeURIComponent(titles)}&origin=*`;
+                // Pobierz obrazy i fragmenty w jednym zapytaniu
+                // Zmieniono exintro=1 na exintro=0 i explaintext=1, aby uzyskać pełny fragment
+                const wikiApiUrl = `https://pl.wikipedia.org/w/api.php?action=query&prop=pageimages|extracts&format=json&piprop=thumbnail&pithumbsize=100&exintro=0&explaintext=1&titles=${encodeURIComponent(titles)}&origin=*`;
                 
                 const wikiResponse = await fetch(wikiApiUrl);
                 const wikiData = await wikiResponse.json();
@@ -788,16 +1012,20 @@
                 for (const article of articles) {
                     const page = Object.values(pages).find(p => p.title === article.article.replace(/_/g, ' '));
                     const imageUrl = page?.thumbnail?.source;
-                    const extract = page?.extract ? page.extract.split('. ')[0] + '.' : 'Brak opisu.'; // Take first sentence
-                    const canvasId = `wiki-canvas-${page?.pageid || Math.random()}`;
+                    const fullExtract = page?.extract || 'Brak opisu.';
                     
+                    const canvasId = `wiki-canvas-${page?.pageid || Math.random()}`;
+                    const articleLink = `https://pl.wikipedia.org/wiki/${article.article}`;
+
                     html += `<div class="wiki-item">`;
-                    html += `<div class="wiki-item-header">`;
                     if (imageUrl) {
                         html += `<canvas id="${canvasId}"></canvas>`;
                     }
-                    html += `<a href="https://pl.wikipedia.org/wiki/${article.article}" target="_blank">${article.article.replace(/_/g, ' ')}</a></div>`;
-                    html += `<div class="wiki-item-snippet">${extract}</div></div>`; // Add snippet
+                    html += `<div class="wiki-text-content">`; // Nowy wrapper dla tytułu i fragmentu
+                    html += `<a href="${articleLink}" target="_blank">${article.article.replace(/_/g, ' ')}</a>`;
+                    // Zawartość fragmentu z "..." i linkiem "więcej"
+                    html += `<div class="wiki-item-snippet">${fullExtract} <a href="${articleLink}" target="_blank" style="color:var(--amiga-orange); text-decoration:underline;">...więcej</a></div>`;
+                    html += `</div></div>`; // Zamknij wiki-text-content i wiki-item
                 }
                 contentEl.innerHTML = html;
 
@@ -832,17 +1060,17 @@
             }
         }
         
-        // This function is now only for simple image-based icons
+        // Ta funkcja jest teraz tylko dla prostych ikon opartych na obrazach
         function createLinkIconHTML(name, url, svgContent) {
             return `<a href="${url}" target="_blank" class="desktop-icon"><div class="icon-image">${svgContent}</div><div class="icon-label">${name}</div></a>`;
         }
 
-        // This function is for interactive icons that open windows
+        // Ta funkcja jest dla interaktywnych ikon, które otwierają okna
         function createInteractiveIconHTML(name, windowId, svgContent, extraClass = '') {
             return `<div class="desktop-icon interactive-icon ${extraClass}" data-window-id="${windowId}"><div class="icon-image">${svgContent}</div><div class="icon-label">${name}</div></div>`;
         }
         
-        function createWindowHTML(id, title, contentHTML, pos) { // pos is now mandatory
+        function createWindowHTML(id, title, contentHTML, pos) { // pos jest teraz obowiązkowe
             const container = document.getElementById('windows-container');
             const windowEl = document.createElement('div');
             windowEl.id = id;
@@ -872,7 +1100,7 @@
 <div class="window-bar-bottom">
                     <div class="window-gadgets"><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/arrow-left.jpg"></div>
                     <div class="bottom-lines"></div><div><img src="https://raw.githubusercontent.com/WidgetUZ/Amiga/refs/heads/main/images/arrow-right.jpg" style="float: left; padding-right: 5px;"> <img src="https://github.com/WidgetUZ/Amiga/blob/main/images/ico-size-window_21.jpg?raw=true"></div>
-                 
+                    
                 </div>`;
             
             container.appendChild(windowEl);
@@ -883,13 +1111,13 @@
         function makeElementDraggable(element) {
             if (!element) {
                 console.error("makeElementDraggable: Element is null or undefined.", element);
-                return; // Exit if element is not valid
+                return; // Wyjdź, jeśli element jest nieprawidłowy
             }
-            // For windows, use the window-bar. For widgets, use the entire element.
+            // Dla okien, użyj window-bar. Dla widżetów, użyj całego elementu.
             const bar = element.classList.contains('amiga-window') ? element.querySelector('.window-bar') : element;
             if (!bar) {
-                console.error("makeElementDraggable: Could not find draggable bar for element:", element.id, element);
-                return; // Exit if bar is not found
+                console.error("makeElementDraggable: Nie można znaleźć paska do przeciągania dla elementu:", element.id, element);
+                return; // Wyjdź, jeśli pasek nie został znaleziony
             }
 
             let isDragging = false, offsetX, offsetY;
@@ -900,7 +1128,7 @@
                 offsetY = clientY - element.offsetTop;
                 highestZIndex++;
                 element.style.zIndex = highestZIndex;
-                // Only apply active/inactive classes to amiga-window elements
+                // Zastosuj klasy active/inactive tylko do elementów amiga-window
                 if (element.classList.contains('amiga-window')) {
                     document.querySelectorAll('.amiga-window').forEach(win => {
                         win.classList.remove('active');
@@ -923,7 +1151,7 @@
             };
 
             bar.addEventListener('mousedown', (e) => {
-                // If the click is on a gadget, don't start dragging
+                // Jeśli kliknięcie jest na gadżecie, nie rozpoczynaj przeciągania
                 if (e.target.closest('.gadget') || e.target.closest('.widget-close-button')) return;
                 onDragStart(e.clientX, e.clientY);
             });
@@ -938,21 +1166,21 @@
             document.addEventListener('touchmove', (e) => onDragMove(e.touches[0].clientX, e.touches[0].clientY));
             document.addEventListener('touchend', onDragEnd);
             
-            // Close gadget listener for both windows and widgets
+            // Nasłuchiwanie na gadżet zamykający zarówno dla okien, jak i widżetów
             const closeGadget = element.querySelector('.gadget-close') || element.querySelector('.widget-close-button .gadget-close');
             if(closeGadget) closeGadget.addEventListener('click', () => { element.style.display = 'none'; });
         }
         
         function loadImageToPixelArt(canvas, url, proxyUrl, maxPixelSize = 48) {
             if (!canvas || !url) {
-                console.error("loadImageToPixelArt: Invalid canvas or URL provided.", {canvas, url});
+                console.error("loadImageToPixelArt: Nieprawidłowy canvas lub URL.", {canvas, url});
                 return;
             }
             const ctx = canvas.getContext('2d');
             let img = new Image();
-            img.crossOrigin = "Anonymous"; // Essential for CORS
+            img.crossOrigin = "Anonymous"; // Niezbędne dla CORS
             img.onload = function() {
-                // console.log(`Image loaded successfully for canvas: ${canvas.id}, URL: ${url}`); // Debugging
+                // console.log(`Obraz załadowany pomyślnie dla canvasa: ${canvas.id}, URL: ${url}`); // Debugowanie
                 const ratio = img.width / img.height;
                 canvas.width = maxPixelSize;
                 canvas.height = maxPixelSize / ratio;
@@ -968,15 +1196,44 @@
             };
             img.onerror = function(e) {
                 console.error("Nie można załadować obrazka do canvasa:", url, e);
-                if(canvas) canvas.style.display = 'none'; // Hide canvas if image fails to load
+                if(canvas) canvas.style.display = 'none'; // Ukryj canvas, jeśli obraz nie załaduje się
             }
             img.src = proxyUrl + encodeURIComponent(url);
         }
         
-        function openWindow(windowEl) {
+        function openWindow(windowEl, iconRect = null) {
             if (windowEl) {
+                if (window.innerWidth <= 768 && iconRect) { // Zastosuj pozycję ikony tylko na urządzeniach mobilnych
+                    windowEl.style.top = `${iconRect.top}px`;
+                    windowEl.style.left = `${iconRect.left}px`;
+                    // Dostosuj, aby okno pozostało w obszarze widoku, jeśli wyjdzie poza ekran
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+                    const windowWidth = windowEl.offsetWidth;
+                    const windowHeight = windowEl.offsetHeight;
+
+                    let newLeft = iconRect.left;
+                    let newTop = iconRect.top;
+
+                    if (newLeft + windowWidth > viewportWidth) {
+                        newLeft = viewportWidth - windowWidth - 10; // 10px padding od prawej
+                    }
+                    if (newLeft < 0) {
+                        newLeft = 10; // 10px padding od lewej
+                    }
+
+                    if (newTop + windowHeight > viewportHeight) {
+                        newTop = viewportHeight - windowHeight - 10; // 10px padding od dołu
+                    }
+                    if (newTop < 0) {
+                        newTop = 10; // 10px padding od góry
+                    }
+                    windowEl.style.top = `${newTop}px`;
+                    windowEl.style.left = `${newLeft}px`;
+
+                }
                 windowEl.style.display = 'flex';
-                // Trigger mousedown to bring to front and set active class
+                // Wywołaj mousedown, aby przenieść na wierzch i ustawić klasę active
                 windowEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, clientX: windowEl.offsetLeft, clientY: windowEl.offsetTop }));
             }
         }
@@ -984,13 +1241,13 @@
         function updateClock() {
             const clockElement = document.getElementById('clock');
             const dateElement = document.getElementById('date');
-            if (clockElement && dateElement) { // Added check for dateElement too
+            if (clockElement && dateElement) { // Dodano również sprawdzenie dla dateElement
                 const now = new Date();
                 clockElement.textContent = now.toLocaleTimeString('pl-PL');
                 dateElement.textContent = now.toLocaleDateString('pl-PL');
-                // console.log('Clock updated:', now.toLocaleTimeString('pl-PL')); // For debugging
+                // console.log('Zegar zaktualizowany:', now.toLocaleTimeString('pl-PL')); // Do debugowania
             } else {
-                // console.error('Clock or Date element not found!'); // For debugging
+                // console.error('Element zegara lub daty nie znaleziony!'); // Do debugowania
             }
         }
         
@@ -998,13 +1255,17 @@
             const textEl = document.getElementById('top-bar-text');
             if (window.innerWidth <= 768) {
                 textEl.textContent = 'Amiga 600';
+                document.getElementById('mobile-feeds-menu').style.display = 'block';
+                document.getElementById('top-bar-right').style.display = 'none'; // Ukryj datę/czas na mobilnym pasku górnym
             } else {
                 textEl.textContent = 'Amiga 600 Workbench 1.3';
+                document.getElementById('mobile-feeds-menu').style.display = 'none';
+                document.getElementById('top-bar-right').style.display = 'flex'; // Pokaż datę/czas na pasku górnym pulpitu
             }
         }
         
         function createBrowserWindow() {
-            // Create window with temporary position, then update after rendering
+            // Utwórz okno z tymczasową pozycją, a następnie zaktualizuj po renderowaniu
             const win = createWindowHTML('browser-window', 'World Wide Web', '', {top: '0px', left: '0px'}); 
             const contentWrapper = win.querySelector('.window-content-wrapper');
             contentWrapper.innerHTML = `
@@ -1015,30 +1276,29 @@
                     </form>
                 </div>
                 <div class="window-content">Wpisz adres URL powyżej.</div>
-`
-			;
+`;
             win.querySelector('.browser-form').addEventListener('submit', (e) => handleBrowserSubmit(e, win));
-            // Set random position after the window content is established
+            // Ustaw losową pozycję po ustaleniu zawartości okna
             setTimeout(() => {
                 const pos = getRandomPosition(win.offsetWidth, win.offsetHeight);
                 win.style.top = pos.top;
                 win.style.left = pos.left;
-            }, 50); // Small delay
+            }, 50); // Małe opóźnienie
         }
 
         function createFeedsWindow() {
             const linksHTML = initialFeeds.map(feed => 
                 `<p><a href="#" class="feed-link" data-url="${feed.url}" data-name="${feed.name}">${feed.name}</a></p>`
             ).join('');
-            // Create window with temporary position, then update after rendering
+            // Utwórz okno z tymczasową pozycją, a następnie zaktualizuj po renderowaniu
             const win = createWindowHTML('feeds-window', 'RSS', linksHTML, {top: '0px', left: '0px'}); 
             win.addEventListener('click', handleFeedLinkClick);
-            // Set random position after the window content is established
+            // Ustaw losową pozycję po ustaleniu zawartości okna
             setTimeout(() => {
                 const pos = getRandomPosition(win.offsetWidth, win.offsetHeight);
                 win.style.top = pos.top;
                 win.style.left = pos.left;
-            }, 50); // Small delay
+            }, 50); // Małe opóźnienie
         }
 
         function createAiWindow() {
@@ -1061,23 +1321,23 @@
                 `;
             });
             contentHTML += '</div>';
-            // Create window with temporary position, then update after rendering
+            // Utwórz okno z tymczasową pozycją, a następnie zaktualizuj po renderowaniu
             const win = createWindowHTML('ai-window', 'AI Tools', contentHTML, {top: '0px', left: '0px'}); 
             
             aiServices.forEach(service => {
-                 const canvasId = `ai-icon-${service.name.replace(/\s/g, '')}`;
-                 const faviconUrl = `https://www.google.com/s2/favicons?domain=${service.url}&sz=64`;
-                 setTimeout(() => {
-                    const canvas = document.getElementById(canvasId);
-                    if(canvas) loadImageToPixelArt(canvas, faviconUrl, 'https://corsproxy.io/?', 16);
-                 }, 0);
+                   const canvasId = `ai-icon-${service.name.replace(/\s/g, '')}`;
+                   const faviconUrl = `https://www.google.com/s2/favicons?domain=${service.url}&sz=64`;
+                   setTimeout(() => {
+                     const canvas = document.getElementById(canvasId);
+                     if(canvas) loadImageToPixelArt(canvas, faviconUrl, 'https://corsproxy.io/?', 16);
+                   }, 0);
             });
-            // Set random position after the window content is established
+            // Ustaw losową pozycję po ustaleniu zawartości okna
             setTimeout(() => {
                 const pos = getRandomPosition(win.offsetWidth, win.offsetHeight);
                 win.style.top = pos.top;
                 win.style.left = pos.left;
-            }, 50); // Small delay
+            }, 50); // Małe opóźnienie
         }
 
         // Nowa funkcja do tworzenia okna Workbench z linkami do stron o Amidze
@@ -1102,24 +1362,24 @@
             });
             contentHTML += '</div>';
 
-            // Create window with temporary position, then update after rendering
+            // Utwórz okno z tymczasową pozycją, a następnie zaktualizuj po renderowaniu
             const workbenchWin = createWindowHTML('workbench-window', 'Amiga Resources', contentHTML, {top: '0px', left: '0px'}); 
             
             // Załaduj favikony dla ikon Workbench
             amigaLinks.forEach(link => {
-                 const canvasId = `workbench-icon-${link.name.replace(/\s/g, '')}`;
-                 const faviconUrl = `https://www.google.com/s2/favicons?domain=${link.url}&sz=64`;
-                 setTimeout(() => {
-                    const canvas = document.getElementById(canvasId);
-                    if(canvas) loadImageToPixelArt(canvas, faviconUrl, 'https://corsproxy.io/?', 16);
-                 }, 0);
+                   const canvasId = `workbench-icon-${link.name.replace(/\s/g, '')}`;
+                   const faviconUrl = `https://www.google.com/s2/favicons?domain=${link.url}&sz=64`;
+                   setTimeout(() => {
+                     const canvas = document.getElementById(canvasId);
+                     if(canvas) loadImageToPixelArt(canvas, faviconUrl, 'https://corsproxy.io/?', 16);
+                   }, 0);
             });
-            // Set random position after the window content is established
+            // Ustaw losową pozycję po ustaleniu zawartości okna
             setTimeout(() => {
                 const pos = getRandomPosition(workbenchWin.offsetWidth, workbenchWin.offsetHeight);
                 workbenchWin.style.top = pos.top;
                 workbenchWin.style.left = pos.left;
-            }, 50); // Small delay
+            }, 50); // Małe opóźnienie
         }
 
         function setupMobileMenu() {
@@ -1145,15 +1405,27 @@
                 const url = e.target.dataset.url;
                 const name = e.target.dataset.name;
                 const feedId = 'feed-' + Date.now();
-                // Create window with temporary position, then update after rendering
+                
                 const newWindow = createWindowHTML(feedId, name, 'Ładowanie...', {top: '0px', left: '0px'}); 
-                openWindow(newWindow);
-                // Set random position after the window content is established
-                setTimeout(() => {
-                    const pos = getRandomPosition(newWindow.offsetWidth, newWindow.offsetHeight);
-                    newWindow.style.top = pos.top;
-                    newWindow.style.left = pos.left;
-                }, 50); // Small delay
+                
+                let iconRect = null;
+                // Jeśli na urządzeniu mobilnym, spróbuj uzyskać pozycję klikniętego linku kanału (który jest częścią rozwijanej listy)
+                if (window.innerWidth <= 768) {
+                    const mobileMenuBtn = document.getElementById('mobile-feeds-menu-btn');
+                    if (mobileMenuBtn) {
+                        iconRect = mobileMenuBtn.getBoundingClientRect();
+                    }
+                }
+                openWindow(newWindow, iconRect); // Przekaż iconRect, jeśli dostępne
+                
+                // Ustaw losową pozycję dla pulpitu lub jeśli iconRect nie zostało znalezione dla urządzeń mobilnych
+                if (window.innerWidth > 768 || !iconRect) {
+                    setTimeout(() => {
+                        const pos = getRandomPosition(newWindow.offsetWidth, newWindow.offsetHeight);
+                        newWindow.style.top = pos.top;
+                        newWindow.style.left = pos.left;
+                    }, 50); // Małe opóźnienie
+                }
                 fetchAndRenderPage(newWindow, url, true);
             }
         }
@@ -1189,7 +1461,7 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(textContent, isRss ? "application/xml" : "text/html");
 
-                // Check for XML parsing errors for RSS feeds
+                // Sprawdź błędy parsowania XML dla kanałów RSS
                 if (isRss && doc.querySelector('parsererror')) {
                     const errorText = doc.querySelector('parsererror').textContent;
                     throw new Error(`Błąd parsowania RSS: ${errorText}`);
@@ -1200,7 +1472,7 @@
                     if (items.length === 0) throw new Error("Nie znaleziono wpisów w kanale RSS.");
                     
                     let finalHtml = '';
-                    const firstItem = items.shift(); // Take the first item
+                    const firstItem = items.shift(); // Pobierz pierwszy element
                     if (firstItem) {
                         let imageUrl = null;
                         const mediaContent = firstItem.querySelector('content[medium="image"], media\\:content[medium="image"]');
@@ -1216,7 +1488,7 @@
                         }
                         
                         const title = (firstItem.querySelector("title")?.textContent || 'Brak tytułu').trim();
-                        // Corrected link extraction for first item as well
+                        // Poprawione wyodrębnianie linku również dla pierwszego elementu
                         const linkElement = firstItem.querySelector("link");
                         const link = linkElement ? (linkElement.textContent || linkElement.getAttribute('href') || '#') : '#';
 
@@ -1235,7 +1507,7 @@
 
                     finalHtml += items.slice(0, 19).map(item => {
                         const title = (item.querySelector("title")?.textContent || 'Brak tytułu').trim();
-                        // Corrected link extraction for subsequent items
+                        // Poprawione wyodrębnianie linku dla kolejnych elementów
                         const linkElement = item.querySelector("link");
                         const link = linkElement ? (linkElement.textContent || linkElement.getAttribute('href') || '#') : '#';
                         return `<div style="padding-top: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);"><p><strong><a href="${link}" target="_blank" style="color:white; text-decoration:none;">${title}</a></strong></p></div>`;
@@ -1277,7 +1549,7 @@
                 }
 
             } catch (error) {
-                console.error(`Błąd wczytywania ${url}:`, error);
+                console.error(`Błąd ładowania ${url}:`, error);
                 contentEl.innerHTML = `<p style="color: var(--amiga-orange);">BŁĄD</p><p>Nie można wczytać zawartości: ${error.message}</p>`;
             }
         }
@@ -1286,7 +1558,8 @@
             const icon = e.target.closest('.interactive-icon');
             if (icon) {
                 const windowEl = document.getElementById(icon.dataset.windowId);
-                openWindow(windowEl);
+                const iconRect = icon.getBoundingClientRect(); // Pobierz pozycję ikony
+                openWindow(windowEl, iconRect); // Przekaż pozycję ikony
             }
         });
     </script>
