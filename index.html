@@ -466,8 +466,9 @@
 
         .boot-logo-container { /* Kontener na logo Amigi */
             position: absolute;
-            top: 50px; /* Podniesiono logo */
-            left: 100px; /* Dostosowano do obrazka */
+            top: 20%; /* Podniesiono logo */
+            left: 50%;
+            transform: translateX(-50%);
             width: 150px; /* Przybliżony rozmiar logo na obrazku */
             height: auto; /* Zachowaj proporcje */
         }
@@ -480,9 +481,10 @@
 
         .rom-text-container {
             position: absolute;
-            bottom: 150px; /* Podniesiono tekst ROM */
-            left: 100px; /* Dostosowano do obrazka */
-            text-align: left;
+            top: 40%; /* Podniesiono tekst ROM i wyśrodkowano */
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center; /* Wyśrodkowano tekst */
             font-size: 20px;
             line-height: 1.4;
             color: var(--amiga-white);
@@ -490,8 +492,9 @@
 
         .floppy-drive-area { /* Wrapper do pozycjonowania stacji dyskietek i dyskietki */
             position: absolute;
-            bottom: 100px; /* Podniesiono całą animację dyskietki */
-            right: 100px; /* Pozycja od prawej */
+            bottom: 20%; /* Podniesiono całą animację dyskietki */
+            left: 50%;
+            transform: translateX(-50%);
             width: 200px; /* Szerokość obrazu komputera */
             height: 100px; /* Wysokość obrazu komputera */
             overflow: hidden; /* Ukryj dyskietkę, gdy jest poza napędem */
@@ -550,9 +553,11 @@
                 width: 100%; /* Zajmij całą szerokość */
                 align-items: center; /* Wyśrodkuj elementy w wierszu */
                 gap: 10px; /* Mniejszy odstęp dla ikon mobilnych */
+                order: 1; /* Ikony na samej górze */
             }
-            #desktop-icons-right { order: 1; } /* Najpierw ikony po prawej na urządzeniach mobilnych */
-            #desktop-icons-left { order: 2; } /* Potem ikony po lewej */
+            #desktop-icons-right { order: 1; } /* Upewnij się, że są na górze */
+            #desktop-icons-left { order: 1; } /* Upewnij się, że są na górze */
+
 
             #widget-container { 
                 position: relative; /* Usuń absolutne pozycjonowanie na urządzeniach mobilnych */
@@ -566,6 +571,7 @@
                 gap: 10px;
                 pointer-events: auto; /* Ponownie włącz zdarzenia wskaźnika dla samego kontenera */
                 padding-bottom: 20px; /* Dodaj trochę odstępu na dole widżetów na urządzeniach mobilnych */
+                order: 2; /* Widżety pod ikonami */
             }
             .amiga-widget {
                 position: relative !important;
@@ -583,20 +589,20 @@
 
             /* Dostosuj ekran startowy dla urządzeń mobilnych */
             .boot-logo-container {
-                top: 50px;
+                top: 10%; /* Podniesiono logo */
                 left: 50%;
                 transform: translateX(-50%);
                 width: 100px; /* Mniejsze logo na urządzeniach mobilnych */
             }
             .rom-text-container {
-                bottom: 50px;
+                top: 30%; /* Podniesiono tekst ROM */
                 left: 50%;
                 transform: translateX(-50%);
                 width: 90%;
                 font-size: 16px; /* Mniejszy tekst na urządzeniach mobilnych */
             }
             .floppy-drive-area {
-                bottom: 30px; /* Dostosuj położenie pionowe dla urządzeń mobilnych */
+                bottom: 10%; /* Podniesiono całą animację dyskietki */
                 right: auto;
                 left: 50%;
                 transform: translateX(-50%);
