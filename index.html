@@ -467,10 +467,10 @@
         .boot-logo-container { /* Kontener na logo Amigi */
             position: absolute;
             top: 20%; /* Podniesiono logo */
-            left: 50%;
-            transform: translateX(-50%);
+            left: 10%; /* Przeniesiono na lewo */
             width: 150px; /* Przybliżony rozmiar logo na obrazku */
             height: auto; /* Zachowaj proporcje */
+            transform: translateX(0); /* Usuń transformację, jeśli nie jest potrzebna */
         }
 
         .boot-logo-container img {
@@ -481,31 +481,31 @@
 
         .rom-text-container {
             position: absolute;
-            top: 40%; /* Podniesiono tekst ROM i wyśrodkowano */
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center; /* Wyśrodkowano tekst */
+            top: calc(20% + 150px + 20px); /* Pod logo + odstęp */
+            left: 10%; /* Przeniesiono na lewo, wyrównane z logo */
+            text-align: left; /* Wyrównano do lewej */
             font-size: 20px;
             line-height: 1.4;
             color: var(--amiga-white);
+            transform: translateX(0); /* Usuń transformację, jeśli nie jest potrzebna */
         }
 
         .floppy-drive-area { /* Wrapper do pozycjonowania stacji dyskietek i dyskietki */
             position: absolute;
             bottom: 20%; /* Podniesiono całą animację dyskietki */
-            left: 50%;
-            transform: translateX(-50%);
+            right: 10%; /* Przeniesiono na prawo */
             width: 200px; /* Szerokość obrazu komputera */
-            height: 100px; /* Wysokość obrazu komputera */
+            height: 150px; /* Zwiększona wysokość, aby zapobiec przycinaniu */
             overflow: hidden; /* Ukryj dyskietkę, gdy jest poza napędem */
+            transform: translateX(0); /* Usuń transformację, jeśli nie jest potrzebna */
         }
 
         .amiga-computer-img {
             position: absolute;
-            bottom: 0; /* Umieść obraz komputera na dole kontenera */
+            bottom: 77px; /* Podniesiono komputer o dodatkowe 50px (27 + 50) */
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100px; /* Upewnij się, że obraz ma swoją oryginalną wysokość */
             object-fit: contain; /* Upewnij się, że pasuje do swojego kontenera */
         }
 
@@ -524,18 +524,60 @@
             0% { top: 100%; } /* Start z dołu kontenera floppy-drive-area */
             100% {
                 /* Dyskietka wchodzi 27px od dołu grafiki amiga-computer.
-                   Ponieważ amiga-computer-img ma wysokość 100% kontenera (100px),
-                   27px od dołu to 73px od góry obrazu komputera.
+                   amiga-computer-img ma wysokość 100px i jest bottom: 77px w floppy-drive-area (150px wysokości).
+                   Dolna krawędź amiga-computer-img jest na 150px - 77px = 73px od góry floppy-drive-area.
+                   Punkt 27px od dołu amiga-computer-img jest na 73px - 27px = 46px od góry floppy-drive-area.
                    Wysokość dyskietki wynosi 90px.
-                   Zatem górna krawędź dyskietki powinna znajdować się na wysokości (73px - 90px) = -17px
-                   względem górnej krawędzi kontenera floppy-drive-area.
+                   Górna krawędź dyskietki powinna być na 46px - 90px = -44px od góry floppy-drive-area.
                 */
-                top: -17px;
+                top: -44px;
             }
         }
 
 
         @media (max-width: 768px) {
+            /* Układ mobilny - bez zmian w układzie boot screena */
+            .boot-logo-container {
+                top: 10%; /* Podniesiono logo */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px; /* Mniejsze logo na urządzeniach mobilnych */
+            }
+            .rom-text-container {
+                top: 30%; /* Podniesiono tekst ROM */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                font-size: 16px; /* Mniejszy tekst na urządzeniach mobilnych */
+            }
+            .floppy-drive-area {
+                bottom: 10%; /* Podniesiono całą animację dyskietki */
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 150px; /* Mniejszy napęd na urządzeniach mobilnych */
+                height: 177px; /* Zwiększona wysokość, aby zapobiec przycinaniu na mobilce (77px bottom + 100px img height) */
+            }
+            .amiga-computer-img {
+                bottom: 77px; /* Podniesiono komputer o 50px również na mobilce (27 + 50) */
+                height: 100px; /* Upewnij się, że obraz ma swoją oryginalną wysokość */
+            }
+            /* Animacja dyskietki na urządzeniach mobilnych będzie skalowana automatycznie */
+            @keyframes insertFloppy {
+                0% { top: 100%; }
+                100% {
+                    /* Dyskietka wchodzi 27px od dołu grafiki amiga-computer.
+                       amiga-computer-img ma wysokość 100px i jest bottom: 77px w floppy-drive-area (177px wysokości).
+                       Dolna krawędź amiga-computer-img jest na 177px - 77px = 100px od góry floppy-drive-area.
+                       Punkt 27px od dołu amiga-computer-img jest na 100px - 27px = 73px od góry floppy-drive-area.
+                       Wysokość dyskietki wynosi 90px.
+                       Górna krawędź dyskietki powinna być na 73px - 90px = -17px od góry floppy-drive-area.
+                    */
+                    top: -17px;
+                }
+            }
+
+
             body { font-size: 20px; /* duży na urządzeniach mobilnych */ }
             .desktop { 
                 flex-direction: column; 
@@ -586,30 +628,6 @@
             #top-bar-text {
                 content: "Amiga 600"; /* Ustaw właściwość content dla tekstu mobilnego */
             }
-
-            /* Dostosuj ekran startowy dla urządzeń mobilnych */
-            .boot-logo-container {
-                top: 10%; /* Podniesiono logo */
-                left: 50%;
-                transform: translateX(-50%);
-                width: 100px; /* Mniejsze logo na urządzeniach mobilnych */
-            }
-            .rom-text-container {
-                top: 30%; /* Podniesiono tekst ROM */
-                left: 50%;
-                transform: translateX(-50%);
-                width: 90%;
-                font-size: 16px; /* Mniejszy tekst na urządzeniach mobilnych */
-            }
-            .floppy-drive-area {
-                bottom: 10%; /* Podniesiono całą animację dyskietki */
-                right: auto;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 150px; /* Mniejszy napęd na urządzeniach mobilnych */
-                height: 75px; /* Mniejsza wysokość napędu */
-            }
-            /* Animacja dyskietki na urządzeniach mobilnych będzie skalowana automatycznie */
         }
         
     </style>
@@ -1286,7 +1304,7 @@
             win.querySelector('.browser-form').addEventListener('submit', (e) => handleBrowserSubmit(e, win));
             // Ustaw losową pozycję po ustaleniu zawartości okna
             setTimeout(() => {
-                const pos = getRandomPosition(win.offsetWidth, win.offsetHeight);
+                const pos = getRandomPosition(win.offsetWidth, win.offsetWidth);
                 win.style.top = pos.top;
                 win.style.left = pos.left;
             }, 50); // Małe opóźnienie
