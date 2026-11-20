@@ -9,7 +9,7 @@
 :root{--b:#0055aa;--k:#00001c;--w:#f7fbf7;--o:#f38204;--m:ui-monospace,Menlo,Consolas,'Courier New',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--b);color:var(--w);font:8px/12px 'Press Start 2P',monospace;overflow:hidden}
-#app{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:8px;height:100%;padding:8px}
+#app{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:8px;height:100%;padding:8px}
 @media(max-width:720px){#app{grid-template-columns:1fr;grid-template-rows:1fr 1fr;overflow:auto}}
 .col{display:flex;flex-direction:column;min-height:0;min-width:0;gap:6px}
 .box{border:2px solid var(--w);padding:6px;min-height:0}
@@ -23,9 +23,22 @@ html,body{height:100%;background:var(--b);color:var(--w);font:8px/12px 'Press St
 .gh{display:flex;gap:6px;align-items:center;margin:8px 0 4px;color:var(--o)}.gh>span:first-child{flex:1}
 .row{display:flex;gap:6px;align-items:flex-start;padding:3px 2px;border-bottom:1px dotted rgba(247,251,247,.35);cursor:pointer}.row:hover{background:rgba(247,251,247,.1)}
 .cb{flex:none;width:12px;height:12px;border:2px solid var(--w);margin-top:1px}.row.on .cb{background:var(--o);border-color:var(--w);box-shadow:inset 0 0 0 2px var(--k)}
-.row .tx{flex:1;min-width:0}.row .tx b{font-weight:400}.row .tx small{display:block;font:11px/14px var(--m);opacity:.75;margin-top:2px;word-break:break-word}
+.row .tx{flex:1;min-width:0}.row .tx b{font-weight:400}
+.row .tx small{display:none;font:11px/14px var(--m);opacity:.78;margin-top:2px;word-break:break-word}
+.row.open .tx small{display:block}
+.row .tx .asg{display:block;font:10px/13px var(--m);color:var(--o);margin-top:2px;word-break:break-word}
 .row img{width:40px;height:40px;object-fit:cover;border:1px solid var(--w);flex:none}
 .mini{border:1px solid var(--w);padding:1px 4px;color:var(--w);cursor:pointer;flex:none}.mini:hover{background:var(--w);color:var(--b)}
+.cbar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:5px;margin-bottom:6px;border:1px solid var(--o);background:rgba(0,0,28,.35)}
+.cbar>span{color:var(--o);margin-right:2px}
+.cpill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--w);padding:2px 5px;cursor:pointer;background:none;color:var(--w);font:inherit}
+.cpill.on{background:var(--o);color:var(--k);border-color:var(--w)}
+.cpill img{width:14px;height:14px;object-fit:cover;border:1px solid currentColor}
+.cpill i{font-style:normal;opacity:.85}
+.srch{display:flex;gap:4px;margin-bottom:6px}.srch input{flex:1}
+.sec-box{border-top:1px solid rgba(247,251,247,.4);margin-top:8px;padding-top:6px}
+.sec-hdr{display:flex;align-items:center;gap:6px;margin-bottom:4px;color:var(--o);background:rgba(0,0,28,.35);padding:3px 5px;border-left:3px solid var(--o)}
+.sec-hdr>span:first-child{flex:1}
 input[type=text],textarea,select{font:12px/16px var(--m);background:var(--w);color:var(--k);border:2px solid var(--w);padding:4px 6px;width:100%;outline:0}
 input:focus,textarea:focus{border-color:var(--o)}
 #out{flex:1;min-height:90px;resize:none}
@@ -40,17 +53,6 @@ input:focus,textarea:focus{border-color:var(--o)}
 .dlg .ttl{margin:0}.dlg .bd{padding:8px}.dlg label{display:block;margin-bottom:8px}.dlg label i{display:block;font-style:normal;margin-bottom:3px;color:var(--o)}
 .dlg .bt{display:flex;gap:8px;justify-content:center;padding:0 8px 8px;flex-wrap:wrap}
 .dim{opacity:.7;font:11px/14px var(--m)}
-.row .tx .asg{display:block;font:10px/13px var(--m);color:var(--o);margin-top:2px;word-break:break-word}
-.cbar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:5px;margin-bottom:6px;border:1px solid var(--o);background:rgba(0,0,28,.35)}
-.cbar>span{color:var(--o);margin-right:2px}
-.cpill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--w);padding:2px 5px;cursor:pointer;background:none;color:var(--w);font:inherit}
-.cpill.on{background:var(--o);color:var(--k);border-color:var(--w)}
-.cpill img{width:14px;height:14px;object-fit:cover;border:1px solid currentColor}
-.cpill i{font-style:normal;opacity:.85}
-.srch{display:flex;gap:4px;margin-bottom:6px}
-.srch input{flex:1}
-.row .tx small{display:none}
-.row.open .tx small{display:block}
 </style>
 </head>
 <body>
@@ -81,47 +83,353 @@ input:focus,textarea:focus{border-color:var(--o)}
 <script>
 const $=s=>document.querySelector(s),E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 let un=0;const uid=()=>'i'+Date.now().toString(36)+(un++).toString(36)+Math.random().toString(36).slice(2,4);
-const C=(id,n,arr,o)=>Object.assign({id,n,k:'list',g:[{n:'',it:arr.map(a=>({id:uid(),n:a[0],d:a[1]}))}]},o||{});
-const D0old=()=>({v:1,sel:{},loc:'',cg:{a:null,b:null,c:null},ex:'',fmt:'flat',vars:[],cats:[
-C('type','Type',[['movie','cinematic feature film still, high production value'],['fashion photography','high-end fashion photography editorial, magazine-quality styling'],['product hero photography','product hero photography, premium commercial advertising shot, flawless showcase of the product'],['puppet doll theatre','puppet doll theatre, handcrafted puppets on a miniature stage, felt and fabric textures, visible rods and strings'],['pixar style cartoon','Pixar-style 3D animated cartoon, expressive characters, soft subsurface shading, warm cinematic lighting'],['manga','black-and-white manga illustration, bold ink linework, screentone shading, dynamic composition'],['anime','anime style, cel-shaded characters, vibrant colors, detailed painted backgrounds'],['noir','film noir, high-contrast black-and-white, deep shadows, smoky atmosphere'],['tv show','TV series episode frame, broadcast television look, polished 16:9 composition']]),
-C('cam','Camera settings',[['imax','shot on IMAX large-format camera, ultra-high resolution, immersive scale'],['shallow depth of field','shallow depth of field, creamy bokeh, subject sharply isolated'],['wide angle','wide-angle lens, expansive field of view, slight perspective distortion'],['hand held','handheld camera, subtle natural shake, documentary feel'],['steady cam','smooth Steadicam movement following the subject'],['fpv drone fly over','FPV drone fly-over, fast fluid aerial movement skimming over the scene'],['spin','spinning camera rotation, dizzying 360-degree twirl'],['tilt up','camera slowly tilts up, revealing the scene from bottom to top'],['tilt down','camera slowly tilts down, revealing the scene from top to bottom'],['span around','camera sweeps around the subject in a smooth orbit'],['macro shot','macro shot, tiny details in razor-sharp focus'],['extreme close up','extreme close-up filling the frame with fine detail'],['close up','close-up shot, emotive detail']]),
-C('frame','Shot framing',[['establishing shot','wide establishing shot showing the full environment'],['medium shot','medium shot, subject framed from the waist up'],['full body','full-body shot, subject entirely in frame'],['over the shoulder','over-the-shoulder shot'],['low angle','low-angle shot looking up, heroic perspective'],['high angle','high-angle shot looking down'],['top-down','top-down overhead view'],['dutch angle','tilted dutch angle, unsettling tension'],['POV','first-person point-of-view shot'],['symmetrical','perfectly symmetrical centered composition']]),
-C('lens','Lens',[['24mm','24mm lens'],['35mm','35mm lens, natural wide perspective'],['50mm','50mm lens, natural perspective'],['85mm portrait','85mm portrait lens, flattering compression'],['anamorphic','anamorphic lens, horizontal flares and oval bokeh'],['fisheye','fisheye lens, strong barrel distortion'],['telephoto','telephoto lens, compressed background']]),
-C('aes','Aesthetic',[['war movie','gritty war movie aesthetic, desaturated tones, dust and smoke, battle-worn textures'],['arizona','Arizona southwest landscape, red rock mesas, saguaro cacti, dusty desert highways'],['florida','Florida subtropical vibe, pastel buildings, palm trees, humid coastal light'],['texas','Texas heartland aesthetic, wide plains, ranches, dusty roads, Americana'],['art deco','Art Deco design, geometric patterns, gold and black ornamentation, streamlined glamour'],['brutalist','brutalist architecture, raw concrete monoliths, stark geometry'],['sci-fi','science fiction aesthetic, futuristic technology, sleek surfaces, holographic displays'],['retro','retro 1980s aesthetic, analog gadgets, neon accents, nostalgic design'],['vintage','vintage mid-century look, faded tones, aged materials, nostalgic atmosphere'],['metropolis','sprawling futuristic metropolis, towering skyscrapers, dense vertical city'],['antarctic','Antarctic polar landscape, endless ice, blue glaciers, stark white emptiness'],['winter','winter season, snow, bare trees, frosty air'],['spring','spring season, blossoming trees, fresh green growth, soft light'],['summer','summer season, lush greenery, bright warm days'],['autumn','autumn season, falling orange leaves, golden foliage, crisp air'],['desert','vast desert, rolling dunes, heat haze, sun-bleached colors']]),
-C('mood','Mood',[['tense','tense, suspenseful mood'],['dreamy','dreamy, ethereal mood'],['melancholic','melancholic, quiet mood'],['epic','epic, grand mood'],['playful','playful, lighthearted mood'],['eerie','eerie, unsettling mood'],['cozy','warm, cozy, intimate mood'],['gritty','gritty, raw, realistic mood'],['luxurious','luxurious, elegant, premium mood']]),
-C('weather','Weather',[['sunny','clear sunny weather, bright sun, crisp shadows'],['cloudy','overcast cloudy sky, soft diffused light'],['fog','thick fog, low visibility, atmospheric depth'],['mist','light mist drifting in the air, soft haze'],['humidity','humid air, damp surfaces, heavy atmosphere, glistening skin'],['rainy','rain falling, wet reflective surfaces, puddles'],['snowy','snowfall, snow-covered surroundings'],['windy','strong wind, moving hair and clothing, swaying trees'],['freezing','freezing temperatures, visible breath, frost on surfaces'],['cold','cold crisp weather, cool tones'],['warm','warm pleasant weather, soft golden warmth'],['hot','scorching heat, heat haze, shimmering air']]),
-C('time','Time of day',[['night','nighttime, dark sky, deep shadows, artificial light sources'],['late afternoon','late afternoon, low warm sun, long shadows'],['noon','midday, high sun, strong overhead light'],['morning','early morning, fresh soft light, gentle haze'],['blue hour','blue hour twilight, deep blue sky'],['dawn','dawn, first light on the horizon']],{s:1}),
-C('light','Light set up',[['dramatic studio','dramatic studio lighting, strong key light, deep contrast, controlled shadows'],['dramatic outdoor','dramatic outdoor lighting, strong directional natural light, high contrast'],['street lights','street lights casting pools of sodium-vapor glow'],['studio 3 point lights','classic three-point studio lighting: key, fill and rim light'],['sun only','natural sunlight only, no artificial lights'],['moonlight only','lit only by cool silver moonlight'],['indoor light','warm indoor practical lighting, lamps and ambient interior glow'],['light beam','visible volumetric light beam cutting through the atmosphere, god rays'],['light leak','analog film light leaks, warm orange flare along the edges'],['golden hour','golden hour, warm low-angle sunlight, soft glow, long shadows']]),
-{id:'color',n:'Color grade',k:'color',g:[]},
-{id:'loc',n:'Location',k:'loc',g:[]},
-{id:'char',n:'Character',k:'list',grp:1,g:[{n:'Project 1',it:[]}]},
-C('act','Action',[['sitting','sitting calmly'],['running','running at full speed, dynamic motion'],['walking','walking steadily'],['fighting','fighting, intense physical combat'],['holding','holding {item} in hand, product clearly visible'],['climbing','climbing, hands gripping the surface'],['upstairs','walking upstairs'],['lifting weights','lifting heavy weights, strained muscles'],['jumping','jumping in mid-air'],['skateboarding','skateboarding, mid-trick'],['swimming','swimming, water splashing'],['sneaking','sneaking quietly, careful steps'],['hiding','hiding, peeking from cover'],['looking after','looking after someone or something with a watchful, protective gaze']]),
-{id:'item',n:'Item',k:'list',grp:1,g:[
- {n:'Filtering jugs',it:[['Prisma','Prisma water filtering jug'],['Crystal','Crystal water filtering jug'],['Atria','Atria water filtering jug'],['Luna','Luna water filtering jug']].map(a=>({id:uid(),n:a[0],d:a[1]}))},
- {n:'Water filtering bottles',it:[['Soft','Soft water filtering bottle'],['Solid','Solid water filtering bottle'],['Solid Steel','Solid Steel water filtering bottle']].map(a=>({id:uid(),n:a[0],d:a[1]}))},
- {n:'Thermal',it:[['Switch Duo','Switch Duo thermal bottle'],['Easy','Easy thermal bottle']].map(a=>({id:uid(),n:a[0],d:a[1]}))}]},
-C('logo','Logo',[['dafi','Dafi brand logo'],['wodostacja','Wodostacja brand logo'],['flow comfort','Flow Comfort brand logo']]),
-C('logoact','What logo does',[['embroidered on hat','logo embroidered on a cap, visible stitched thread detail'],['embroidered on sleeve','logo embroidered on the sleeve'],['embroidered on chest','logo embroidered on the chest'],['embroidered on shoes','logo embroidered on the shoes'],['printed all around clothing','logo repeated as an all-over print pattern on the clothing'],['printed all around hat','logo repeated as an all-over print pattern on the hat'],['printed all around shoes','logo repeated as an all-over print pattern on the shoes']]),
-C('other','Other',[['subtle texture imperfections','subtle texture imperfections, natural surface detail, not overly clean'],['bad tv warp','bad TV warp, wobbling CRT distortion, scanline glitches'],['VHS quality','VHS tape quality, tracking noise, soft color bleed, analog grain'],['4K','4K ultra-sharp resolution'],['film grain','35mm film grain'],['halation','halation glow around bright highlights'],['lens flare','cinematic lens flare'],['motion blur','natural motion blur']]),
-C('ratio','Aspect ratio',[['16:9','aspect ratio 16:9'],['9:16','vertical aspect ratio 9:16'],['21:9','ultra-wide aspect ratio 21:9'],['1:1','square aspect ratio 1:1'],['4:5','portrait aspect ratio 4:5']],{s:1}),
-C('avoid','Avoid',[['no text','no text, no watermarks, no captions'],['no deformed hands','no deformed hands, no extra fingers or limbs'],['no blur','no unwanted blur'],['no plastic skin','no plastic or airbrushed skin'],['no oversaturation','no oversaturated colors']])
-]});
-const ND={"type":[["UGC smartphone video","authentic UGC smartphone video, vertical, natural and unpolished"],["documentary b-roll","cinematic documentary b-roll, observational and natural"],["lifestyle advertising","lifestyle advertising campaign, aspirational real-life moments"],["corporate commercial","polished corporate commercial, clean and trustworthy"],["social media reel","fast-paced social media reel, scroll-stopping visuals"],["studio catalogue shot","clean studio catalogue shot on a seamless backdrop"],["behind the scenes","behind-the-scenes on set look with real crew atmosphere"]],"cam":[["dolly in","slow dolly-in toward the subject"],["dolly out","slow dolly-out away from the subject"],["push-in","gentle push-in, increasing intimacy"],["tracking shot","smooth lateral tracking shot following the subject"],["crane up","crane shot rising upward to reveal the scene"],["crane down","crane shot descending toward the subject"],["orbit 360","camera orbits 360 degrees around the subject"],["whip pan","fast whip pan transition"],["rack focus","rack focus shifting from foreground to subject"],["static locked-off","static locked-off camera, no movement"],["gimbal follow","smooth gimbal follow shot"],["slow pan","slow pan across the scene"],["parallax slide","parallax slider move revealing depth between foreground and background"]],"other":[["natural skin texture","natural skin texture with visible pores and fine detail"],["flyaway hairs","natural flyaway hairs and fine baby hairs"],["fabric detail","realistic fabric weave and wrinkles"],["dust particles","dust particles floating in the light"],["lens dirt","subtle lens smudges and imperfections"],["realistic hands","anatomically correct natural hands with five fingers"],["natural imperfections","natural asymmetry and everyday imperfections"]],"act":[["petting pet","gently petting {pet}"],["walking pet","walking {pet} on a leash"],["playing fetch","playing fetch with {pet}"],["feeding pet","feeding {pet}"],["pet water bowl","filling the water bowl of {pet} with fresh filtered water"],["pet drinking","{pet} drinking water from a bowl"],["hugging pet","hugging {pet} affectionately"],["pet on lap","{pet} resting on the lap"],["brushing pet","brushing {pet}"],["training pet","training {pet} to sit and giving a treat"],["pet sleeping beside","{pet} sleeping peacefully beside the person"],["playing with toy","playing with {pet} using a toy"],["carrying pet","carrying {pet} in the arms"],["pet at window","{pet} watching from the windowsill"],["pet greeting at door","{pet} greeting the person at the door"],["drinking water","drinking a glass of water, refreshed"],["pouring water","pouring water into a glass"],["filling bottle","filling a bottle at a water station"],["unboxing","unboxing a product with curiosity"],["cheers","clinking glasses or bottles together"],["talking to camera","talking directly to the camera"],["working on laptop","working on a laptop"],["cooking","cooking in the kitchen"],["stretching","stretching before a workout"]],"places":[["Christmas living room","a cozy living room at Christmas, softly glowing tree lights creating warm golden bokeh, beige tones"],["Christmas dinner table","a candle-lit family dinner table with a decorated Christmas tree behind, warm amber light"],["Apartment entrance hall","a modern apartment entrance hall with an open dark wooden door leading to a bright white stairwell, a coat rack with jackets and hats, a shoe bench and a grey fluffy rug"],["Glass office with big windows","a bright modern office with floor-to-ceiling steel-framed windows overlooking green trees, warm sunlight and beige columns"],["Open-plan office kitchen","a modern open-plan office kitchen with warm oak cabinetry, white marble countertops and large sunlit windows"],["Grey studio backdrop with sun gobo","a seamless light-grey studio backdrop with hard window-gobo sunlight shadows across the wall and floor"],["Dusk living room with fireplace","a cozy modern living room at dusk with a lit fireplace, pendant lamp, candle, bookshelves and a large window with snowy pines, warm amber low light"],["Modern gym with copper mirrors","a bright modern boutique gym with copper-framed mirrors, orange leather machines, tall windows and warm sunlight"],["Hospital corridor with water station","a bright modern hospital corridor with tall windows, long sunlit floor shadows and a stainless-steel wall-mounted water station"],["Neon gym, diagonal panels","a dark gym with vivid neon pink, orange and blue diagonal wall panels, dumbbell racks, barbells and kettlebells"],["High-rise apartment, city view","a high-rise apartment with a large window and a hazy city skyline view in daylight"],["Industrial production hall","a bright modern production hall with blue industrial machines, screen control panels and warning-light towers"],["Premium car showroom","a premium car showroom with exposed concrete columns, floor-to-ceiling glass, a polished stone table and dark SUVs parked behind"],["White studio with softboxes","a white photo studio with large softboxes and white cubes, clean high-key lighting"],["City park under live oaks","a sunlit city park under huge spreading live oak trees, green lawn, benches and dappled light, with a picnic blanket on the grass"],["Modern kitchen","a bright modern kitchen with a clean countertop and natural light from a window"],["Office water cooler corner","an office corner with a water dispenser, plants and a glass wall"],["School corridor","a bright school corridor with lockers and a water fountain"],["Airport lounge","a modern airport lounge with large windows and planes outside"],["Hotel lobby","an elegant hotel lobby with warm lighting and marble floors"],["Warehouse / logistics hall","a large logistics warehouse with high shelving and pallets"],["Rooftop terrace at sunset","a rooftop terrace overlooking a city at sunset"],["Beach promenade","a sunny seaside promenade with palm trees and the sea in the background"],["Mountain trail","a scenic mountain hiking trail with a wide valley view"],["Supermarket aisle","a bright supermarket aisle with shelves of bottled water"]],"chars":[{"n":"Home & family","it":[["Halina","Halina, a warm woman in her late 60s with a chin-length silver-gray bob and side part, deep smile lines, brown eyes, rosy cheeks, kind genuine smile",{"id":"ch_halina","gen":"f","rf":0}],["Magda","Magda, a woman in her mid-30s with shoulder-length wavy dark-brown hair, brown eyes, fair skin, bright open laugh",{"id":"ch_magda","gen":"f","rf":0}],["Piotr","Piotr, a man in his late 30s with short dark-brown hair and a full neatly trimmed beard, warm relaxed expression",{"id":"ch_piotr","gen":"m","rf":0}],["Zosia","Zosia, a girl of about 8 with long straight light-brown hair with golden highlights and a bright cheerful smile",{"id":"ch_zosia","gen":"f","rf":0}],["Antek","Antek, a boy of about 6 with short blond hair and a joyful laughing smile",{"id":"ch_antek","gen":"m","rf":0}],["Zbigniew","Zbigniew, a man in his mid-60s with short gray hair, a trimmed gray-white beard, round dark-framed glasses and weathered ruddy skin",{"id":"ch_zbigniew","gen":"m","rf":0}],["Marta","Marta, a woman in her early 40s with long wavy dark-brown hair with caramel highlights, brown eyes, soft pensive expression",{"id":"ch_marta","gen":"f","rf":0}]]},{"n":"Office & business","it":[["Michał","Michał, a man in his late 30s with short swept-back brown hair, light stubble, round tortoiseshell glasses, warm confident smile and lightly tanned skin",{"id":"ch_michal","gen":"m","rf":0}],["Ewa","Ewa, a woman in her early 40s with light-brown wavy hair tied back in a loose bun with loose strands, fair skin, calm focused expression",{"id":"ch_ewa","gen":"f","rf":0}],["Karolina","Karolina, a woman in her mid-30s with a short glossy black bob with side-swept fringe, light blue eyes, defined brows and an intense serious gaze",{"id":"ch_karolina","gen":"f","rf":0}],["Jan","Jan, a man in his mid-40s with tousled medium-brown hair graying at the temples, light stubble, blue-gray eyes and a serious composed expression",{"id":"ch_jan","gen":"m","rf":0}],["Mei","Mei, a woman in her mid-30s of East Asian appearance with long straight black hair and side-swept bangs, bold red lipstick and a poised confident gaze",{"id":"ch_mei","gen":"f","rf":0}]]},{"n":"Fitness & gym","it":[["Robert","Robert, a very muscular bald man in his mid-50s with a thick gray-white goatee, tanned weathered skin and a big warm grin",{"id":"ch_robert","gen":"m","rf":0}],["Paweł","Paweł, a man in his mid-30s with short brown hair, a full trimmed beard, athletic muscular build and a serious confident gaze",{"id":"ch_pawel","gen":"m","rf":0}],["Natalia","Natalia, a woman in her late 20s with a high ponytail of light-brown hair, green-gray eyes, toned athletic build and a subtle confident smile",{"id":"ch_natalia","gen":"f","rf":0}],["Julia","Julia, a woman in her mid-20s with wavy shoulder-length blonde hair, athletic build and a playful cheeky smirk",{"id":"ch_julia","gen":"f","rf":0}],["Bartek","Bartek, a man in his late 20s with a short fade haircut and textured light-brown top, light stubble, athletic build and a confident smile",{"id":"ch_bartek","gen":"m","rf":0}]]},{"n":"Service & healthcare","it":[["Adam","Adam, a man in his early 30s with short neatly styled dark-brown hair, a short stubble beard, warm friendly smile and a broad-shouldered athletic build",{"id":"ch_adam","gen":"m","rf":0}],["Anna","Anna, a woman in her early 30s with blonde hair tied back in a low bun, light eyes, fair skin and a calm composed expression",{"id":"ch_anna","gen":"f","rf":0}],["Kamil","Kamil, a man in his late 20s with short side-swept light-blond hair with faded sides, clean-shaven, fair skin, light eyes and an athletic build",{"id":"ch_kamil","gen":"m","rf":0}]]},{"n":"Outdoor & lifestyle","it":[["Ola","Ola, a woman around 30 with messy brunette hair in a top bun, hazel-green eyes, a soft friendly smile and an athletic build",{"id":"ch_ola","gen":"f","rf":0}]]}],"outfit":[{"n":"Women's wardrobe","gen":"f","it":[["Chunky knit sweater","an oversized chunky knit sweater with relaxed trousers"],["Smart-casual office","a knit sweater over a white collared shirt with pleated high-waist trousers and a leather belt"],["White shirt & trousers","a crisp white button-up shirt with high-waist tailored trousers"],["Tailored blazer","a tailored beige blazer over a silk blouse"],["Power suit","a navy tailored blazer and trousers power suit"],["Trench coat","a beige trench coat over a knit sweater and jeans"],["Denim look","a denim jacket, white t-shirt and blue jeans"],["Leather jacket","a black leather jacket with a white tee and black jeans"],["Loungewear","soft cozy loungewear: hoodie and sweatpants"],["Athleisure","a sports bra or fitted top with leggings and an oversized t-shirt"],["Yoga set","a fitted yoga top and high-waist leggings"],["Running outfit","running leggings, a technical top and a light windbreaker"],["Summer linen dress","a flowing summer linen dress with sandals"],["Floral midi dress","a floral midi dress with white sneakers"],["Little black dress","an elegant little black dress"],["Evening dress","an elegant long evening dress"],["Winter puffer","a puffer jacket with a wool scarf and beanie"],["Raincoat","a bright yellow raincoat with rubber boots"],["Hiking gear","a technical shell jacket, trekking trousers and hiking boots"],["Christmas sweater","a Nordic Christmas knit sweater with snowflake pattern"],["Medical scrubs","mint-green medical scrubs"],["Apron over casual","a canvas apron over casual clothes"],["Cardigan & top","a soft cardigan over a cream top with jeans"],["Swimwear","a stylish swimsuit with a light cover-up"]]},{"n":"Men's wardrobe","gen":"m","it":[["Black polo & cargo","a black polo shirt with black cargo trousers and work boots"],["Navy polo & chinos","a navy polo shirt with beige chinos"],["White linen shirt","a white linen button-up shirt with rolled sleeves and jeans"],["Turtleneck & jeans","a black merino turtleneck with blue jeans"],["Charcoal suit","a charcoal suit with a white shirt, no tie"],["Suit & tie","a dark suit with a white shirt and tie"],["Tuxedo","a black tuxedo with bow tie"],["Denim jacket","a denim jacket over a white t-shirt"],["Leather jacket","a black leather jacket with a gray tee"],["Bomber jacket","a bomber jacket with a plain tee and dark jeans"],["Hoodie & joggers","a hoodie with joggers and sneakers"],["Gym wear","a fitted sports t-shirt with athletic shorts"],["Tank top gym","a performance tank top with shorts"],["Running outfit","a technical running shirt, shorts and a light windbreaker"],["Winter parka","a hooded winter parka over a knit sweater"],["Wool overcoat","a long wool overcoat over a turtleneck"],["Christmas sweater","a Nordic Christmas knit sweater"],["Flannel & boots","a flannel shirt with jeans and boots"],["Hi-vis workwear","a hi-vis work jacket, work trousers and safety boots"],["Coveralls","durable work coveralls"],["Lab coat","a white lab coat over a shirt"],["Medical scrubs","navy medical scrubs"],["Summer casual","a short-sleeve summer shirt with shorts"],["Hiking gear","a technical shell jacket, trekking trousers and hiking boots"]]},{"n":"Branded & workwear","gen":"*","it":[["Dafi service uniform","a black polo shirt with a white Dafi drop logo embroidered on the chest, black cargo trousers and black leather work boots"],["Dafi cap","a cap with an embroidered Dafi drop logo"],["Dafi tee","a plain t-shirt with a small Dafi drop logo on the chest"],["Wodostacja service jacket","a dark service jacket with a Wodostacja logo on the chest"],["Flow Comfort hoodie","a hoodie with a Flow Comfort logo on the chest"],["Sales rep look","a white shirt with a small drop logo on the collar and a navy crossbody bag"]]},{"n":"Signature outfits","gen":"own","it":[["Halina — signature","a beige knit cardigan over a cream top",{"c":"ch_halina"}],["Magda — signature","a navy Nordic Christmas sweater with white snowflakes and a red pattern band",{"c":"ch_magda"}],["Piotr — signature","a dark green knit sweater",{"c":"ch_piotr"}],["Zosia — signature","a navy Nordic sweater with white snowflakes and a red collar",{"c":"ch_zosia"}],["Antek — signature","a navy sweater with white snowflakes and a red collar",{"c":"ch_antek"}],["Zbigniew — signature","a dark olive hooded winter parka over an olive knit sweater and dark trousers",{"c":"ch_zbigniew"}],["Marta — signature","an oversized chunky beige knit sweater with black trousers",{"c":"ch_marta"}],["Michał — signature","a white linen button-up shirt with rolled sleeves, a small navy water-drop logo on the collar and a navy crossbody bag strap",{"c":"ch_michal"}],["Ewa — signature","a beige knit sweater over a white collared shirt, brown pleated high-waist trousers, a tan leather belt with a gold buckle, a thin gold watch and bracelet",{"c":"ch_ewa"}],["Karolina — signature","an oversized black button-up shirt with black trousers",{"c":"ch_karolina"}],["Jan — signature","a black merino turtleneck with blue jeans",{"c":"ch_jan"}],["Mei — signature","a cream tailored blazer over a simple top",{"c":"ch_mei"}],["Robert — signature","a fitted black t-shirt and black athletic shorts",{"c":"ch_robert"}],["Paweł — signature","a gradient teal-to-orange sports t-shirt, black shorts and black sneakers",{"c":"ch_pawel"}],["Natalia — signature","a colorful pink-orange-purple gradient sports tank top and leggings",{"c":"ch_natalia"}],["Julia — signature","a charcoal oversized t-shirt over a white sports top with beige leggings",{"c":"ch_julia"}],["Bartek — signature","a light-blue crew-neck t-shirt with charcoal gym shorts",{"c":"ch_bartek"}],["Adam — signature","a black polo shirt with a white drop logo on the chest, black cargo trousers and black leather work boots",{"c":"ch_adam"}],["Anna — signature","mint-green medical scrubs (V-neck top and trousers)",{"c":"ch_anna"}],["Kamil — signature","a navy pique polo shirt",{"c":"ch_kamil"}],["Ola — signature","an olive-green sports crop tank top with beige leggings",{"c":"ch_ola"}]]}],"acc":[["round glasses","round tortoiseshell glasses"],["thin-rim glasses","thin black-rimmed glasses"],["sunglasses","stylish sunglasses"],["gold watch","a thin gold wristwatch"],["smartwatch","a smartwatch"],["bracelet","a delicate bracelet"],["stud earrings","small stud earrings"],["crossbody bag","a navy crossbody bag"],["backpack","a minimalist backpack"],["baseball cap","a baseball cap"],["beanie","a knit beanie"],["scarf","a wool scarf"],["headphones","over-ear headphones"],["lanyard badge","a lanyard with an ID badge"],["gym towel","a towel over the shoulder"],["apron","a work apron"],["gloves","work gloves"]],"pet":[{"n":"Dogs","it":[["Labrador Retriever","a friendly yellow Labrador Retriever"],["Golden Retriever","a fluffy Golden Retriever"],["German Shepherd","a German Shepherd"],["French Bulldog","a French Bulldog with bat ears"],["Beagle","a tricolor Beagle"],["Border Collie","a black-and-white Border Collie"],["Siberian Husky","a Siberian Husky with blue eyes"],["Poodle","a curly Poodle"],["Dachshund","a Dachshund"],["Welsh Corgi","a Welsh Corgi"],["Yorkshire Terrier","a small Yorkshire Terrier"],["Chihuahua","a tiny Chihuahua"],["Shih Tzu","a long-haired Shih Tzu"],["Boxer","a muscular Boxer"],["Cocker Spaniel","a Cocker Spaniel with long ears"],["Jack Russell Terrier","an energetic Jack Russell Terrier"],["Pug","a wrinkly Pug"],["Samoyed","a fluffy white Samoyed"],["Mixed-breed dog","a friendly mixed-breed dog"]]},{"n":"Cats","it":[["Domestic tabby cat","a domestic tabby cat"],["British Shorthair","a round-faced British Shorthair"],["Maine Coon","a large fluffy Maine Coon"],["Persian","a long-haired Persian cat"],["Siamese","a Siamese cat with blue eyes"],["Ragdoll","a Ragdoll cat"],["Bengal","a spotted Bengal cat"],["Sphynx","a hairless Sphynx cat"],["Scottish Fold","a Scottish Fold with folded ears"],["Russian Blue","a Russian Blue cat"],["Norwegian Forest cat","a Norwegian Forest cat"],["Black cat","a sleek black cat"]]},{"n":"Small pets, birds & others","it":[["Rabbit","a fluffy rabbit"],["Hamster","a small hamster"],["Guinea pig","a guinea pig"],["Budgerigar","a colorful budgerigar"],["Cockatiel","a cockatiel"],["Parrot","a vivid parrot"],["Goldfish","a goldfish in an aquarium"],["Turtle","a pet turtle"],["Ferret","a playful ferret"],["Chinchilla","a soft chinchilla"],["Horse","a horse"]]}],"pose":[["standing facing camera","standing facing the camera with arms relaxed at the sides"],["hands in pockets","standing casually with hands in pockets"],["arms crossed","standing with arms crossed, confident stance"],["looking off-camera smiling","looking off-camera with a warm smile, three-quarter view"],["side profile","side profile view looking forward"],["over the shoulder","glancing back over the shoulder at the camera"],["walking toward camera","walking toward the camera at a natural pace"],["walking away","walking away from the camera, seen from behind"],["sofa, reaching for phone","sitting on a sofa leaning sideways to reach a phone on the coffee table"],["sitting on bench","sitting on a bench with elbows on knees"],["seated, pushing glass to camera","seated at a stone table, pushing a glass of water across the table toward the camera"],["holding glass toward camera","holding a glass of clear water out toward the camera, glass in sharp focus"],["handshake","shaking hands, looking off to the side with a smile"],["pressing dispenser","pressing a water dispenser button with one finger while holding a glass under the spout"],["carrying water pack","carrying a heavy shrink-wrapped pack of water bottles with a bent back, strained effort"],["cheers POV","POV shot of two people clinking bottles, one arm reaching toward the camera"],["offering bottle (picnic)","sitting cross-legged on a picnic blanket, extending a bottle toward the camera"],["back-to-back with bottles","standing back-to-back, each extending a thermal bottle toward the camera"],["products fanned at chest","holding three product packs fanned out at chest height, facing the camera"],["biceps curl on bench","seated on a gym bench performing a dumbbell biceps curl while looking at the camera"],["gym, bottle in hand","standing relaxed in the gym, smiling, holding a bottle at the side"],["laughing around table","laughing together around a dinner table, looking off-camera"],["close-up smiling at camera","close-up of the face smiling directly into the camera"],["leaning toward box","leaning toward a cardboard box, smiling, in profile"],["sitting on stairs","sitting on stairs, relaxed"],["leaning on wall","leaning casually against a wall"],["arms raised","arms raised in celebration"],["drinking water","drinking from a glass of water, eyes closed in refreshment"],["kneeling","kneeling down to eye level"]],"expr":[["smiling warmly","warm genuine smile"],["laughing","laughing openly"],["cheeky smirk","cheeky playful smirk"],["serious gaze","serious intense gaze"],["pensive","pensive thoughtful expression"],["calm composed","calm composed expression"],["surprised","pleasantly surprised expression"],["strained effort","strained effortful expression"],["relieved","relieved, refreshed expression"],["confident","confident expression"],["tired","tired weary expression"],["curious","curious expression"]],"arch":[["Art Deco (USA / Europe, 1920s–30s)","Art Deco exterior: stepped setback tower, vertical piers, geometric ornament, gilded metal details, limestone and terracotta facade",{"i":"Art Deco interior: marble floors in geometric patterns, brass and chrome fixtures, lacquered wood, sunburst motifs, glamorous symmetrical lobby"}],["Bauhaus / International Style (Germany, 1920s–30s)","Bauhaus exterior: white cubic volumes, flat roof, ribbon windows, steel and glass curtain walls, no ornament",{"i":"Bauhaus interior: open functional plan, tubular steel furniture, primary-color accents, plain white walls, abundant daylight"}],["California mid-century modern (USA, 1950s)","mid-century modern house exterior: low flat roof with deep overhangs, post-and-beam frame, floor-to-ceiling glass, courtyard pool, Palm Springs light",{"i":"mid-century modern interior: open plan with walnut paneling, Eames-style furniture, sunken living room, terrazzo floors, warm orange accents"}],["Googie / Space Age (USA, 1950s–60s)","Googie space-age exterior: swooping cantilevered roofs, starburst and boomerang shapes, neon signs, glass walls, chrome",{"i":"Googie interior: curved booths, terrazzo, chrome trim, pastel turquoise and pink, atomic-age lamps"}],["Brutalism (UK / Europe, 1950s–70s)","Brutalist exterior: massive raw board-formed concrete blocks, repetitive window modules, heavy sculptural geometry, overcast mood",{"i":"Brutalist interior: exposed concrete walls and ceilings, deep-set windows, minimal furniture, dramatic shafts of light"}],["Soviet bloc / PRL modernism (Poland, USSR, GDR, 1950s–80s)","Soviet-bloc exterior: prefabricated panel apartment blocks, monumental socialist-realist facades, wide boulevards, mosaics, muted palette",{"i":"Soviet-bloc interior: compact functional flat, patterned wallpaper, wooden wall unit, parquet floors, vintage lamps, 1970s colors"}],["Scandinavian modernism (Nordics, 1930s–60s)","Scandinavian modernist exterior: pale brick and timber cladding, low pitched roofs, large windows, birch trees, soft northern light",{"i":"Scandinavian interior: light oak floors, white walls, functional organic furniture, wool textiles, candles, hygge calm"}],["Brazilian modernism (Brazil, 1950s–60s)","Brazilian modernist exterior (Niemeyer): sweeping white concrete curves, thin columns, reflecting pools, tropical vegetation",{"i":"Brazilian modernist interior: free-flowing curved walls, tropical hardwood, rattan furniture, glass opening to a garden, colorful murals"}],["Mexican modernism (Mexico, 1940s–70s)","Barragán-style exterior: monolithic planes in vivid pink, ochre and cobalt, hidden courtyards, still water, strong sun shadows",{"i":"Mexican modernist interior: bold color-blocked walls, volcanic stone, dark timber, simple geometry, shafts of golden light"}],["Japanese minimalism (Japan, 1980s–now)","Japanese minimalist exterior (Ando / Kuma): smooth poured concrete or slatted timber, precise geometry, still water, bamboo and moss garden",{"i":"Japanese minimalist interior: tatami and light wood, shoji-like screens, low furniture, quiet empty space, diffuse natural light"}],["Japanese Metabolism (Japan, 1960s–70s)","Metabolist exterior: modular capsule pods plugged into a concrete core tower, futuristic urban megastructure",{"i":"capsule-style interior: compact pod room with built-in bed, round porthole window, retro-futuristic gadgets, glossy white surfaces"}],["Postmodern (USA / Italy, 1980s)","postmodern exterior: playful pastel colors, oversized classical columns and pediments, bold geometric shapes, ironic ornament",{"i":"postmodern interior: Memphis-style patterns, terrazzo, bright color blocks, sculptural furniture, neon lines"}],["High-tech (UK / Japan, 1970s–90s)","high-tech exterior: exposed steel structure, external pipes and ducts, glass curtain walls, bright primary-color elements, visible engineering",{"i":"high-tech interior: open flexible plan, exposed trusses and ductwork, glass walkways, aluminium and steel finishes, bright daylight"}],["Deconstructivism (USA / Europe, 1980s–2000s)","deconstructivist exterior: fractured sloping planes, crumpled titanium or steel cladding, tilted volumes, dramatic angles",{"i":"deconstructivist interior: sloping walls and floors, unexpected angles, shards of light, raw sculptural geometry"}],["Parametric / fluid futurism (UK / Middle East, 2000s–now)","parametric exterior (Zaha Hadid style): flowing white curves, seamless sweeping surfaces, no right angles, futuristic fluid forms",{"i":"parametric interior: continuous flowing white walls, sculptural curves, concealed LED light lines, glossy futuristic finishes"}],["Dubai / Gulf futurism (UAE, 2000s–now)","Gulf supertall exterior: needle-like glass skyscrapers, reflective curtain walls, desert haze and golden sunlight, ultra-luxury",{"i":"luxury Gulf interior: polished marble, gold accents, floor-to-ceiling skyline views, plush lounges, dramatic chandeliers"}],["Contemporary Chinese megacity (China, 2000s–now)","Chinese megacity exterior: dense glowing high-rises, LED-lit towers, elevated highways, futuristic glass landmarks, Shanghai / Shenzhen skyline",{"i":"contemporary Chinese interior: sleek tech-forward spaces, dark wood and stone, subtle lattice screens, ambient LED lighting"}],["Biophilic green architecture (Singapore / Milan, 2010s–now)","biophilic exterior: towers with terraces overflowing with trees and plants, green facades, vertical forests, sunlight through foliage",{"i":"biophilic interior: indoor plants and living walls, natural timber, daylight atriums, soft organic shapes"}],["Contemporary African earth architecture (Africa, 2000s–now)","African earth architecture exterior (Kéré style): rammed-earth walls, clay-brick lattices, deep shading roofs, warm terracotta tones, local materials",{"i":"earth architecture interior: cool thick clay walls, patterned light through brick screens, handwoven textiles, natural ventilation"}],["Industrial loft conversion (UK / USA)","converted industrial building exterior: red brick facade, big arched steel-framed windows, iron fire escapes, old factory chimney",{"i":"industrial loft interior: exposed brick, steel beams, concrete floors, large factory windows, high ceilings, Edison bulbs"}]],"comp":[["rule of thirds","rule-of-thirds composition"],["centered subject","centered symmetrical composition"],["leading lines","strong leading lines drawing the eye to the subject"],["negative space","generous negative space for copy"],["foreground framing","foreground elements framing the subject"],["layered depth","layered depth with foreground, midground and background"],["golden ratio","golden ratio composition"]],"film":[["Kodak Portra 400","Kodak Portra 400 film look, warm natural skin tones"],["Kodak Vision3 500T","Kodak Vision3 500T cinematic tungsten film look"],["Fuji Eterna","Fuji Eterna soft cool pastel film look"],["Cinestill 800T","Cinestill 800T with halation and teal shadows"],["Ilford HP5 B&W","Ilford HP5 black-and-white film grain"],["16mm film","16mm documentary film texture"],["Super 8","Super 8 home-movie look"],["clean digital cinema","clean modern digital cinema camera look"],["cross-processed film","cross-processed vintage film look"]],"motion":[["real-time","natural real-time motion at 24 fps"],["slow motion","slow motion at 120 fps"],["time-lapse","time-lapse"],["hyperlapse","hyperlapse"],["speed ramp","speed ramp from fast to slow motion"],["freeze frame","freeze-frame moment"],["5 seconds","5-second clip"],["8 seconds","8-second clip"],["seamless loop","seamless loop"]],"prod":[["label facing camera","product label facing the camera, perfectly legible"],["logo sharp","logo clearly visible and sharp"],["condensation","water droplets and condensation on the product"],["water pour","a clean crystal-clear stream of water pouring"],["ice and bubbles","ice cubes and bubbles in clear water"],["product in focus","product in sharp focus in the foreground, person softly blurred"],["hero close-up","product hero close-up with soft reflections"],["backlit glass","a glass of crystal-clear water backlit by sunlight"],["water splash","dynamic water splash frozen in motion"]],"props":[["laptop","a laptop on the desk"],["coffee mug","a ceramic coffee mug"],["cardboard boxes","cardboard delivery boxes"],["smartphone","a smartphone"],["notebook","a notebook and pen"],["water glass","a glass of water"],["shopping bags","shopping bags"],["yoga mat","a yoga mat"],["dumbbells","dumbbells"],["flowers","a vase of fresh flowers"],["candles","lit candles"],["books","a stack of books"],["plants","green houseplants"],["picnic blanket","a woven picnic blanket"],["towel","a folded towel"],["gift boxes","wrapped gift boxes"]],"bg":[["empty location","empty location, no other people"],["busy background","busy lively background with people"],["blurred people","out-of-focus people moving in the background"],["minimal background","clean minimal background"],["depth with windows","background with large windows and visible outdoor greenery"],["city skyline","distant city skyline behind"],["nature background","natural greenery in the background"]],"audio":[["natural room tone","natural room tone and subtle ambience"],["soft music","soft uplifting background music"],["city ambience","city ambience"],["no dialogue","no dialogue"],["voice-over","calm voice-over narration"],["nature sounds","birdsong and gentle nature sounds"],["water sounds","clear sound of pouring water"]]};
 const I1=a=>Object.assign({id:uid(),n:a[0],d:a[1]},a[2]||{}),G1=(n,arr,o)=>Object.assign({n,it:arr.map(I1)},o||{}),NC=(id,n,arr,o)=>Object.assign({id,n,k:'list',g:[G1('',arr)]},o||{});
-function D0(){const d=D0old();d.v=2;const by=id=>d.cats.find(c=>c.id===id),add=(id,arr)=>by(id).g[0].it.push(...arr.map(I1)),ins=(after,c)=>d.cats.splice(d.cats.findIndex(x=>x.id===after)+1,0,c);
- add('type',ND.type);add('cam',ND.cam);add('other',ND.other);add('act',ND.act);
- by('loc').g=[G1('Saved places',ND.places)];by('char').g=ND.chars.map(g=>G1(g.n,g.it));
- ins('aes',NC('arch','Architecture style',ND.arch,{dual:1,mode:'ext'}));ins('lens',NC('comp','Composition',ND.comp));ins('cam',NC('motion','Motion & speed',ND.motion));ins('color',NC('film','Film look',ND.film));ins('loc',NC('bg','Background',ND.bg));
- ins('char',{id:'outfit',n:'Outfit',k:'list',grp:1,g:ND.outfit.map(g=>G1(g.n,g.it,{gen:g.gen}))});ins('outfit',NC('acc','Accessories',ND.acc));ins('acc',NC('expr','Expression',ND.expr));ins('expr',NC('pose','Pose',ND.pose));
- ins('pose',{id:'pet',n:'Pets',k:'list',grp:1,g:ND.pet.map(g=>G1(g.n,g.it))});ins('item',NC('prod','Product details',ND.prod));ins('logoact',NC('props','Props',ND.props));ins('other',NC('audio','Audio',ND.audio));return d}
+
 const COLS=[['Teal','#0f6e78'],['Orange','#e8892b'],['Amber Gold','#d9a441'],['Deep Navy Blue','#14233f'],['Steel Blue','#4a6d8c'],['Sky Blue','#7fb3d9'],['Crimson Red','#a3182b'],['Burgundy','#5a1022'],['Rust','#a6451f'],['Emerald Green','#1f7a53'],['Forest Green','#1c3b2a'],['Olive','#6b6b3a'],['Sage Green','#8fa58a'],['Mustard Yellow','#c9a227'],['Magenta','#c2187e'],['Neon Cyan','#19d4e6'],['Purple','#5b2a86'],['Pastel Pink','#e9a8b9'],['Cream White','#efe6d2'],['Sand Beige','#c7ad85'],['Warm Brown','#6b4326'],['Desaturated Grey','#7d8084'],['Charcoal','#2a2a2e'],['Black','#0b0b0d']];
 const PRE=[['Teal & Orange','Teal','Deep Navy Blue','Orange'],['Golden warm','Amber Gold','Warm Brown','Cream White'],['Cold steel noir','Steel Blue','Charcoal','Desaturated Grey'],['Neon cyberpunk','Black','Magenta','Neon Cyan'],['Crimson thriller','Charcoal','Burgundy','Crimson Red'],['Matrix green','Forest Green','Black','Emerald Green'],['Pastel quirky','Pastel Pink','Sand Beige','Mustard Yellow'],['Desert dust','Sand Beige','Rust','Sky Blue']];
-const COMP=['type','mood','char','outfit','acc','expr','pet','pose','act','item','prod','logo','logoact','props','loc','arch','bg','aes','weather','time','light','cam','motion','frame','lens','comp','film','color','audio','other','ratio','avoid'];
-const LBL={type:'Type',mood:'Mood',char:'Character',outfit:'Outfit',acc:'Accessories',expr:'Expression',pet:'Pet',pose:'Pose',act:'Action',item:'Item',prod:'Product details',logo:'Logo',logoact:'Logo treatment',props:'Props',loc:'Location',arch:'Architecture',bg:'Background',aes:'Aesthetic',weather:'Weather',time:'Time',light:'Lighting',cam:'Camera',motion:'Motion',frame:'Framing',lens:'Lens',comp:'Composition',film:'Film look',color:'Color grade',audio:'Audio',other:'Details',ratio:'Format',avoid:'Avoid'};
-const CHAR_CATS=['outfit','acc','expr','pose','act'];
-let D,cur='type',slot='a',manual=false,actChar=null,q='',openId=null;
+
+const PRESETS=[
+ {id:'pr_hero_white',g:'Hero Product Studios',n:'Hero: Clean White Studio',desc:'Pure white cyclorama studio, softboxes, crisp commercial reflections, centered symmetrical framing.',
+  pick:{type:['product hero photography'],loc:['White studio with softboxes'],light:['studio 3 point lights'],frame:['symmetrical'],comp:['centered subject'],other:['4K','subtle texture imperfections']},
+  cg:['Cream White','Desaturated Grey','Sky Blue']},
+ {id:'pr_hero_grey',g:'Hero Product Studios',n:'Hero: Neutral Grey Studio',desc:'Seamless light-grey studio with directional window gobo light, clean sculptural shadow play.',
+  pick:{type:['product hero photography'],loc:['Grey studio backdrop with sun gobo'],light:['dramatic studio'],frame:['symmetrical'],comp:['centered subject'],other:['4K']},
+  cg:['Desaturated Grey','Charcoal','Amber Gold']},
+ {id:'pr_hero_black',g:'Hero Product Studios',n:'Hero: Deep Black Contrast',desc:'Abstract matte black backdrop, strong key light, deep contrast, 120 fps slow-motion close-up.',
+  pick:{type:['product hero photography'],loc:['Abstract black studio'],light:['dramatic studio'],cam:['extreme close up'],motion:['slow motion'],frame:['symmetrical'],comp:['centered subject'],other:['4K']},
+  cg:['Black','Charcoal','Amber Gold']},
+ {id:'pr_hero_artdeco',g:'Hero Product Studios',n:'Hero: Abstract Art Deco',desc:'Geometric Art Deco backdrop matching product color pattern, dramatic studio lighting, centered symmetry.',
+  pick:{type:['product hero photography'],loc:['Abstract Art Deco studio'],aes:['art deco'],light:['dramatic studio'],cam:['extreme close up'],motion:['slow motion'],frame:['symmetrical'],comp:['centered subject'],other:['4K']},
+  cg:['Black','Amber Gold','Cream White']},
+ {id:'pr_hero_stone',g:'Hero Product Studios',n:'Hero: Raw Stone & Rock',desc:'Sculpted dark rock & mineral plinth backdrop inspired by product texture, hard directional light.',
+  pick:{type:['product hero photography'],loc:['Abstract dark stone & rock backdrop'],light:['dramatic studio'],cam:['extreme close up'],motion:['slow motion'],frame:['symmetrical'],other:['4K','subtle texture imperfections']},
+  cg:['Charcoal','Desaturated Grey','Rust']},
+ {id:'pr_hero_water',g:'Hero Product Studios',n:'Hero: Water, Ripples & Droplets',desc:'Dark reflective water surface with ripples, condensation droplets and crisp backlit refractions.',
+  pick:{type:['product hero photography'],loc:['Reflective water surface studio'],prod:['condensation','backlit glass','hero close-up'],light:['dramatic studio'],cam:['macro shot'],motion:['slow motion'],frame:['symmetrical'],other:['4K']},
+  cg:['Deep Navy Blue','Teal','Neon Cyan']},
+ {id:'pr_hero_metal',g:'Hero Product Studios',n:'Hero: Brushed Metal & Steel',desc:'Brushed stainless steel & industrial metallic plates with cool specular highlights.',
+  pick:{type:['product hero photography'],loc:['Brushed steel & metal studio'],light:['dramatic studio'],cam:['extreme close up'],motion:['slow motion'],frame:['symmetrical'],other:['4K']},
+  cg:['Steel Blue','Charcoal','Sky Blue']},
+ {id:'pr_hero_wood',g:'Hero Product Studios',n:'Hero: Warm Wood & Natural',desc:'Warm natural oak & walnut podium with soft organic window light, clean lifestyle luxury.',
+  pick:{type:['product hero photography'],loc:['Warm natural wood plinth studio'],light:['golden hour'],frame:['symmetrical'],comp:['centered subject'],other:['4K','subtle texture imperfections']},
+  cg:['Warm Brown','Sand Beige','Cream White']},
+ {id:'pr_hero_sparks',g:'Hero Product Studios',n:'Hero: Dark Steel & Sparks',desc:'Dark industrial steel backdrop with flying golden sparks, high-contrast rim light, 120 fps.',
+  pick:{type:['product hero photography'],loc:['Abstract steel & sparks backdrop'],light:['dramatic studio'],cam:['extreme close up'],motion:['slow motion'],frame:['symmetrical'],other:['4K']},
+  cg:['Black','Charcoal','Orange']},
+ {id:'pr_hero_podium',g:'Hero Product Studios',n:'Hero: Color-Matched Podium',desc:'Minimalist geometric podium & pastel shapes color-matched to the product palette.',
+  pick:{type:['product hero photography'],loc:['Geometric color-matched podium'],light:['dramatic studio'],frame:['symmetrical'],comp:['centered subject'],other:['4K']},
+  cg:['Sand Beige','Pastel Pink','Cream White']},
+ {id:'pr_ugc_kitchen',g:'Lifestyle & Cinema',n:'UGC: Home Kitchen & Jug (9:16)',desc:'Authentic vertical smartphone UGC in a sunlit home kitchen, handheld natural feel.',
+  pick:{type:['UGC smartphone video'],loc:['Home kitchen & sink'],light:['sun only'],time:['morning'],cam:['hand held'],ratio:['9:16'],other:['natural skin texture','realistic hands']},
+  cg:['Cream White','Sand Beige','Sky Blue']},
+ {id:'pr_cinema_action',g:'Lifestyle & Cinema',n:'Cinema: Gritty War / Action (21:9)',desc:'Anamorphic widescreen gritty war drama look, desaturated tones, IMAX scale.',
+  pick:{type:['movie'],cstyle:['gritty war drama'],aes:['war movie'],cam:['imax','hand held'],lens:['anamorphic'],film:['Kodak Vision3 500T'],ratio:['21:9'],other:['film grain']},
+  cg:['Olive','Charcoal','Desaturated Grey']},
+ {id:'pr_noir_night',g:'Lifestyle & Cinema',n:'Cinema: Neo-Noir Night Thriller',desc:'Moody rain-slicked night scene, Cinestill 800T halation, teal & orange contrast.',
+  pick:{type:['movie'],cstyle:['neo-noir thriller'],time:['night'],weather:['rainy'],light:['street lights'],lens:['anamorphic'],film:['Cinestill 800T'],other:['halation','film grain']},
+  cg:['Teal','Deep Navy Blue','Orange']}
+];
+
+const ND={
+"type":[
+ ["movie","cinematic feature film still, high production value"],
+ ["product hero photography","product hero photography, premium commercial advertising shot, flawless showcase of the product"],
+ ["UGC smartphone video","authentic UGC smartphone video, vertical, natural and unpolished"],
+ ["lifestyle advertising","lifestyle advertising campaign, aspirational real-life moments"],
+ ["documentary b-roll","cinematic documentary b-roll, observational and natural"],
+ ["corporate commercial","polished corporate commercial, clean and trustworthy"],
+ ["social media reel","fast-paced social media reel, scroll-stopping visuals"],
+ ["studio catalogue shot","clean studio catalogue shot on a seamless backdrop"],
+ ["fashion photography","high-end fashion photography editorial, magazine-quality styling"],
+ ["behind the scenes","behind-the-scenes on set look with real crew atmosphere"],
+ ["puppet doll theatre","puppet doll theatre, handcrafted puppets on a miniature stage, felt and fabric textures, visible rods and strings"],
+ ["pixar style cartoon","Pixar-style 3D animated cartoon, expressive characters, soft subsurface shading, warm cinematic lighting"],
+ ["anime","anime style, cel-shaded characters, vibrant colors, detailed painted backgrounds"],
+ ["manga","black-and-white manga illustration, bold ink linework, screentone shading, dynamic composition"],
+ ["noir","film noir, high-contrast black-and-white, deep shadows, smoky atmosphere"],
+ ["tv show","TV series episode frame, broadcast television look, polished 16:9 composition"]
+],
+"cstyle":[
+ ["gritty war drama","gritty modern war drama cinema look, desaturated palette, smoke and dust, raw realism"],
+ ["neo-noir thriller","neo-noir thriller cinema style, high-contrast chiaroscuro lighting, moody shadows, rain-slicked tension"],
+ ["1980s sci-fi action","1980s sci-fi action cinema style, practical effects, atmospheric haze, bold rim lighting"],
+ ["1990s analog indie","1990s independent film style, natural handheld framing, lived-in locations, subtle grain"],
+ ["slow-burn drama","intimate slow-burn drama cinema style, natural window light, quiet pacing, emotional restraint"],
+ ["epic adventure","sweeping epic adventure cinema style, grand scale, dramatic sky and vistas, heroic staging"],
+ ["high-contrast commercial","high-contrast modern commercial cinema look, crisp highlights, clean depth, punchy clarity"]
+],
+"mood":[
+ ["tense","tense, suspenseful mood"],["dreamy","dreamy, ethereal mood"],["melancholic","melancholic, quiet mood"],
+ ["epic","epic, grand mood"],["playful","playful, lighthearted mood"],["eerie","eerie, unsettling mood"],
+ ["cozy","warm, cozy, intimate mood"],["gritty","gritty, raw, realistic mood"],["luxurious","luxurious, elegant, premium mood"]
+],
+"aes":[
+ ["war movie","gritty war movie aesthetic, desaturated tones, dust and smoke, battle-worn textures"],
+ ["art deco","Art Deco design, geometric patterns, gold and black ornamentation, streamlined glamour"],
+ ["brutalist","brutalist architecture, raw concrete monoliths, stark geometry"],
+ ["sci-fi","science fiction aesthetic, futuristic technology, sleek surfaces, holographic displays"],
+ ["retro","retro 1980s aesthetic, analog gadgets, neon accents, nostalgic design"],
+ ["vintage","vintage mid-century look, faded tones, aged materials, nostalgic atmosphere"],
+ ["metropolis","sprawling futuristic metropolis, towering skyscrapers, dense vertical city"],
+ ["arizona","Arizona southwest landscape, red rock mesas, saguaro cacti, dusty desert highways"],
+ ["florida","Florida subtropical vibe, pastel buildings, palm trees, humid coastal light"],
+ ["texas","Texas heartland aesthetic, wide plains, ranches, dusty roads, Americana"],
+ ["antarctic","Antarctic polar landscape, endless ice, blue glaciers, stark white emptiness"],
+ ["winter","winter season, snow, bare trees, frosty air"],["spring","spring season, blossoming trees, fresh green growth, soft light"],
+ ["summer","summer season, lush greenery, bright warm days"],["autumn","autumn season, falling orange leaves, golden foliage, crisp air"],
+ ["desert","vast desert, rolling dunes, heat haze, sun-bleached colors"]
+],
+"chars":[
+ {"n":"Home & family","it":[
+  ["Halina","Halina, a warm woman in her late 60s with a chin-length silver-gray bob and side part, deep smile lines, brown eyes, rosy cheeks, kind genuine smile",{"id":"ch_halina","gen":"f","rf":0}],
+  ["Magda","Magda, a woman in her mid-30s with shoulder-length wavy dark-brown hair, brown eyes, fair skin, bright open laugh",{"id":"ch_magda","gen":"f","rf":0}],
+  ["Piotr","Piotr, a man in his late 30s with short dark-brown hair and a full neatly trimmed beard, warm relaxed expression",{"id":"ch_piotr","gen":"m","rf":0}],
+  ["Zosia","Zosia, a girl of about 8 with long straight light-brown hair with golden highlights and a bright cheerful smile",{"id":"ch_zosia","gen":"f","rf":0}],
+  ["Antek","Antek, a boy of about 6 with short blond hair and a joyful laughing smile",{"id":"ch_antek","gen":"m","rf":0}],
+  ["Zbigniew","Zbigniew, a man in his mid-60s with short gray hair, a trimmed gray-white beard, round dark-framed glasses and weathered ruddy skin",{"id":"ch_zbigniew","gen":"m","rf":0}],
+  ["Marta","Marta, a woman in her early 40s with long wavy dark-brown hair with caramel highlights, brown eyes, soft pensive expression",{"id":"ch_marta","gen":"f","rf":0}]
+ ]},
+ {"n":"Office & business","it":[
+  ["Michał","Michał, a man in his late 30s with short swept-back brown hair, light stubble, round tortoiseshell glasses, warm confident smile and lightly tanned skin",{"id":"ch_michal","gen":"m","rf":0}],
+  ["Ewa","Ewa, a woman in her early 40s with light-brown wavy hair tied back in a loose bun with loose strands, fair skin, calm focused expression",{"id":"ch_ewa","gen":"f","rf":0}],
+  ["Karolina","Karolina, a woman in her mid-30s with a short glossy black bob with side-swept fringe, light blue eyes, defined brows and an intense serious gaze",{"id":"ch_karolina","gen":"f","rf":0}],
+  ["Jan","Jan, a man in his mid-40s with tousled medium-brown hair graying at the temples, light stubble, blue-gray eyes and a serious composed expression",{"id":"ch_jan","gen":"m","rf":0}],
+  ["Mei","Mei, a woman in her mid-30s of East Asian appearance with long straight black hair and side-swept bangs, bold red lipstick and a poised confident gaze",{"id":"ch_mei","gen":"f","rf":0}]
+ ]},
+ {"n":"Fitness & gym","it":[
+  ["Robert","Robert, a very muscular bald man in his mid-50s with a thick gray-white goatee, tanned weathered skin and a big warm grin",{"id":"ch_robert","gen":"m","rf":0}],
+  ["Paweł","Paweł, a man in his mid-30s with short brown hair, a full trimmed beard, athletic muscular build and a serious confident gaze",{"id":"ch_pawel","gen":"m","rf":0}],
+  ["Natalia","Natalia, a woman in her late 20s with a high ponytail of light-brown hair, green-gray eyes, toned athletic build and a subtle confident smile",{"id":"ch_natalia","gen":"f","rf":0}],
+  ["Julia","Julia, a woman in her mid-20s with wavy shoulder-length blonde hair, athletic build and a playful cheeky smirk",{"id":"ch_julia","gen":"f","rf":0}],
+  ["Bartek","Bartek, a man in his late 20s with a short fade haircut and textured light-brown top, light stubble, athletic build and a confident smile",{"id":"ch_bartek","gen":"m","rf":0}]
+ ]},
+ {"n":"Service & healthcare","it":[
+  ["Adam","Adam, a man in his early 30s with short neatly styled dark-brown hair, a short stubble beard, warm friendly smile and a broad-shouldered athletic build",{"id":"ch_adam","gen":"m","rf":0}],
+  ["Anna","Anna, a woman in her early 30s with blonde hair tied back in a low bun, light eyes, fair skin and a calm composed expression",{"id":"ch_anna","gen":"f","rf":0}],
+  ["Kamil","Kamil, a man in his late 20s with short side-swept light-blond hair with faded sides, clean-shaven, fair skin, light eyes and an athletic build",{"id":"ch_kamil","gen":"m","rf":0}]
+ ]},
+ {"n":"Outdoor & lifestyle","it":[
+  ["Ola","Ola, a woman around 30 with messy brunette hair in a top bun, hazel-green eyes, a soft friendly smile and an athletic build",{"id":"ch_ola","gen":"f","rf":0}]
+ ]}
+],
+"outfit":[
+ {"n":"Women's wardrobe","gen":"f","it":[["Chunky knit sweater","an oversized chunky knit sweater with relaxed trousers"],["Smart-casual office","a knit sweater over a white collared shirt with pleated high-waist trousers and a leather belt"],["White shirt & trousers","a crisp white button-up shirt with high-waist tailored trousers"],["Tailored blazer","a tailored beige blazer over a silk blouse"],["Power suit","a navy tailored blazer and trousers power suit"],["Trench coat","a beige trench coat over a knit sweater and jeans"],["Denim look","a denim jacket, white t-shirt and blue jeans"],["Leather jacket","a black leather jacket with a white tee and black jeans"],["Loungewear","soft cozy loungewear: hoodie and sweatpants"],["Athleisure","a sports bra or fitted top with leggings and an oversized t-shirt"],["Yoga set","a fitted yoga top and high-waist leggings"],["Running outfit","running leggings, a technical top and a light windbreaker"],["Summer linen dress","a flowing summer linen dress with sandals"],["Floral midi dress","a floral midi dress with white sneakers"],["Little black dress","an elegant little black dress"],["Evening dress","an elegant long evening dress"],["Winter puffer","a puffer jacket with a wool scarf and beanie"],["Raincoat","a bright yellow raincoat with rubber boots"],["Hiking gear","a technical shell jacket, trekking trousers and hiking boots"],["Christmas sweater","a Nordic Christmas knit sweater with snowflake pattern"],["Medical scrubs","mint-green medical scrubs"],["Apron over casual","a canvas apron over casual clothes"],["Cardigan & top","a soft cardigan over a cream top with jeans"],["Swimwear","a stylish swimsuit with a light cover-up"]]},
+ {"n":"Men's wardrobe","gen":"m","it":[["Black polo & cargo","a black polo shirt with black cargo trousers and work boots"],["Navy polo & chinos","a navy polo shirt with beige chinos"],["White linen shirt","a white linen button-up shirt with rolled sleeves and jeans"],["Turtleneck & jeans","a black merino turtleneck with blue jeans"],["Charcoal suit","a charcoal suit with a white shirt, no tie"],["Suit & tie","a dark suit with a white shirt and tie"],["Tuxedo","a black tuxedo with bow tie"],["Denim jacket","a denim jacket over a white t-shirt"],["Leather jacket","a black leather jacket with a gray tee"],["Bomber jacket","a bomber jacket with a plain tee and dark jeans"],["Hoodie & joggers","a hoodie with joggers and sneakers"],["Gym wear","a fitted sports t-shirt with athletic shorts"],["Tank top gym","a performance tank top with shorts"],["Running outfit","a technical running shirt, shorts and a light windbreaker"],["Winter parka","a hooded winter parka over a knit sweater"],["Wool overcoat","a long wool overcoat over a turtleneck"],["Christmas sweater","a Nordic Christmas knit sweater"],["Flannel & boots","a flannel shirt with jeans and boots"],["Hi-vis workwear","a hi-vis work jacket, work trousers and safety boots"],["Coveralls","durable work coveralls"],["Lab coat","a white lab coat over a shirt"],["Medical scrubs","navy medical scrubs"],["Summer casual","a short-sleeve summer shirt with shorts"],["Hiking gear","a technical shell jacket, trekking trousers and hiking boots"]]},
+ {"n":"Branded & workwear","gen":"*","it":[["Dafi service uniform","a black polo shirt with a white Dafi drop logo embroidered on the chest, black cargo trousers and black leather work boots"],["Dafi cap","a cap with an embroidered Dafi drop logo"],["Dafi tee","a plain t-shirt with a small Dafi drop logo on the chest"],["Wodostacja service jacket","a dark service jacket with a Wodostacja logo on the chest"],["Flow Comfort hoodie","a hoodie with a Flow Comfort logo on the chest"],["Sales rep look","a white shirt with a small drop logo on the collar and a navy crossbody bag"]]},
+ {"n":"Signature outfits","gen":"own","it":[["Halina — signature","a beige knit cardigan over a cream top",{"c":"ch_halina"}],["Magda — signature","a navy Nordic Christmas sweater with white snowflakes and a red pattern band",{"c":"ch_magda"}],["Piotr — signature","a dark green knit sweater",{"c":"ch_piotr"}],["Zosia — signature","a navy Nordic sweater with white snowflakes and a red collar",{"c":"ch_zosia"}],["Antek — signature","a navy sweater with white snowflakes and a red collar",{"c":"ch_antek"}],["Zbigniew — signature","a dark olive hooded winter parka over an olive knit sweater and dark trousers",{"c":"ch_zbigniew"}],["Marta — signature","an oversized chunky beige knit sweater with black trousers",{"c":"ch_marta"}],["Michał — signature","a white linen button-up shirt with rolled sleeves, a small navy water-drop logo on the collar and a navy crossbody bag strap",{"c":"ch_michal"}],["Ewa — signature","a beige knit sweater over a white collared shirt, brown pleated high-waist trousers, a tan leather belt with a gold buckle, a thin gold watch and bracelet",{"c":"ch_ewa"}],["Karolina — signature","an oversized black button-up shirt with black trousers",{"c":"ch_karolina"}],["Jan — signature","a black merino turtleneck with blue jeans",{"c":"ch_jan"}],["Mei — signature","a cream tailored blazer over a simple top",{"c":"ch_mei"}],["Robert — signature","a fitted black t-shirt and black athletic shorts",{"c":"ch_robert"}],["Paweł — signature","a gradient teal-to-orange sports t-shirt, black shorts and black sneakers",{"c":"ch_pawel"}],["Natalia — signature","a colorful pink-orange-purple gradient sports tank top and leggings",{"c":"ch_natalia"}],["Julia — signature","a charcoal oversized t-shirt over a white sports top with beige leggings",{"c":"ch_julia"}],["Bartek — signature","a light-blue crew-neck t-shirt with charcoal gym shorts",{"c":"ch_bartek"}],["Adam — signature","a black polo shirt with a white drop logo on the chest, black cargo trousers and black leather work boots",{"c":"ch_adam"}],["Anna — signature","mint-green medical scrubs (V-neck top and trousers)",{"c":"ch_anna"}],["Kamil — signature","a navy pique polo shirt",{"c":"ch_kamil"}],["Ola — signature","an olive-green sports crop tank top with beige leggings",{"c":"ch_ola"}]]}
+],
+"acc":[["round glasses","round tortoiseshell glasses"],["thin-rim glasses","thin black-rimmed glasses"],["sunglasses","stylish sunglasses"],["gold watch","a thin gold wristwatch"],["smartwatch","a smartwatch"],["bracelet","a delicate bracelet"],["stud earrings","small stud earrings"],["crossbody bag","a navy crossbody bag"],["backpack","a minimalist backpack"],["baseball cap","a baseball cap"],["beanie","a knit beanie"],["scarf","a wool scarf"],["headphones","over-ear headphones"],["lanyard badge","a lanyard with an ID badge"],["gym towel","a towel over the shoulder"],["apron","a work apron"],["gloves","work gloves"]],
+"expr":[["smiling warmly","warm genuine smile"],["laughing","laughing openly"],["cheeky smirk","cheeky playful smirk"],["serious gaze","serious intense gaze"],["pensive","pensive thoughtful expression"],["calm composed","calm composed expression"],["surprised","pleasantly surprised expression"],["strained effort","strained effortful expression"],["relieved","relieved, refreshed expression"],["confident","confident expression"],["tired","tired weary expression"],["curious","curious expression"]],
+"pose":[["standing facing camera","standing facing the camera with arms relaxed at the sides"],["hands in pockets","standing casually with hands in pockets"],["arms crossed","standing with arms crossed, confident stance"],["looking off-camera smiling","looking off-camera with a warm smile, three-quarter view"],["side profile","side profile view looking forward"],["over the shoulder","glancing back over the shoulder at the camera"],["walking toward camera","walking toward the camera at a natural pace"],["walking away","walking away from the camera, seen from behind"],["sofa, reaching for phone","sitting on a sofa leaning sideways to reach a phone on the coffee table"],["sitting on bench","sitting on a bench with elbows on knees"],["seated, pushing glass to camera","seated at a stone table, pushing a glass of water across the table toward the camera"],["holding glass toward camera","holding a glass of clear water out toward the camera, glass in sharp focus"],["handshake","shaking hands, looking off to the side with a smile"],["pressing dispenser","pressing a water dispenser button with one finger while holding a glass under the spout"],["carrying water pack","carrying a heavy shrink-wrapped pack of water bottles with a bent back, strained effort"],["cheers POV","POV shot of two people clinking bottles, one arm reaching toward the camera"],["offering bottle (picnic)","sitting cross-legged on a picnic blanket, extending a bottle toward the camera"],["back-to-back with bottles","standing back-to-back, each extending a thermal bottle toward the camera"],["products fanned at chest","holding three product packs fanned out at chest height, facing the camera"],["biceps curl on bench","seated on a gym bench performing a dumbbell biceps curl while looking at the camera"],["gym, bottle in hand","standing relaxed in the gym, smiling, holding a bottle at the side"],["laughing around table","laughing together around a dinner table, looking off-camera"],["close-up smiling at camera","close-up of the face smiling directly into the camera"],["leaning toward box","leaning toward a cardboard box, smiling, in profile"],["sitting on stairs","sitting on stairs, relaxed"],["leaning on wall","leaning casually against a wall"],["arms raised","arms raised in celebration"],["kneeling","kneeling down to eye level"]],
+"act":[
+ ["filling jug at tap","filling {item} under a kitchen tap, clear water flowing into the reservoir"],
+ ["pouring from jug into glass","pouring fresh filtered water from {item} into a glass, clear stream catching the light"],
+ ["pouring from jug into bottle","pouring filtered water from {item} into a reusable bottle without spilling"],
+ ["checking jug filter","inspecting or seating a filter cartridge inside {item} with clean hands"],
+ ["placing jug on countertop","setting a full {item} down onto a kitchen counter or table"],
+ ["drinking from filter bottle","drinking water from {item}, refreshing moment during a busy day"],
+ ["filling filter bottle at station","filling {item} at a tap or water station, tilted bottle under the stream"],
+ ["closing bottle to go","securing the cap on {item} and picking it up to go"],
+ ["holding","holding {item} in hand, product clearly visible"],
+ ["drinking water","drinking a glass of water, refreshed"],
+ ["pouring water","pouring water into a glass"],
+ ["filling bottle","filling a bottle at a water station"],
+ ["unboxing","unboxing a product with curiosity"],
+ ["cheers","clinking glasses or bottles together"],
+ ["talking to camera","talking directly to the camera"],
+ ["working on laptop","working on a laptop"],
+ ["cooking","cooking in the kitchen"],
+ ["stretching","stretching before a workout"],
+ ["sitting","sitting calmly"],["running","running at full speed, dynamic motion"],["walking","walking steadily"],
+ ["fighting","fighting, intense physical combat"],["climbing","climbing, hands gripping the surface"],
+ ["upstairs","walking upstairs"],["lifting weights","lifting heavy weights, strained muscles"],
+ ["jumping","jumping in mid-air"],["skateboarding","skateboarding, mid-trick"],
+ ["swimming","swimming, water splashing"],["sneaking","sneaking quietly, careful steps"],
+ ["hiding","hiding, peeking from cover"]
+],
+"sport":[
+ ["Running / jogging","running outdoors at a steady pace, active posture, athletic movement"],
+ ["Trail hiking / rucking","hiking on a trail with a loaded pack, steady stride, outdoor exertion"],
+ ["Cycling","riding a bicycle outdoors, hands on handlebars, forward momentum"],
+ ["Fast walking / power walk","brisk purposeful walking with swinging arms and active stride"],
+ ["Gym / strength training","doing strength training in a gym with weights or machines, focused form"],
+ ["Calisthenics / bodyweight","performing bodyweight exercises such as push-ups, squats or pull-ups"],
+ ["Stretching & mobility","doing dynamic stretching and mobility work before or after exercise"],
+ ["Yoga / core workout","holding a controlled yoga or core workout posture"],
+ ["Swimming","swimming in a pool or open water, active strokes and water movement"],
+ ["Racket / court sport","playing a fast court sport such as tennis, squash or badminton"],
+ ["Team field sport","playing an outdoor team sport on grass or turf, active movement"]
+],
+"item":[
+ {"n":"Filtering jugs","it":[["Prisma","Prisma water filtering jug"],["Crystal","Crystal water filtering jug"],["Atria","Atria water filtering jug"],["Luna","Luna water filtering jug"]]},
+ {"n":"Water filtering bottles","it":[["Soft","Soft water filtering bottle"],["Solid","Solid water filtering bottle"],["Solid Steel","Solid Steel water filtering bottle"]]},
+ {"n":"Thermal","it":[["Switch Duo","Switch Duo thermal bottle"],["Easy","Easy thermal bottle"]]}
+],
+"prod":[["label facing camera","product label facing the camera, perfectly legible"],["logo sharp","logo clearly visible and sharp"],["condensation","water droplets and condensation on the product"],["water pour","a clean crystal-clear stream of water pouring"],["ice and bubbles","ice cubes and bubbles in clear water"],["product in focus","product in sharp focus in the foreground, person softly blurred"],["hero close-up","product hero close-up with soft reflections"],["backlit glass","a glass of crystal-clear water backlit by sunlight"],["water splash","dynamic water splash frozen in motion"]],
+"logo":[["dafi","Dafi brand logo"],["wodostacja","Wodostacja brand logo"],["flow comfort","Flow Comfort brand logo"]],
+"logoact":[["embroidered on hat","logo embroidered on a cap, visible stitched thread detail"],["embroidered on sleeve","logo embroidered on the sleeve"],["embroidered on chest","logo embroidered on the chest"],["embroidered on shoes","logo embroidered on the shoes"],["printed all around clothing","logo repeated as an all-over print pattern on the clothing"],["printed all around hat","logo repeated as an all-over print pattern on the hat"],["printed all around shoes","logo repeated as an all-over print pattern on the shoes"]],
+"props":[["laptop","a laptop on the desk"],["coffee mug","a ceramic coffee mug"],["cardboard boxes","cardboard delivery boxes"],["smartphone","a smartphone"],["notebook","a notebook and pen"],["water glass","a glass of water"],["shopping bags","shopping bags"],["yoga mat","a yoga mat"],["dumbbells","dumbbells"],["flowers","a vase of fresh flowers"],["candles","lit candles"],["books","a stack of books"],["plants","green houseplants"],["picnic blanket","a woven picnic blanket"],["towel","a folded towel"],["gift boxes","wrapped gift boxes"]],
+"places":[
+ {"n":"Hero Product Studios","it":[
+  ["White studio with softboxes","a clean white cyclorama photo studio with large softboxes and white cubes, pure high-key backdrop"],
+  ["Grey studio backdrop with sun gobo","a seamless light-grey studio backdrop with hard window-gobo sunlight shadows across the wall and floor"],
+  ["Abstract black studio","an abstract deep matte black studio environment with subtle dark architectural planes and dramatic shadow falloff"],
+  ["Abstract Art Deco studio","an abstract Art Deco studio backdrop with stepped geometric reliefs and metallic accents matching the product palette"],
+  ["Abstract dark stone & rock backdrop","an abstract dark sculpted stone and mineral rock backdrop matching the product color tone"],
+  ["Reflective water surface studio","a dark studio tabletop covered in shallow clear water with subtle ripples and specular light reflections"],
+  ["Brushed steel & metal studio","an abstract brushed stainless steel and dark metallic plate backdrop with crisp reflections"],
+  ["Warm natural wood plinth studio","a minimalist studio set with a warm natural oak and walnut wooden surface and soft organic shadows"],
+  ["Abstract steel & sparks backdrop","a dark industrial steel studio backdrop with fine golden sparks drifting through the air"],
+  ["Geometric color-matched podium","a minimalist sculptural podium with matte geometric blocks color-matched to the product"]
+ ]},
+ {"n":"Home & apartment","it":[
+  ["Home kitchen & sink","a lived-in home kitchen with sink, faucet, countertop prep area, cabinets and morning light through the window"],
+  ["Modern kitchen","a bright modern kitchen with a clean countertop and natural light from a window"],
+  ["Home dining room","a home dining room with wooden table, chairs, natural daylight and everyday tableware"],
+  ["Living room sofa corner","a comfortable living room sofa area with cushions, coffee table and warm home atmosphere"],
+  ["Cozy bedroom","a calm home bedroom with made bed, soft textiles, bedside lamp and warm ambient lighting"],
+  ["Home bathroom by sink","a clean home bathroom by the vanity sink, mirror, neutral tiles and soft light"],
+  ["Home office desk corner","a home work desk with laptop, lamp, shelf and natural side light"],
+  ["Apartment entrance hall","a modern apartment entrance hall with an open dark wooden door leading to a bright white stairwell, a coat rack with jackets and hats, a shoe bench and a grey fluffy rug"],
+  ["Apartment balcony / terrace","a home balcony or terrace with outdoor seating, plants and view outside"],
+  ["Utility / laundry room","a practical home utility and laundry room with shelves, storage and clean functional surfaces"],
+  ["Dusk living room with fireplace","a cozy modern living room at dusk with a lit fireplace, pendant lamp, candle, bookshelves and a large window with snowy pines, warm amber low light"],
+  ["High-rise apartment, city view","a high-rise apartment with a large window and a hazy city skyline view in daylight"],
+  ["Christmas living room","a cozy living room at Christmas, softly glowing tree lights creating warm golden bokeh, beige tones"],
+  ["Christmas dinner table","a candle-lit family dinner table with a decorated Christmas tree behind, warm amber light"]
+ ]},
+ {"n":"Commercial, gym & outdoor","it":[
+  ["Glass office with big windows","a bright modern office with floor-to-ceiling steel-framed windows overlooking green trees, warm sunlight and beige columns"],
+  ["Open-plan office kitchen","a modern open-plan office kitchen with warm oak cabinetry, white marble countertops and large sunlit windows"],
+  ["Office water cooler corner","an office corner with a water dispenser, plants and a glass wall"],
+  ["Modern gym with copper mirrors","a bright modern boutique gym with copper-framed mirrors, orange leather machines, tall windows and warm sunlight"],
+  ["Neon gym, diagonal panels","a dark gym with vivid neon pink, orange and blue diagonal wall panels, dumbbell racks, barbells and kettlebells"],
+  ["Hospital corridor with water station","a bright modern hospital corridor with tall windows, long sunlit floor shadows and a stainless-steel wall-mounted water station"],
+  ["Industrial production hall","a bright modern production hall with blue industrial machines, screen control panels and warning-light towers"],
+  ["Premium car showroom","a premium car showroom with exposed concrete columns, floor-to-ceiling glass, a polished stone table and dark SUVs parked behind"],
+  ["School corridor","a bright school corridor with lockers and a water fountain"],
+  ["Airport lounge","a modern airport lounge with large windows and planes outside"],
+  ["Hotel lobby","an elegant hotel lobby with warm lighting and marble floors"],
+  ["Warehouse / logistics hall","a large logistics warehouse with high shelving and pallets"],
+  ["City park under live oaks","a sunlit city park under huge spreading live oak trees, green lawn, benches and dappled light, with a picnic blanket on the grass"],
+  ["Rooftop terrace at sunset","a rooftop terrace overlooking a city at sunset"],
+  ["Beach promenade","a sunny seaside promenade with palm trees and the sea in the background"],
+  ["Mountain trail","a scenic mountain hiking trail with a wide valley view"],
+  ["Supermarket aisle","a bright supermarket aisle with shelves of bottled water"]
+ ]}
+],
+"arch":[
+ ["Art Deco (USA / Europe, 1920s–30s)","Art Deco exterior: stepped setback tower, vertical piers, geometric ornament, gilded metal details, limestone and terracotta facade",{"i":"Art Deco interior: marble floors in geometric patterns, brass and chrome fixtures, lacquered wood, sunburst motifs, glamorous symmetrical lobby"}],
+ ["Bauhaus / International Style (Germany, 1920s–30s)","Bauhaus exterior: white cubic volumes, flat roof, ribbon windows, steel and glass curtain walls, no ornament",{"i":"Bauhaus interior: open functional plan, tubular steel furniture, primary-color accents, plain white walls, abundant daylight"}],
+ ["California mid-century modern (USA, 1950s)","mid-century modern house exterior: low flat roof with deep overhangs, post-and-beam frame, floor-to-ceiling glass, courtyard pool, Palm Springs light",{"i":"mid-century modern interior: open plan with walnut paneling, Eames-style furniture, sunken living room, terrazzo floors, warm orange accents"}],
+ ["Brutalism (UK / Europe, 1950s–70s)","Brutalist exterior: massive raw board-formed concrete blocks, repetitive window modules, heavy sculptural geometry, overcast mood",{"i":"Brutalist interior: exposed concrete walls and ceilings, deep-set windows, minimal furniture, dramatic shafts of light"}],
+ ["Soviet bloc / PRL modernism (Poland, USSR, GDR, 1950s–80s)","Soviet-bloc exterior: prefabricated panel apartment blocks, monumental socialist-realist facades, wide boulevards, mosaics, muted palette",{"i":"Soviet-bloc interior: compact functional flat, patterned wallpaper, wooden wall unit, parquet floors, vintage lamps, 1970s colors"}],
+ ["Scandinavian modernism (Nordics, 1930s–60s)","Scandinavian modernist exterior: pale brick and timber cladding, low pitched roofs, large windows, birch trees, soft northern light",{"i":"Scandinavian interior: light oak floors, white walls, functional organic furniture, wool textiles, candles, hygge calm"}],
+ ["Japanese minimalism (Japan, 1980s–now)","Japanese minimalist exterior (Ando / Kuma): smooth poured concrete or slatted timber, precise geometry, still water, bamboo and moss garden",{"i":"Japanese minimalist interior: tatami and light wood, shoji-like screens, low furniture, quiet empty space, diffuse natural light"}],
+ ["Industrial loft conversion (UK / USA)","converted industrial building exterior: red brick facade, big arched steel-framed windows, iron fire escapes, old factory chimney",{"i":"industrial loft interior: exposed brick, steel beams, concrete floors, large factory windows, high ceilings, Edison bulbs"}]
+],
+"bg":[["empty location","empty location, no other people"],["busy background","busy lively background with people"],["blurred people","out-of-focus people moving in the background"],["minimal background","clean minimal background"],["depth with windows","background with large windows and visible outdoor greenery"],["city skyline","distant city skyline behind"],["nature background","natural greenery in the background"]],
+"light":[["dramatic studio","dramatic studio lighting, strong key light, deep contrast, controlled shadows"],["studio 3 point lights","classic three-point studio lighting: key, fill and rim light"],["dramatic outdoor","dramatic outdoor lighting, strong directional natural light, high contrast"],["golden hour","golden hour, warm low-angle sunlight, soft glow, long shadows"],["sun only","natural sunlight only, no artificial lights"],["indoor light","warm indoor practical lighting, lamps and ambient interior glow"],["street lights","street lights casting pools of sodium-vapor glow"],["moonlight only","lit only by cool silver moonlight"],["light beam","visible volumetric light beam cutting through the atmosphere, god rays"],["light leak","analog film light leaks, warm orange flare along the edges"]],
+"time":[["morning","early morning, fresh soft light, gentle haze"],["noon","midday, high sun, strong overhead light"],["late afternoon","late afternoon, low warm sun, long shadows"],["golden hour / sunset","sunset golden hour, warm directional glow"],["blue hour","blue hour twilight, deep blue sky"],["night","nighttime, dark sky, deep shadows, artificial light sources"],["dawn","dawn, first light on the horizon"]],
+"weather":[["sunny","clear sunny weather, bright sun, crisp shadows"],["cloudy","overcast cloudy sky, soft diffused light"],["fog","thick fog, low visibility, atmospheric depth"],["mist","light mist drifting in the air, soft haze"],["humidity","humid air, damp surfaces, heavy atmosphere, glistening skin"],["rainy","rain falling, wet reflective surfaces, puddles"],["snowy","snowfall, snow-covered surroundings"],["windy","strong wind, moving hair and clothing, swaying trees"],["freezing","freezing temperatures, visible breath, frost on surfaces"],["cold","cold crisp weather, cool tones"],["warm","warm pleasant weather, soft golden warmth"],["hot","scorching heat, heat haze, shimmering air"]],
+"frame":[["symmetrical","perfectly symmetrical centered composition"],["establishing shot","wide establishing shot showing the full environment"],["medium shot","medium shot, subject framed from the waist up"],["full body","full-body shot, subject entirely in frame"],["over the shoulder","over-the-shoulder shot"],["low angle","low-angle shot looking up, heroic perspective"],["high angle","high-angle shot looking down"],["top-down","top-down overhead view"],["dutch angle","tilted dutch angle, unsettling tension"],["POV","first-person point-of-view shot"]],
+"lens":[["24mm","24mm lens"],["35mm","35mm lens, natural wide perspective"],["50mm","50mm lens, natural perspective"],["85mm portrait","85mm portrait lens, flattering compression"],["anamorphic","anamorphic lens, horizontal flares and oval bokeh"],["fisheye","fisheye lens, strong barrel distortion"],["telephoto","telephoto lens, compressed background"]],
+"cam":[
+ ["imax","shot on IMAX large-format camera, ultra-high resolution, immersive scale"],
+ ["shallow depth of field","shallow depth of field, creamy bokeh, subject sharply isolated"],
+ ["wide angle","wide-angle lens, expansive field of view, slight perspective distortion"],
+ ["hand held","handheld camera, subtle natural shake, documentary feel"],
+ ["handheld breathing","subtle organic handheld breathing motion, natural human presence"],
+ ["steady cam","smooth Steadicam movement following the subject"],
+ ["gimbal follow","smooth gimbal follow shot"],
+ ["dolly in","slow dolly-in toward the subject"],["dolly out","slow dolly-out away from the subject"],
+ ["push-in","gentle push-in, increasing intimacy"],["tracking shot","smooth lateral tracking shot following the subject"],
+ ["arc shot","curved arc movement around the subject, shifting perspective smoothly"],
+ ["orbit 360","camera orbits 360 degrees around the subject"],["span around","camera sweeps around the subject in a smooth orbit"],
+ ["slow pan","slow pan across the scene"],["whip pan","fast whip pan transition"],
+ ["tilt up","camera slowly tilts up, revealing the scene from bottom to top"],
+ ["tilt down","camera slowly tilts down, revealing the scene from top to bottom"],
+ ["crane up","crane shot rising upward to reveal the scene"],["crane down","crane shot descending toward the subject"],
+ ["bird's-eye glide","high smooth overhead glide looking down across the scene"],
+ ["parallax slide","parallax slider move revealing depth between foreground and background"],
+ ["rack focus","rack focus shifting from foreground to subject"],
+ ["crash zoom","fast dramatic zoom into the subject or detail"],["whip zoom","quick kinetic zoom combined with subtle camera motion"],
+ ["static locked-off","static locked-off camera, no movement"],
+ ["fpv drone fly over","FPV drone fly-over, fast fluid aerial movement skimming over the scene"],
+ ["spin","spinning camera rotation, dizzying 360-degree twirl"],
+ ["macro shot","macro shot, tiny details in razor-sharp focus"],
+ ["extreme close up","extreme close-up filling the frame with fine detail"],
+ ["close up","close-up shot, emotive detail"]
+],
+"motion":[["real-time","natural real-time motion at 24 fps"],["slow motion","slow motion at 120 fps"],["speed ramp","speed ramp from fast to slow motion"],["time-lapse","time-lapse"],["hyperlapse","hyperlapse"],["freeze frame","freeze-frame moment"],["5 seconds","5-second clip"],["8 seconds","8-second clip"],["seamless loop","seamless loop"]],
+"comp":[["centered subject","centered symmetrical composition"],["rule of thirds","rule-of-thirds composition"],["leading lines","strong leading lines drawing the eye to the subject"],["negative space","generous negative space for copy"],["foreground framing","foreground elements framing the subject"],["layered depth","layered depth with foreground, midground and background"],["golden ratio","golden ratio composition"]],
+"film":[["clean digital cinema","clean modern digital cinema camera look"],["Kodak Portra 400","Kodak Portra 400 film look, warm natural skin tones"],["Kodak Vision3 500T","Kodak Vision3 500T cinematic tungsten film look"],["Fuji Eterna","Fuji Eterna soft cool pastel film look"],["Cinestill 800T","Cinestill 800T with halation and teal shadows"],["Ilford HP5 B&W","Ilford HP5 black-and-white film grain"],["16mm film","16mm documentary film texture"],["Super 8","Super 8 home-movie look"],["cross-processed film","cross-processed vintage film look"]],
+"other":[["4K","4K ultra-sharp resolution"],["subtle texture imperfections","subtle texture imperfections, natural surface detail, not overly clean"],["natural skin texture","natural skin texture with visible pores and fine detail"],["realistic hands","anatomically correct natural hands with five fingers"],["fabric detail","realistic fabric weave and wrinkles"],["flyaway hairs","natural flyaway hairs and fine baby hairs"],["dust particles","dust particles floating in the light"],["film grain","35mm film grain"],["halation","halation glow around bright highlights"],["lens flare","cinematic lens flare"],["lens dirt","subtle lens smudges and imperfections"],["motion blur","natural motion blur"],["natural imperfections","natural asymmetry and everyday imperfections"],["bad tv warp","bad TV warp, wobbling CRT distortion, scanline glitches"],["VHS quality","VHS tape quality, tracking noise, soft color bleed, analog grain"]],
+"ratio":[["16:9","aspect ratio 16:9"],["9:16","vertical aspect ratio 9:16"],["21:9","ultra-wide aspect ratio 21:9"],["1:1","square aspect ratio 1:1"],["4:5","portrait aspect ratio 4:5"]],
+"avoid":[["no text","no text, no watermarks, no captions"],["no deformed hands","no deformed hands, no extra fingers or limbs"],["no blur","no unwanted blur"],["no plastic skin","no plastic or airbrushed skin"],["no oversaturation","no oversaturated colors"]]
+};
+
+function D0(){
+ return{v:3,sel:{},csel:{},loc:'',cg:{a:null,b:null,c:null},ex:'',fmt:'flat',vars:[],upresets:[],cats:[
+  NC('type','Type',ND.type),
+  NC('cstyle','Cinema style',ND.cstyle),
+  NC('mood','Mood',ND.mood),
+  NC('aes','Aesthetic',ND.aes),
+  {id:'char',n:'Character',k:'list',grp:1,g:ND.chars.map(g=>G1(g.n,g.it))},
+  {id:'outfit',n:'Outfit',k:'list',grp:1,g:ND.outfit.map(g=>G1(g.n,g.it,{gen:g.gen}))},
+  NC('acc','Accessories',ND.acc),
+  NC('expr','Expression',ND.expr),
+  NC('pose','Pose',ND.pose),
+  NC('act','Action',ND.act),
+  NC('sport','Sports',ND.sport),
+  {id:'item',n:'Item',k:'list',grp:1,g:ND.item.map(g=>G1(g.n,g.it))},
+  NC('prod','Product details',ND.prod),
+  NC('logo','Logo',ND.logo),
+  NC('logoact','Logo treatment',ND.logoact),
+  NC('props','Props',ND.props),
+  {id:'loc',n:'Location',k:'loc',grp:1,g:ND.places.map(g=>G1(g.n,g.it))},
+  NC('arch','Architecture',ND.arch,{dual:1,mode:'ext'}),
+  NC('bg','Background',ND.bg),
+  NC('light','Lighting',ND.light),
+  NC('time','Time of day',ND.time,{s:1}),
+  NC('weather','Weather',ND.weather),
+  NC('frame','Shot framing',ND.frame),
+  NC('lens','Lens',ND.lens),
+  NC('cam','Camera settings',ND.cam),
+  NC('motion','Motion & speed',ND.motion),
+  NC('comp','Composition',ND.comp),
+  NC('film','Film look',ND.film),
+  NC('other','Details',ND.other),
+  {id:'color',n:'Color grade',k:'color',g:[]},
+  NC('ratio','Aspect ratio',ND.ratio,{s:1}),
+  NC('avoid','Avoid',ND.avoid)
+ ]};
+}
+
+const COMP=['type','cstyle','mood','char','outfit','acc','expr','pose','act','sport','item','prod','logo','logoact','props','loc','arch','bg','aes','weather','time','light','cam','motion','frame','lens','comp','film','color','other','ratio','avoid'];
+const LBL={type:'Type',cstyle:'Cinema style',mood:'Mood',char:'Character',outfit:'Outfit',acc:'Accessories',expr:'Expression',pose:'Pose',act:'Action',sport:'Sports',item:'Item',prod:'Product details',logo:'Logo',logoact:'Logo treatment',props:'Props',loc:'Location',arch:'Architecture',bg:'Background',aes:'Aesthetic',weather:'Weather',time:'Time',light:'Lighting',cam:'Camera',motion:'Motion',frame:'Framing',lens:'Lens',comp:'Composition',film:'Film look',color:'Color grade',other:'Details',ratio:'Format',avoid:'Avoid'};
+const CHAR_CATS=['outfit','acc','expr','pose','act','sport'];
+
+const TABS=[
+ {id:'presets',n:'Presets',k:'presets'},
+ {id:'scene',n:'Scene & Style',cats:['type','cstyle','mood','aes']},
+ {id:'subj',n:'Subject & Action',cats:['char','outfit','acc','expr','pose','act','sport'],cbar:1},
+ {id:'prod',n:'Product & Props',cats:['item','prod','logo','logoact','props']},
+ {id:'loc',n:'Location & BG',cats:['loc','arch','bg']},
+ {id:'light',n:'Lighting & Time',cats:['light','time','weather']},
+ {id:'cam',n:'Camera & Motion',cats:['frame','lens','cam','motion','comp']},
+ {id:'look',n:'Look & Color',cats:['film','other','color']},
+ {id:'ratio',n:'Format',cats:['ratio']},
+ {id:'avoid',n:'Avoid',cats:['avoid']}
+];
+
+let D,cur='presets',slot='a',manual=false,actChar=null,q='',openId=null;
 const KEY='wb13.pm';
-try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!D||!D.cats)D=D0();if(!D.csel)D.csel={};
+try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!D||!D.cats)D=D0();
+if(!D.csel)D.csel={};
+if(!D.upresets)D.upresets=[];
+
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){alert('Brak miejsca w pamięci przeglądarki (zbyt duże obrazki?).')}};
 const cat=id=>D.cats.find(c=>c.id===id),sel=id=>D.sel[id]||(D.sel[id]=[]);
 const getSel=(id,cid=actChar)=>{if(CHAR_CATS.includes(id)&&cid){if(!D.csel)D.csel={};if(!D.csel[cid])D.csel[cid]={};return D.csel[cid][id]||(D.csel[cid][id]=[])}return sel(id)};
@@ -129,123 +437,418 @@ const allItems=c=>c.g.flatMap(g=>g.it);
 const findItem=(c,id)=>allItems(c).find(i=>i.id===id);
 function syncActChar(){const ids=sel('char');if(!ids.length)actChar=null;else if(actChar!==null&&!ids.includes(actChar))actChar=ids[0]}
 function purgeId(cid,itemId){const s=sel(cid),i=s.indexOf(itemId);if(i>=0)s.splice(i,1);if(D.csel)Object.values(D.csel).forEach(m=>{if(m[cid]){const k=m[cid].indexOf(itemId);if(k>=0)m[cid].splice(k,1)}});if(cid==='char'&&D.csel){delete D.csel[itemId];syncActChar()}}
-function migrate(){const N=D0();let prev=null;N.cats.forEach(nc=>{const ex=D.cats.find(c=>c.id===nc.id);
- if(!ex){const i=prev?D.cats.findIndex(c=>c.id===prev)+1:0;D.cats.splice(i,0,nc)}
- else{if(nc.dual&&!ex.dual){ex.dual=1;ex.mode=ex.mode||'ext'}nc.g.forEach(ng=>{const eg=ex.g.find(x=>x.n===ng.n);if(!eg)ex.g.push(ng);else{const have=new Set(eg.it.map(i=>i.n));ng.it.forEach(i=>{if(!have.has(i.n))eg.it.push(i)})}})}
- prev=nc.id});if(!D.csel)D.csel={};D.v=2;save()}
-if((D.v||1)<2)migrate();
+
+function migrate(){
+ const N=D0();
+ D.cats=D.cats.filter(c=>c.id!=='pet'&&c.id!=='audio');
+ delete D.sel.pet;delete D.sel.audio;
+ if(D.csel)Object.values(D.csel).forEach(m=>{delete m.pet;delete m.audio});
+ let prev=null;
+ N.cats.forEach(nc=>{
+  const ex=D.cats.find(c=>c.id===nc.id);
+  if(!ex){const i=prev?D.cats.findIndex(c=>c.id===prev)+1:0;D.cats.splice(i,0,nc)}
+  else{
+   if(nc.dual&&!ex.dual){ex.dual=1;ex.mode=ex.mode||'ext'}
+   if(nc.grp&&!ex.grp){ex.grp=1;if(ex.g.length===1&&!ex.g[0].n)ex.g=[]}
+   nc.g.forEach(ng=>{
+    const eg=ex.g.find(x=>x.n===ng.n);
+    if(!eg)ex.g.push(ng);
+    else{const have=new Set(eg.it.map(i=>i.n));ng.it.forEach(i=>{if(!have.has(i.n))eg.it.push(i)})}
+   });
+  }
+  prev=nc.id;
+ });
+ if(!D.csel)D.csel={};
+ if(!D.upresets)D.upresets=[];
+ D.v=3;save();
+}
+if((D.v||1)<3)migrate();
 syncActChar();
+
 /* ---- składanie promptu ---- */
 const nm=id=>(D.sel[id]||[]).map(i=>findItem(cat(id),i)).filter(Boolean);
-function descOf(c,it){const pets=nm('pet').map(x=>'the '+x.n),items=nm('item').map(x=>x.n);
- let d=it.d.replace('{item}',items.length?items.join(' and '):'the product').replace(/\{pet\}/g,pets.length?pets.join(' and '):'the pet');
+function descOf(c,it){
+ const items=nm('item').map(x=>x.n);
+ let d=it.d.replace(/\{item\}/g,items.length?items.join(' and '):'the product');
  if(c.dual){const m=c.mode||'ext';d=m==='int'?(it.i||it.d):m==='both'?it.d+(it.i?'; '+it.i:''):it.d}
  if(c.id==='char'&&!d.startsWith(it.n))d=it.n+': '+d;
- if(it.img&&it.rf!==0)d+=' (match the attached reference image of '+it.n+')';return d}
-function parts(){const out=[];COMP.forEach(id=>{const c=cat(id);if(!c)return;let p=[];
- if(c.k==='color'){const g=D.cg,t=[];if(g.a)t.push(g.a.n+' ('+g.a.h+') dominant 60%');if(g.b)t.push(g.b.n+' ('+g.b.h+') secondary 30%');if(g.c)t.push(g.c.n+' ('+g.c.h+') accent 10%');if(t.length)p=[t.join('; ')]}
- else if(id==='char'){const chs=nm('char'),blocks=[];chs.forEach(ch=>{const bits=[descOf(c,ch)],cs=(D.csel&&D.csel[ch.id])||{};
-   CHAR_CATS.forEach(cid=>{const cc=cat(cid);if(!cc)return;const arr=(cs[cid]||[]).map(x=>findItem(cc,x)).filter(Boolean);if(!arr.length)return;
+ if(it.img&&it.rf!==0)d+=' (match the attached reference image of '+it.n+')';
+ return d;
+}
+function parts(){
+ const out=[];
+ COMP.forEach(id=>{
+  const c=cat(id);if(!c)return;let p=[];
+  if(c.k==='color'){
+   const g=D.cg,t=[];
+   if(g.a)t.push(g.a.n+' ('+g.a.h+') dominant 60%');
+   if(g.b)t.push(g.b.n+' ('+g.b.h+') secondary 30%');
+   if(g.c)t.push(g.c.n+' ('+g.c.h+') accent 10%');
+   if(t.length)p=[t.join('; ')];
+  }else if(id==='char'){
+   const chs=nm('char'),blocks=[];
+   chs.forEach(ch=>{
+    const bits=[descOf(c,ch)],cs=(D.csel&&D.csel[ch.id])||{};
+    CHAR_CATS.forEach(cid=>{
+     const cc=cat(cid);if(!cc)return;
+     const arr=(cs[cid]||[]).map(x=>findItem(cc,x)).filter(Boolean);
+     if(!arr.length)return;
      if(cid==='outfit')arr.forEach(i=>bits.push('wearing '+i.d));
      else if(cid==='acc')bits.push('with '+arr.map(i=>descOf(cc,i)).join(', '));
-     else arr.forEach(i=>bits.push(descOf(cc,i)))});
-   blocks.push(bits.join(', '))});if(blocks.length)p=[blocks.join('; ')]}
- else if(id==='outfit'){const chs=nm('char');c.g.forEach(g=>g.it.forEach(i=>{if(!sel('outfit').includes(i.id))return;let who='';
-   if(g.gen==='own'){const o=chs.find(x=>x.id===i.c);if(!o)return;who=o.n}else if(g.gen==='f'||g.gen==='m')who=chs.filter(x=>x.gen===g.gen).map(x=>x.n).join(' and ');
-   p.push((who?who+' ':'')+'wearing '+i.d)}))}
- else{p=allItems(c).filter(i=>sel(id).includes(i.id)).map(i=>descOf(c,i));if(c.k==='loc'&&D.loc.trim())p.push('set in '+D.loc.trim())}
- if(p.length)out.push([id,p])});return out}
-function compose(){const P=parts(),ex=D.ex.trim();let t;
- if(D.fmt==='flat'){const av=P.find(x=>x[0]==='avoid'),main=P.filter(x=>x[0]!=='avoid').flatMap(x=>x[0]==='color'?x[1].map(s=>'color grade: '+s):x[1]);t=main.join(', ');if(av)t+=(t?'. ':'')+'Avoid: '+av[1].join(', ');if(ex)t+=(t?'. ':'')+ex}
- else{t=P.map(([id,p])=>LBL[id]+': '+p.join(', ')).join('\n');if(ex)t+=(t?'\n':'')+'Extra: '+ex}
- return t}
-function renderOut(){if(!manual)$('#out').value=compose();const v=$('#out').value;$('#cnt').textContent=v.length+' chars · '+(v.trim()?v.trim().split(/\s+/).length:0)+' words'}
+     else arr.forEach(i=>bits.push(descOf(cc,i)));
+    });
+    blocks.push(bits.join(', '));
+   });
+   if(blocks.length)p=[blocks.join('; ')];
+  }else if(id==='outfit'){
+   const chs=nm('char');
+   c.g.forEach(g=>g.it.forEach(i=>{
+    if(!sel('outfit').includes(i.id))return;
+    let who='';
+    if(g.gen==='own'){const o=chs.find(x=>x.id===i.c);if(!o)return;who=o.n}
+    else if(g.gen==='f'||g.gen==='m')who=chs.filter(x=>x.gen===g.gen).map(x=>x.n).join(' and ');
+    p.push((who?who+' ':'')+'wearing '+i.d);
+   }));
+  }else{
+   p=allItems(c).filter(i=>sel(id).includes(i.id)).map(i=>descOf(c,i));
+   if(c.k==='loc'&&D.loc.trim())p.push('set in '+D.loc.trim());
+  }
+  if(p.length)out.push([id,p]);
+ });
+ return out;
+}
+function compose(){
+ const P=parts(),ex=D.ex.trim();let t;
+ if(D.fmt==='flat'){
+  const av=P.find(x=>x[0]==='avoid'),main=P.filter(x=>x[0]!=='avoid').flatMap(x=>x[0]==='color'?x[1].map(s=>'color grade: '+s):x[1]);
+  t=main.join(', ');
+  if(av)t+=(t?'. ':'')+'Avoid: '+av[1].join(', ');
+  if(ex)t+=(t?'. ':'')+ex;
+ }else{
+  t=P.map(([id,p])=>LBL[id]+': '+p.join(', ')).join('\n');
+  if(ex)t+=(t?'\n':'')+'Extra: '+ex;
+ }
+ return t;
+}
+function renderOut(){
+ if(!manual)$('#out').value=compose();
+ const v=$('#out').value;
+ $('#cnt').textContent=v.length+' chars · '+(v.trim()?v.trim().split(/\s+/).length:0)+' words';
+}
+
 /* ---- UI ---- */
-function dlg(title,build,btns){const o=E('div','dlg');o.innerHTML='<div class="ttl"></div><div class="bd"></div><div class="bt"></div>';o.firstChild.textContent=title;build(o.querySelector('.bd'));
- btns.forEach(([t,f,c])=>{const b=E('button','bn'+(c?' '+c:''),t);b.onclick=()=>{if(f&&f(o)===false)return;o.remove()};o.querySelector('.bt').append(b)});document.body.append(o);const i=o.querySelector('input,textarea');if(i)i.focus();
- o.onkeydown=e=>{if(e.key==='Escape')o.remove()};return o}
-function ask(title,label,val,cb){let i;dlg(title,d=>{const l=E('label');l.append(E('i','',label));i=E('input');i.type='text';i.value=val||'';l.append(i);d.append(l);i.onkeydown=e=>{if(e.key==='Enter'){const v=i.value.trim();if(v){i.closest('.dlg').remove();cb(v)}}}},[['OK',()=>{const v=i.value.trim();if(!v)return false;cb(v)}],['Cancel']])}
-function catCount(c){if(c.k==='loc')return sel(c.id).length+(D.loc.trim()?1:0);if(c.k==='color')return[D.cg.a,D.cg.b,D.cg.c].filter(Boolean).length;if(CHAR_CATS.includes(c.id)){let n=sel(c.id).length;sel('char').forEach(cid=>{n+=((D.csel&&D.csel[cid]&&D.csel[cid][c.id])||[]).length});return n}return sel(c.id).length}
-function tabs(){const t=$('#tabs');t.replaceChildren(...D.cats.map(c=>{const n=catCount(c),b=E('div','tab'+(c.id===cur?' on':''),c.n);if(n)b.append(E('i','',n));b.onclick=()=>{cur=c.id;q='';openId=null;draw();$('#pane').scrollTop=0};return b}));
- const p=E('div','tab','+');p.title='New category';p.onclick=()=>ask('New category','Name','',n=>{D.cats.push({id:uid(),n,k:'list',custom:1,g:[{n:'',it:[]}]});cur=D.cats[D.cats.length-1].id;q='';openId=null;save();draw()});t.append(p)}
-function toggle(c,id){const isCh=CHAR_CATS.includes(c.id)&&sel('char').length>0,s=isCh?getSel(c.id):sel(c.id),i=s.indexOf(id);
+function dlg(title,build,btns){
+ const o=E('div','dlg');o.innerHTML='<div class="ttl"></div><div class="bd"></div><div class="bt"></div>';o.firstChild.textContent=title;build(o.querySelector('.bd'));
+ btns.forEach(([t,f,c])=>{const b=E('button','bn'+(c?' '+c:''),t);b.onclick=()=>{if(f&&f(o)===false)return;o.remove()};o.querySelector('.bt').append(b)});
+ document.body.append(o);const i=o.querySelector('input,textarea');if(i)i.focus();
+ o.onkeydown=e=>{if(e.key==='Escape')o.remove()};return o;
+}
+function ask(title,label,val,cb){
+ let i;dlg(title,d=>{const l=E('label');l.append(E('i','',label));i=E('input');i.type='text';i.value=val||'';l.append(i);d.append(l);i.onkeydown=e=>{if(e.key==='Enter'){const v=i.value.trim();if(v){i.closest('.dlg').remove();cb(v)}}}},[['OK',()=>{const v=i.value.trim();if(!v)return false;cb(v)}],['Cancel']]);
+}
+
+function singleCatCount(c){
+ if(!c)return 0;
+ if(c.k==='loc')return sel(c.id).length+(D.loc.trim()?1:0);
+ if(c.k==='color')return[D.cg.a,D.cg.b,D.cg.c].filter(Boolean).length;
+ if(CHAR_CATS.includes(c.id)){let n=sel(c.id).length;sel('char').forEach(cid=>{n+=((D.csel&&D.csel[cid]&&D.csel[cid][c.id])||[]).length});return n}
+ return sel(c.id).length;
+}
+function tabCount(tb){
+ if(tb.k==='presets')return 0;
+ return tb.cats.reduce((sum,cid)=>sum+singleCatCount(cat(cid)),0);
+}
+function customCats(){
+ const known=new Set(TABS.flatMap(t=>t.cats||[]));
+ return D.cats.filter(c=>!known.has(c.id));
+}
+function tabs(){
+ const t=$('#tabs'),allTabs=[...TABS,...customCats().map(c=>({id:'c_'+c.id,n:c.n,cats:[c.id]}))];
+ t.replaceChildren(...allTabs.map(tb=>{
+  const n=tabCount(tb),b=E('div','tab'+(tb.id===cur?' on':''),tb.n);
+  if(n)b.append(E('i','',n));
+  b.onclick=()=>{cur=tb.id;q='';openId=null;draw();$('#pane').scrollTop=0};
+  return b;
+ }));
+ const p=E('div','tab','+');p.title='New custom category';
+ p.onclick=()=>ask('New category','Name','',n=>{
+  const id=uid();D.cats.push({id,n,k:'list',custom:1,g:[{n:'',it:[]}]});
+  cur='c_'+id;q='';openId=null;save();draw();
+ });
+ t.append(p);
+}
+
+function toggle(c,id){
+ const isCh=CHAR_CATS.includes(c.id)&&sel('char').length>0,s=isCh?getSel(c.id):sel(c.id),i=s.indexOf(id);
  if(i>=0)s.splice(i,1);else{if(c.s)s.length=0;s.push(id)}
  if(c.id==='char'){if(i<0)actChar=id;syncActChar()}
- manual=false;save();draw()}
-function itemDlg(c,g,it){const n=!it;let nmI,ds,dI,gn,im=it&&it.img||null,rf=!it||it.rf!==0,pv,cb;
- dlg(n?'Add to '+c.n:'Edit: '+it.n,d=>{let l=E('label');l.append(E('i','','Name'));nmI=E('input');nmI.type='text';nmI.value=n?'':it.n;l.append(nmI);d.append(l);
+ manual=false;save();draw();
+}
+
+function itemDlg(c,g,it){
+ const n=!it;let nmI,ds,dI,gn,im=it&&it.img||null,rf=!it||it.rf!==0,pv,cb;
+ dlg(n?'Add to '+c.n:'Edit: '+it.n,d=>{
+  let l=E('label');l.append(E('i','','Name'));nmI=E('input');nmI.type='text';nmI.value=n?'':it.n;l.append(nmI);d.append(l);
   if(c.id==='char'){l=E('label');l.append(E('i','','Gender (used to match outfits)'));gn=E('select');[['f','Female'],['m','Male'],['x','Other']].forEach(([v,t])=>{const o=E('option','',t);o.value=v;gn.append(o)});gn.value=(it&&it.gen)||'f';l.append(gn);d.append(l)}
   l=E('label');l.append(E('i','',c.dual?'Exterior description':'Prompt description (what goes into the final prompt)'));ds=E('textarea');ds.rows=4;ds.value=n?'':it.d;l.append(ds);d.append(l);
   if(c.dual){l=E('label');l.append(E('i','','Interior description'));dI=E('textarea');dI.rows=4;dI.value=n?'':(it.i||'');l.append(dI);d.append(l)}
-  l=E('label');l.append(E('i','',c.id==='char'?'Face thumbnail / reference image':'Reference image (optional: product, character, logo)'));const fi=E('input');fi.type='file';fi.accept='image/*';pv=E('img');pv.style.cssText='display:block;margin-top:6px;max-width:90px;border:1px solid #f7fbf7';if(im)pv.src=im;else pv.hidden=true;
+  l=E('label');l.append(E('i','',c.id==='char'?'Face thumbnail / reference image':'Reference image (optional: product, character, logo)'));
+  const fi=E('input');fi.type='file';fi.accept='image/*';pv=E('img');pv.style.cssText='display:block;margin-top:6px;max-width:90px;border:1px solid #f7fbf7';if(im)pv.src=im;else pv.hidden=true;
   fi.onchange=()=>{const f=fi.files[0];if(!f)return;const m=new Image();m.onload=()=>{const s=Math.min(1,160/Math.max(m.width,m.height)),c2=document.createElement('canvas');c2.width=Math.round(m.width*s);c2.height=Math.round(m.height*s);c2.getContext('2d').drawImage(m,0,0,c2.width,c2.height);im=c2.toDataURL('image/jpeg',.75);pv.src=im;pv.hidden=false};m.src=URL.createObjectURL(f)};
   const rmi=E('button','bn d','Remove img');rmi.type='button';rmi.style.marginTop='4px';rmi.onclick=()=>{im=null;pv.src='';pv.hidden=true;fi.value='';rmi.hidden=true};if(!im)rmi.hidden=true;fi.addEventListener('change',()=>rmi.hidden=false);
-  l.append(fi,pv,rmi);d.append(l);l=E('label');cb=E('input');cb.type='checkbox';cb.checked=rf;l.append(cb,E('span','',' mention the reference image in the prompt'));d.append(l)},
- [['Save',()=>{const name=nmI.value.trim();if(!name)return false;const o={n:name,d:ds.value.trim()||name,rf:cb.checked?1:0};if(gn)o.gen=gn.value;if(dI)o.i=dI.value.trim();if(im)o.img=im;
+  l.append(fi,pv,rmi);d.append(l);
+  l=E('label');cb=E('input');cb.type='checkbox';cb.checked=rf;l.append(cb,E('span','',' mention the reference image in the prompt'));d.append(l);
+ },[
+  ['Save',()=>{const name=nmI.value.trim();if(!name)return false;const o={n:name,d:ds.value.trim()||name,rf:cb.checked?1:0};if(gn)o.gen=gn.value;if(dI)o.i=dI.value.trim();if(im)o.img=im;
    if(n){o.id=uid();g.it.push(o)}else{Object.assign(it,o);if(!im)delete it.img}manual=false;save();draw()}],
-  ...(n?[]:[['Delete',()=>{g.it.splice(g.it.indexOf(it),1);purgeId(c.id,it.id);manual=false;save();draw()},'d']]),['Cancel']])}
-function charBar(c,p){const chs=nm('char');if(!CHAR_CATS.includes(c.id)||!chs.length)return;
+  ...(n?[]:[['Delete',()=>{g.it.splice(g.it.indexOf(it),1);purgeId(c.id,it.id);manual=false;save();draw()},'d']]),
+  ['Cancel']
+ ]);
+}
+
+function charBar(p){
+ const chs=nm('char');if(!chs.length)return;
  const bar=E('div','cbar');bar.append(E('span','','Assign to:'));
- chs.forEach(ch=>{const b=E('button','cpill'+(actChar===ch.id?' on':''));if(ch.img){const im=E('img');im.src=ch.img;b.append(im)}b.append(document.createTextNode(ch.n));const cnt=getSel(c.id,ch.id).length;if(cnt)b.append(E('i','',' '+cnt));b.onclick=()=>{actChar=ch.id;draw()};bar.append(b)});
- const gb=E('button','cpill'+(actChar===null?' on':''),'Global');const gcnt=sel(c.id).length;if(gcnt)gb.append(E('i','',' '+gcnt));gb.onclick=()=>{actChar=null;draw()};bar.append(gb);p.append(bar)}
-function charSummary(chId){const cs=(D.csel&&D.csel[chId])||{},parts=[];CHAR_CATS.forEach(cid=>{const cc=cat(cid);if(!cc)return;const names=(cs[cid]||[]).map(x=>findItem(cc,x)).filter(Boolean).map(x=>x.n);if(names.length)parts.push(LBL[cid]+': '+names.join(', '))});return parts.join(' | ')}
-function itemAssignees(cid,itemId,chs){const who=[];chs.forEach(ch=>{if(getSel(cid,ch.id).includes(itemId))who.push(ch.n)});if(sel(cid).includes(itemId))who.push('Global');return who}
-function listRows(c,p){const chs=nm('char'),isCh=CHAR_CATS.includes(c.id)&&chs.length>0,activeCh=isCh&&actChar?chs.find(x=>x.id===actChar):null;
+ chs.forEach(ch=>{
+  const b=E('button','cpill'+(actChar===ch.id?' on':''));
+  if(ch.img){const im=E('img');im.src=ch.img;b.append(im)}
+  b.append(document.createTextNode(ch.n));
+  const cnt=CHAR_CATS.reduce((s,cid)=>s+getSel(cid,ch.id).length,0);
+  if(cnt)b.append(E('i','',' '+cnt));
+  b.onclick=()=>{actChar=ch.id;draw()};
+  bar.append(b);
+ });
+ const gb=E('button','cpill'+(actChar===null?' on':''),'Global');
+ const gcnt=CHAR_CATS.reduce((s,cid)=>s+sel(cid).length,0);
+ if(gcnt)gb.append(E('i','',' '+gcnt));
+ gb.onclick=()=>{actChar=null;draw()};
+ bar.append(gb);p.append(bar);
+}
+
+function charSummary(chId){
+ const cs=(D.csel&&D.csel[chId])||{},parts=[];
+ CHAR_CATS.forEach(cid=>{const cc=cat(cid);if(!cc)return;const names=(cs[cid]||[]).map(x=>findItem(cc,x)).filter(Boolean).map(x=>x.n);if(names.length)parts.push(LBL[cid]+': '+names.join(', '))});
+ return parts.join(' | ');
+}
+function itemAssignees(cid,itemId,chs){
+ const who=[];chs.forEach(ch=>{if(getSel(cid,ch.id).includes(itemId))who.push(ch.n)});
+ if(sel(cid).includes(itemId))who.push('Global');return who;
+}
+
+function renderCatRows(c,box){
+ const chs=nm('char'),isCh=CHAR_CATS.includes(c.id)&&chs.length>0,activeCh=isCh&&actChar?chs.find(x=>x.id===actChar):null;
  const targetChs=activeCh?[activeCh]:chs,gens=new Set(targetChs.map(x=>x.gen).filter(Boolean)),ids=new Set(targetChs.map(x=>x.id)),flt=c.id==='outfit'&&!D.ofAll;
  const activeSel=isCh?getSel(c.id):sel(c.id),ql=q.trim().toLowerCase();let shown=0;
- if(flt&&!chs.length)p.append(E('div','dim','Tip: select a character to filter outfits by gender and to see their signature outfits.'));
- if(c.grp&&!c.g.length)p.append(E('div','dim','No groups yet — add one with “+ Group”.'));
- c.g.forEach(g=>{let items=g.it;if(flt){if(g.gen==='own')items=g.it.filter(i=>ids.has(i.c));else if((g.gen==='f'||g.gen==='m')&&gens.size&&!gens.has(g.gen))items=[];if(g.it.length&&!items.length)return}
+ if(flt&&!chs.length&&!ql)box.append(E('div','dim','Tip: select a character above to filter outfits by gender & signature looks.'));
+ c.g.forEach(g=>{
+  let items=g.it;
+  if(flt){
+   if(g.gen==='own')items=g.it.filter(i=>ids.has(i.c));
+   else if((g.gen==='f'||g.gen==='m')&&gens.size&&!gens.has(g.gen))items=[];
+   if(g.it.length&&!items.length)return;
+  }
   if(ql)items=items.filter(i=>i.n.toLowerCase().includes(ql)||i.d.toLowerCase().includes(ql)||(i.i&&i.i.toLowerCase().includes(ql)));
   if(ql&&!items.length)return;
-  if(c.grp||g.n){const gh=E('div','gh');gh.append(E('span','',g.n||'—'));
-   if(c.grp){const a=E('span','mini','+ Item');a.onclick=()=>itemDlg(c,g);const r=E('span','mini','✎');r.onclick=()=>ask('Rename group','Name',g.n,n=>{g.n=n;save();draw()});const x=E('span','mini','×');x.onclick=()=>{if(confirm('Delete group '+g.n+' with all its items?')){g.it.forEach(i=>purgeId(c.id,i.id));c.g.splice(c.g.indexOf(g),1);manual=false;save();draw()}};gh.append(a,r,x)}
-   p.append(gh)}
-  if(c.grp&&!g.it.length)p.append(E('div','dim','Empty group.'));
-  items.forEach(it=>{shown++;const on=activeSel.includes(it.id),isOpen=openId===it.id,r=E('div','row'+(on?' on':'')+(isOpen?' open':''));r.append(E('div','cb'));
+  if(c.grp||g.n){
+   const gh=E('div','gh');gh.append(E('span','',g.n||'—'));
+   if(c.grp){
+    const a=E('span','mini','+ Item');a.onclick=()=>itemDlg(c,g);
+    const r=E('span','mini','✎');r.onclick=()=>ask('Rename group','Name',g.n,n=>{g.n=n;save();draw()});
+    const x=E('span','mini','×');x.onclick=()=>{if(confirm('Delete group '+g.n+' with all its items?')){g.it.forEach(i=>purgeId(c.id,i.id));c.g.splice(c.g.indexOf(g),1);manual=false;save();draw()}};
+    gh.append(a,r,x);
+   }
+   box.append(gh);
+  }
+  items.forEach(it=>{
+   shown++;
+   const on=activeSel.includes(it.id),isOpen=openId===it.id,r=E('div','row'+(on?' on':'')+(isOpen?' open':''));
+   r.append(E('div','cb'));
    if(it.img){const im=E('img');im.src=it.img;r.append(im)}
-   const tx=E('div','tx');tx.append(E('b','',it.n),E('small','',c.dual&&(c.mode||'ext')==='int'&&it.i?it.i:it.d));
+   const tx=E('div','tx');
+   tx.append(E('b','',it.n),E('small','',c.dual&&(c.mode||'ext')==='int'&&it.i?it.i:it.d));
    if(isCh){const who=itemAssignees(c.id,it.id,chs);if(who.length)tx.append(E('span','asg','→ '+who.join(', ')))}
    if(c.id==='char'){const sm=charSummary(it.id);if(sm)tx.append(E('span','asg',sm))}
    r.append(tx);
-   const ex=E('span','mini',isOpen?'▴':'▾');ex.title='Show / hide prompt';ex.onclick=e=>{e.stopPropagation();openId=isOpen?null:it.id;listWrap.replaceChildren();listRows(c,listWrap)};
-   const ed=E('span','mini','✎');ed.onclick=e=>{e.stopPropagation();itemDlg(c,g,it)};r.append(ex,ed);r.onclick=()=>toggle(c,it.id);p.append(r)})});
- if(ql&&!shown)p.append(E('div','dim','No matching items.'));
- if(!c.grp&&c.g[0]&&!c.g[0].it.length)p.append(E('div','dim','Empty — add your first item with “+ Item”.'))}
-let listWrap;
-function paneList(c,p,pre){const hd=E('div','ph');hd.append(E('b','',c.n));
- if(c.dual){const m=E('button','bn',{ext:'Exterior',int:'Interior',both:'Both'}[c.mode||'ext']);m.title='Exterior / interior / both';m.onclick=()=>{c.mode={ext:'int',int:'both',both:'ext'}[c.mode||'ext'];manual=false;save();draw()};hd.append(m)}
- if(c.id==='outfit'){const f=E('button','bn'+(D.ofAll?' on':''),D.ofAll?'Show all':'Filtered');f.title='Filter outfits by the selected characters';f.onclick=()=>{D.ofAll=!D.ofAll;save();draw()};hd.append(f)}
- const bm=E('button','bn'+(c.s?' on':''),c.s?'Single':'Multi');bm.title='Selection mode';bm.onclick=()=>{c.s=c.s?0:1;if(c.s){const s=sel(c.id);s.length=Math.min(s.length,1);if(CHAR_CATS.includes(c.id)&&D.csel)Object.values(D.csel).forEach(m=>{if(m[c.id])m[c.id].length=Math.min(m[c.id].length,1)})}manual=false;save();draw()};hd.append(bm);
- const clr=E('button','bn','Clear');clr.onclick=()=>{if(CHAR_CATS.includes(c.id)&&sel('char').length)getSel(c.id).length=0;else D.sel[c.id]=[];if(c.id==='char')syncActChar();manual=false;save();draw()};hd.append(clr);
- if(c.grp){const ng=E('button','bn','+ Group');ng.onclick=()=>ask('New group','Group / session / project name','',n=>{c.g.push({n,it:[]});save();draw()});hd.append(ng)}
- else{const a=E('button','bn','+ Item');a.onclick=()=>itemDlg(c,c.g[0]);hd.append(a)}
- const rn=E('button','bn','Rename');rn.onclick=()=>ask('Rename category','Name',c.n,n=>{c.n=n;save();draw()});hd.append(rn);
- if(c.custom||c.grp){const dc=E('button','bn d','×');dc.title='Delete category';dc.onclick=()=>{if(confirm('Delete category '+c.n+'?')){D.cats.splice(D.cats.indexOf(c),1);delete D.sel[c.id];cur=D.cats[0].id;manual=false;save();draw()}};hd.append(dc)}
- p.append(hd);charBar(c,p);if(pre)pre(p);
- const sb=E('div','srch'),si=E('input');si.type='text';si.placeholder='Search '+c.n.toLowerCase()+'…';si.value=q;
- const sx=E('button','bn','×');sx.title='Clear search';sx.hidden=!q;
- si.oninput=()=>{q=si.value;sx.hidden=!q;listWrap.replaceChildren();listRows(c,listWrap)};
- sx.onclick=()=>{q='';si.value='';sx.hidden=true;listWrap.replaceChildren();listRows(c,listWrap);si.focus()};
+   const ex=E('span','mini',isOpen?'▴':'▾');ex.title='Show / hide prompt';
+   ex.onclick=e=>{e.stopPropagation();openId=isOpen?null:it.id;renderSections()};
+   const ed=E('span','mini','✎');ed.onclick=e=>{e.stopPropagation();itemDlg(c,g,it)};
+   r.append(ex,ed);
+   r.onclick=()=>toggle(c,it.id);
+   box.append(r);
+  });
+ });
+ if(!c.grp&&c.g[0]&&!c.g[0].it.length&&!ql)box.append(E('div','dim','Empty — add your first item with “+ Item”.'));
+ return shown;
+}
+
+function renderColorBlock(box){
+ const hd=E('div','sec-hdr');hd.append(E('span','','Color grade · 60 / 30 / 10'));
+ const cl=E('button','mini','Clear');cl.onclick=()=>{D.cg={a:null,b:null,c:null};slot='a';manual=false;save();draw()};hd.append(cl);box.append(hd);
+ const sl=E('div','slots');
+ [['a','Dominant 60%'],['b','Secondary 30%'],['c','Accent 10%']].forEach(([k,t])=>{
+  const s=E('div','slot'+(slot===k?' on':''));s.append(E('div','',t));
+  const sw=E('s');if(D.cg[k])sw.style.background=D.cg[k].h;
+  s.append(sw,E('span','',D.cg[k]?D.cg[k].n:'— pick —'));
+  s.onclick=()=>{slot=k;draw()};sl.append(s);
+ });
+ box.append(sl);
+ const pr=E('div','row2');pr.style.marginBottom='6px';
+ PRE.forEach(([n,a,b,c3])=>{
+  const f=x=>{const q=COLS.concat(D.cc||[]).find(z=>z[0]===x);return{n:q[0],h:q[1]}},bt=E('button','bn',n);
+  bt.onclick=()=>{D.cg={a:f(a),b:f(b),c:f(c3)};manual=false;save();draw()};pr.append(bt);
+ });
+ box.append(pr);
+ const tl=E('div','tiles');
+ COLS.concat(D.cc||[]).forEach(([n,h])=>{
+  const t=E('div','tile'),k=['a','b','c'].find(x=>D.cg[x]&&D.cg[x].n===n);
+  if(k)t.classList.add('sel');
+  const s=E('s');s.style.background=h;t.append(s,E('span','',n));
+  if(k)t.append(E('em','',{a:'60%',b:'30%',c:'10%'}[k]));
+  t.onclick=()=>{if(k===slot)D.cg[slot]=null;else{D.cg[slot]={n,h};const nx={a:'b',b:'c',c:'c'}[slot];if(!D.cg[nx]||nx===slot)slot=nx}manual=false;save();draw()};
+  tl.append(t);
+ });
+ box.append(tl);
+ const ad=E('button','bn','+ Custom color');ad.style.marginTop='6px';
+ ad.onclick=()=>{let nm,hx;dlg('Custom color',d=>{let l=E('label');l.append(E('i','','Name'));nm=E('input');nm.type='text';l.append(nm);d.append(l);l=E('label');l.append(E('i','','Color'));hx=E('input');hx.type='color';hx.value='#c0392b';hx.style.cssText='width:60px;height:30px;padding:0';l.append(hx);d.append(l)},[['Add',()=>{if(!nm.value.trim())return false;(D.cc=D.cc||[]).push([nm.value.trim(),hx.value]);save();draw()}],['Cancel']])};
+ box.append(ad);
+}
+
+let secWrap,curTabObj;
+function renderSections(){
+ secWrap.replaceChildren();
+ const ql=q.trim().toLowerCase();let totalShown=0;
+ curTabObj.cats.forEach((cid,idx)=>{
+  const c=cat(cid);if(!c)return;
+  if(c.k==='color'){if(!ql){const b=E('div',idx?'sec-box':'');renderColorBlock(b);secWrap.append(b)}return}
+  const sec=E('div',idx?'sec-box':'');
+  const hd=E('div','sec-hdr');hd.append(E('span','',c.n));
+  if(c.dual){const m=E('span','mini',{ext:'Ext',int:'Int',both:'Both'}[c.mode||'ext']);m.title='Exterior / interior / both';m.onclick=()=>{c.mode={ext:'int',int:'both',both:'ext'}[c.mode||'ext'];manual=false;save();draw()};hd.append(m)}
+  if(c.id==='outfit'){const f=E('span','mini',D.ofAll?'All':'Filtered');f.title='Filter outfits by selected character';f.onclick=()=>{D.ofAll=!D.ofAll;save();draw()};hd.append(f)}
+  const bm=E('span','mini',c.s?'1':'Multi');bm.title='Single / Multi selection';bm.onclick=()=>{c.s=c.s?0:1;if(c.s){const s=sel(c.id);s.length=Math.min(s.length,1);if(CHAR_CATS.includes(c.id)&&D.csel)Object.values(D.csel).forEach(m=>{if(m[c.id])m[c.id].length=Math.min(m[c.id].length,1)})}manual=false;save();draw()};hd.append(bm);
+  const clr=E('span','mini','Clear');clr.onclick=()=>{if(CHAR_CATS.includes(c.id)&&sel('char').length)getSel(c.id).length=0;else D.sel[c.id]=[];if(c.id==='char')syncActChar();manual=false;save();draw()};hd.append(clr);
+  if(c.grp){const ng=E('span','mini','+ Grp');ng.onclick=()=>ask('New group','Group / project name','',n=>{c.g.push({n,it:[]});save();draw()});hd.append(ng)}
+  else{const a=E('span','mini','+ Item');a.onclick=()=>itemDlg(c,c.g[0]);hd.append(a)}
+  if(c.custom){const dc=E('span','mini','×');dc.title='Delete category';dc.onclick=()=>{if(confirm('Delete category '+c.n+'?')){D.cats.splice(D.cats.indexOf(c),1);delete D.sel[c.id];cur='presets';manual=false;save();draw()}};hd.append(dc)}
+  sec.append(hd);
+
+  if(c.k==='loc'&&!ql){
+   const li=E('input');li.type='text';li.placeholder='city / country / custom place … e.g. Kielce, Poland';li.value=D.loc;li.style.marginBottom='4px';
+   li.oninput=()=>{D.loc=li.value;manual=false;save();renderOut();tabs()};
+   sec.append(li);
+  }
+  const inner=E('div'),cnt=renderCatRows(c,inner);
+  if(ql&&!cnt)return;
+  totalShown+=cnt;sec.append(inner);secWrap.append(sec);
+ });
+ if(ql&&!totalShown)secWrap.append(E('div','dim','No matching items.'));
+}
+
+/* ---- Presets ---- */
+function applyPreset(pr){
+ D.sel={};D.csel={};actChar=null;D.loc=pr.loc||'';
+ Object.entries(pr.pick||{}).forEach(([cid,names])=>{
+  const c=cat(cid);if(!c)return;
+  D.sel[cid]=names.map(nmStr=>{
+   const it=allItems(c).find(x=>x.n.toLowerCase()===nmStr.toLowerCase());
+   return it?it.id:null;
+  }).filter(Boolean);
+ });
+ if(pr.cg&&pr.cg.length===3){
+  const findCol=nmStr=>{const q=COLS.concat(D.cc||[]).find(z=>z[0].toLowerCase()===nmStr.toLowerCase());return q?{n:q[0],h:q[1]}:null};
+  D.cg={a:findCol(pr.cg[0]),b:findCol(pr.cg[1]),c:findCol(pr.cg[2])};
+ }else{D.cg={a:null,b:null,c:null}}
+ manual=false;save();draw();
+}
+function saveUserPreset(){
+ ask('Save current setup as preset','Preset name','Custom Hero Preset',n=>{
+  const pick={};
+  Object.entries(D.sel).forEach(([cid,ids])=>{
+   const c=cat(cid);if(!c||!ids.length)return;
+   pick[cid]=ids.map(id=>findItem(c,id)).filter(Boolean).map(x=>x.n);
+  });
+  const cg=[D.cg.a,D.cg.b,D.cg.c].every(Boolean)?[D.cg.a.n,D.cg.b.n,D.cg.c.n]:null;
+  D.upresets.unshift({id:uid(),g:'My Custom Presets',n,desc:'Custom saved scene setup ('+Object.keys(pick).length+' categories)',loc:D.loc,pick,cg});
+  save();draw();
+ });
+}
+function panePresets(p){
+ const hd=E('div','ph');hd.append(E('b','','Scene Presets'));
+ const sv=E('button','bn','+ Save current as preset');sv.onclick=saveUserPreset;hd.append(sv);
+ p.append(hd);
+ const sb=E('div','srch'),si=E('input');si.type='text';si.placeholder='Search presets (e.g. white, black, wood, sparks, ugc)…';si.value=q;
+ const sx=E('button','bn','×');sx.hidden=!q;
+ si.oninput=()=>{q=si.value;sx.hidden=!q;renderPresetList(wrap)};
+ sx.onclick=()=>{q='';si.value='';sx.hidden=true;renderPresetList(wrap);si.focus()};
  sb.append(si,sx);p.append(sb);
- listWrap=E('div');p.append(listWrap);listRows(c,listWrap)}
-function paneColor(c,p){const hd=E('div','ph');hd.append(E('b','',c.n+' · 60 / 30 / 10'));const cl=E('button','bn','Clear');cl.onclick=()=>{D.cg={a:null,b:null,c:null};slot='a';manual=false;save();draw()};hd.append(cl);p.append(hd);
- const sl=E('div','slots');[['a','Dominant 60%'],['b','Secondary 30%'],['c','Accent 10%']].forEach(([k,t])=>{const s=E('div','slot'+(slot===k?' on':''));s.append(E('div','',t));const sw=E('s');if(D.cg[k])sw.style.background=D.cg[k].h;s.append(sw,E('span','',D.cg[k]?D.cg[k].n:'— pick —'));s.onclick=()=>{slot=k;draw()};sl.append(s)});p.append(sl);
- const pr=E('div','row2');pr.style.marginBottom='6px';PRE.forEach(([n,a,b,c3])=>{const f=x=>{const q=COLS.concat(D.cc||[]).find(z=>z[0]===x);return{n:q[0],h:q[1]}},bt=E('button','bn',n);bt.onclick=()=>{D.cg={a:f(a),b:f(b),c:f(c3)};manual=false;save();draw()};pr.append(bt)});p.append(pr);
- const tl=E('div','tiles');COLS.concat(D.cc||[]).forEach(([n,h])=>{const t=E('div','tile'),k=['a','b','c'].find(x=>D.cg[x]&&D.cg[x].n===n);if(k)t.classList.add('sel');const s=E('s');s.style.background=h;t.append(s,E('span','',n));if(k)t.append(E('em','',{a:'60%',b:'30%',c:'10%'}[k]));
-  t.onclick=()=>{if(k===slot)D.cg[slot]=null;else{D.cg[slot]={n,h};const nx={a:'b',b:'c',c:'c'}[slot];if(!D.cg[nx]||nx===slot)slot=nx}manual=false;save();draw()};tl.append(t)});p.append(tl);
- const ad=E('button','bn','+ Custom color');ad.style.marginTop='6px';ad.onclick=()=>{let nm,hx;dlg('Custom color',d=>{let l=E('label');l.append(E('i','','Name'));nm=E('input');nm.type='text';l.append(nm);d.append(l);l=E('label');l.append(E('i','','Color'));hx=E('input');hx.type='color';hx.value='#c0392b';hx.style.cssText='width:60px;height:30px;padding:0';l.append(hx);d.append(l)},[['Add',()=>{if(!nm.value.trim())return false;(D.cc=D.cc||[]).push([nm.value.trim(),hx.value]);save();draw()}],['Cancel']])};p.append(ad)}
-function draw(){tabs();const c=cat(cur)||D.cats[0],p=$('#pane');p.replaceChildren();if(c.k==='color')paneColor(c,p);else if(c.k==='loc')paneList(c,p,pp=>{const i=E('input');i.type='text';i.placeholder='city / country / planet … e.g. Kielce, Poland';i.value=D.loc;i.oninput=()=>{D.loc=i.value;manual=false;save();renderOut();tabs()};pp.append(i,E('div','dim','Free text is added as “set in …”. Tick a saved place below to add a full scene description.'))});else paneList(c,p);renderVars();renderOut()}
+ const wrap=E('div');p.append(wrap);renderPresetList(wrap);
+}
+function renderPresetList(wrap){
+ wrap.replaceChildren();
+ const ql=q.trim().toLowerCase();
+ const all=[...D.upresets,...PRESETS];
+ const groups=[...new Set(all.map(x=>x.g))];
+ let shown=0;
+ groups.forEach(gn=>{
+  let list=all.filter(x=>x.g===gn);
+  if(ql)list=list.filter(x=>x.n.toLowerCase().includes(ql)||x.desc.toLowerCase().includes(ql));
+  if(!list.length)return;
+  const gh=E('div','gh');gh.append(E('span','',gn));wrap.append(gh);
+  list.forEach(pr=>{
+   shown++;
+   const isOpen=openId===pr.id,r=E('div','row'+(isOpen?' open':''));
+   r.append(E('div','cb'));
+   const tx=E('div','tx');tx.append(E('b','',pr.n),E('small','',pr.desc));r.append(tx);
+   const ex=E('span','mini',isOpen?'▴':'▾');ex.onclick=e=>{e.stopPropagation();openId=isOpen?null:pr.id;renderPresetList(wrap)};
+   r.append(ex);
+   if(pr.g==='My Custom Presets'){
+    const dl=E('span','mini','×');dl.onclick=e=>{e.stopPropagation();if(confirm('Delete preset '+pr.n+'?')){D.upresets=D.upresets.filter(x=>x.id!==pr.id);save();renderPresetList(wrap)}};
+    r.append(dl);
+   }
+   r.onclick=()=>applyPreset(pr);
+   wrap.append(r);
+  });
+ });
+ if(!shown)wrap.append(E('div','dim','No matching presets.'));
+}
+
+function draw(){
+ tabs();
+ const allTabs=[...TABS,...customCats().map(c=>({id:'c_'+c.id,n:c.n,cats:[c.id]}))];
+ curTabObj=allTabs.find(t=>t.id===cur)||allTabs[0];
+ const p=$('#pane');p.replaceChildren();
+ if(curTabObj.k==='presets'){panePresets(p);renderVars();renderOut();return}
+ const hd=E('div','ph');hd.append(E('b','',curTabObj.n));p.append(hd);
+ if(curTabObj.cbar)charBar(p);
+ const sb=E('div','srch'),si=E('input');si.type='text';si.placeholder='Search in '+curTabObj.n.toLowerCase()+'…';si.value=q;
+ const sx=E('button','bn','×');sx.title='Clear search';sx.hidden=!q;
+ si.oninput=()=>{q=si.value;sx.hidden=!q;renderSections()};
+ sx.onclick=()=>{q='';si.value='';sx.hidden=true;renderSections();si.focus()};
+ sb.append(si,sx);p.append(sb);
+ secWrap=E('div');p.append(secWrap);renderSections();
+ renderVars();renderOut();
+}
+
 /* ---- warianty ---- */
 const snapState=()=>JSON.parse(JSON.stringify({sel:D.sel,csel:D.csel||{},loc:D.loc,cg:D.cg,ex:D.ex,fmt:D.fmt}));
-function renderVars(){const v=$('#vars');v.replaceChildren();if(!D.vars.length){v.append(E('div','dim','No saved variants yet.'));return}
- D.vars.forEach(x=>{const r=E('div','v'),n=E('span','',x.n);n.title=x.t;n.onclick=()=>{const s=JSON.parse(JSON.stringify(x.st));D.sel=s.sel;D.csel=s.csel||{};D.loc=s.loc;D.cg=s.cg;D.ex=s.ex;D.fmt=s.fmt;$('#ex').value=D.ex;syncActChar();manual=false;save();syncFmt();draw()};
-  const cp=E('span','mini','Copy');cp.onclick=()=>copy(x.t);const dl=E('span','mini','×');dl.onclick=()=>{if(confirm('Delete variant '+x.n+'?')){D.vars.splice(D.vars.indexOf(x),1);save();renderVars()}};r.append(n,cp,dl);v.append(r)})}
+function renderVars(){
+ const v=$('#vars');v.replaceChildren();
+ if(!D.vars.length){v.append(E('div','dim','No saved variants yet.'));return}
+ D.vars.forEach(x=>{
+  const r=E('div','v'),n=E('span','',x.n);n.title=x.t;
+  n.onclick=()=>{const s=JSON.parse(JSON.stringify(x.st));D.sel=s.sel;D.csel=s.csel||{};D.loc=s.loc;D.cg=s.cg;D.ex=s.ex;D.fmt=s.fmt;$('#ex').value=D.ex;syncActChar();manual=false;save();syncFmt();draw()};
+  const cp=E('span','mini','Copy');cp.onclick=()=>copy(x.t);
+  const dl=E('span','mini','×');dl.onclick=()=>{if(confirm('Delete variant '+x.n+'?')){D.vars.splice(D.vars.indexOf(x),1);save();renderVars()}};
+  r.append(n,cp,dl);v.append(r);
+ });
+}
 $('#bvar').onclick=()=>{const t=$('#out').value.trim();if(!t)return;ask('Save variant','Variant name','Variant '+(D.vars.length+1),n=>{D.vars.unshift({id:uid(),n,t,ts:Date.now(),st:snapState()});save();renderVars()})};
+
 /* ---- przyciski ---- */
-function copy(t){const done=()=>{const b=$('#bcopy');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',1200)};
+function copy(t){
+ const done=()=>{const b=$('#bcopy');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',1200)};
  const fb=()=>{const a=E('textarea');a.value=t;a.style.cssText='position:fixed;left:-999px';document.body.append(a);a.select();try{document.execCommand('copy');done()}catch(e){}a.remove()};
- if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb()}
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();
+}
 $('#bcopy').onclick=()=>copy($('#out').value);
 const dlf=(name,type,txt)=>{const a=E('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)};
 $('#bsave').onclick=()=>dlf('prompt.txt','text/plain',$('#out').value);
@@ -257,7 +860,7 @@ $('#out').oninput=()=>{manual=true;renderOut()};
 $('#ex').oninput=e=>{D.ex=e.target.value;manual=false;save();renderOut()};
 $('#bexp').onclick=()=>dlf('promptmaker-backup.json','application/json',JSON.stringify(D));
 $('#bimp').onclick=()=>$('#fimp').click();
-$('#fimp').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.cats)throw 0;if(confirm('Replace all current data with the backup?')){D=o;if(!D.csel)D.csel={};save();location.reload()}}catch(x){alert('This is not a Prompt Maker backup file.')}});e.target.value=''};
+$('#fimp').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.cats)throw 0;if(confirm('Replace all current data with the backup?')){D=o;if(!D.csel)D.csel={};if(!D.upresets)D.upresets=[];save();location.reload()}}catch(x){alert('This is not a Prompt Maker backup file.')}});e.target.value=''};
 $('#ex').value=D.ex||'';syncFmt();draw();
 </script>
 </body>
